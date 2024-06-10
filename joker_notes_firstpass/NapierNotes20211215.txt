@@ -1,0 +1,45 @@
+Napier: 12/15/2021
+
+- Goals: fast context switches
+ 
+- Experiment: Joey C, Mender
+
+- Recording Start Time: 9:00 am
+- Recording Stop Time:  10:00 am
+
+- xPC Model: Rig_main_Cortical_CerToNNP
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,0,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 70/120
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 14
+	* Visualization Style: All
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true);
+		SBP KF correlation = 0.71612
+		SBP KF lag = 2 (0 lag used)
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',3,3,false,[2 4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[],[]},true);
+	
+-Runs:
+	Run 1: calibration
+	Run 2: TS34 training. 400 trials. BR~3.9.
+	Run 3: KF0 - 250 trials. BR~1.7-2.0.
+	Run 4: RF0 - 200 trials. BR~2.2
+	Run 5: RF0 - switching 0/50 lag every 20 trials for first 120, then 0/100 lag every 20. BR~1.8
+	Run 6: RF0 - switching noise on/off every 20(ish) trials. (noise every 32, std=0.01, decay=0.9975)
+	Run 7: RF0 - switching bias 0/0.0001 every 20 trials, start at trial 60. Had some trouble around 65 for a sec
+	
+	
+-Notes:
+	good_chans_SBP = [1,3:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	Slowish training and a decent KF

@@ -1,0 +1,72 @@
+Napier: 6/19/2023
+
+- Goals: KalmanNet encoder model testing and RNN comparison
+ 
+- Experimenters: Luis, Maddi
+
+- Recording Start Time: 10:00 am
+- Recording Stop Time:   am
+
+- xPC Model: Rig_main_Cortical_Parasite_v2
+- Recorded Array: Motor (Patient cable/cerebus)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPass
+- Drink: Apple Juice
+
+- Params:
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 37, 29
+	* Visualization Style: MRS
+	* Manipulandum: old
+	
+-Decoders:
+	- RNN0: trained on run 2, using good chans.
+		Test Correlation:[0.856848959321521, 0.8179763851772935, 0.6551685339562028, 0.6875055448573081]
+	- KNet0: trained on run 2, hyperparameters from 06/15
+		Best corr: 0.743 at iteration 150
+		[0.76944748 0.78104518 0.70506456 0.71521799]
+	- RNN1: trained on run 2, using all chans.
+		Test Correlation:[0.8468050882488214, 0.8226069322132444, 0.6528291749638593, 0.7060918919009803]
+	
+
+-Runs:	
+	Run 1: Calibration
+	Run 2: 500 TS37. Bitrate ~2.9.
+	Run 3: 500 TS29. Bitrate ~3.8-4.5
+	
+	-- 5 min break
+	-- RNN0
+	Run 4: 70 TS29. Can't do most trials: very low Bitrate and success rate. 0.45 bitrate
+	-- KNet0
+	Run 5: 222 TS29, beta=0.98. Fingers biased towards flexion, especially the MRS. Seems to struggle to do any trials at all. After a while, it got unbiased on its own, and Napier could do trials. Bitrate 1.5. Crashed at 222 trials. 
+	-- RNN0
+	Run 6: 50 TS29. Has trouble doing most trials.
+	-- KNet0
+	Run 7: 310 TS29. Bitrate ~2. Seems to struggle more with stopping, but generally moves faster. 
+	
+	-- RNN1
+	Run 8: 50 TS29. It is definitely better peformance than on run 6, but still not great.
+	
+	-- KNet0
+	Run 9: 50 TS29. Couldn't do any trials. completely biased towards flexion.
+
+Summary:
+
+TODO:
+	- 
+
+Notes:
+	artifact on channels 77.
+	
+	chans with >1 Hz
+	good_chans_SBP = [5,7,8,12,15,25,33,35,65,67,68,69,71,72,73,74,75,78,79,81,82,83,84,91,94]
+
+	Signals don't look very good today.
+	
+
+
+

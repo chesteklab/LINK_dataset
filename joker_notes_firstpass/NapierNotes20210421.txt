@@ -1,0 +1,180 @@
+Napier: 4/21/2021
+
+- Goals: Find a good training time for the network
+
+- Experiment: Hisham, Joey, Matt
+
+- Recording Start Time: 10:55 am
+- Recording Stop Time:   pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRS
+	
+-Decoders:
+Epoch 3, Iteration 1200, loss = 0.0163
+Checking accuracy on validation set
+Mean Correlation is 0.613171
+Mean SNR is 4.10051.
+Total number of peaks is 149.
+Average control peaks is 0.238271.
+Average signal peaks is 0.0586376.
+Ratio of control to true signal is 4.06344.
+Feature number 0.
+Median of feature is -0.00275493.
+Ratio of control to true signal is 2.38929.
+Correlation is 0.524319
+Feature number 1.
+Median of feature is 0.0561081.
+Ratio of control to true signal is 5.79068.
+Correlation is 0.702022
+
+Epoch 5, Iteration 1600, loss = 0.0103
+Checking accuracy on validation set
+Mean Correlation is 0.625351
+Mean SNR is 3.84722.
+Total number of peaks is 157.
+Average control peaks is 0.188469.
+Average signal peaks is 0.0586376.
+Ratio of control to true signal is 3.21412.
+Feature number 0.
+Median of feature is 0.000436028.
+Ratio of control to true signal is 2.22831.
+Correlation is 0.538734
+Feature number 1.
+Median of feature is 0.0410119.
+Ratio of control to true signal is 4.2312.
+Correlation is 0.711968
+
+Epoch 6, Iteration 2000, loss = 0.0067
+Checking accuracy on validation set
+Mean Correlation is 0.605769
+Mean SNR is 2.94143.
+Total number of peaks is 230.
+Average control peaks is 0.146314.
+Average signal peaks is 0.0586376.
+Ratio of control to true signal is 2.49522.
+Feature number 0.
+Median of feature is 0.00309851.
+Ratio of control to true signal is 2.13757.
+Correlation is 0.537472
+Feature number 1.
+Median of feature is 0.0191039.
+Ratio of control to true signal is 2.86421.
+Correlation is 0.674065
+
+Epoch 7, Iteration 2400, loss = 0.0052
+Checking accuracy on validation set
+Mean Correlation is 0.607592
+Mean SNR is 2.84662.
+Total number of peaks is 223.
+Average control peaks is 0.145391.
+Average signal peaks is 0.0586376.
+Ratio of control to true signal is 2.47949.
+Feature number 0.
+Median of feature is -0.0013294.
+Ratio of control to true signal is 2.21636.
+Correlation is 0.52779
+Feature number 1.
+Median of feature is 0.0186236.
+Ratio of control to true signal is 2.75097.
+Correlation is 0.687395
+
+Epoch 8, Iteration 2800, loss = 0.0034
+Checking accuracy on validation set
+Mean Correlation is 0.611489
+Mean SNR is 2.91647.
+Total number of peaks is 189.
+Average control peaks is 0.134811.
+Average signal peaks is 0.0586376.
+Ratio of control to true signal is 2.29905.
+Feature number 0.
+Median of feature is 0.0153723.
+Ratio of control to true signal is 2.33501.
+Correlation is 0.535015
+Feature number 1.
+Median of feature is 0.0116746.
+Ratio of control to true signal is 2.26196.
+Correlation is 0.687963
+
+Epoch 10, Iteration 3200, loss = 0.0023
+Checking accuracy on validation set
+Mean Correlation is 0.614257
+Mean SNR is 2.849.
+Total number of peaks is 211.
+Average control peaks is 0.126423.
+Average signal peaks is 0.0586376.
+Ratio of control to true signal is 2.15601.
+Feature number 0.
+Median of feature is 0.00189768.
+Ratio of control to true signal is 1.91553.
+Correlation is 0.538383
+Feature number 1.
+Median of feature is 0.0165443.
+Ratio of control to true signal is 2.40411.
+Correlation is 0.690131
+
+Epoch 2, Iteration 800, loss = 0.0223
+Checking accuracy on validation set
+Mean Correlation is 0.513444
+Mean SNR is 5.01033.
+Total number of peaks is 46.
+Average control peaks is 0.324761.
+Average signal peaks is 0.0586376.
+Ratio of control to true signal is 5.53845.
+Feature number 0.
+Median of feature is -0.0274016.
+Ratio of control to true signal is 3.4913.
+Correlation is 0.415139
+Feature number 1.
+Median of feature is 0.0861224.
+Ratio of control to true signal is 7.65051.
+Correlation is 0.611749
+
+Epoch 11, Iteration 3600, loss = 0.0018
+Checking accuracy on validation set
+Mean Correlation is 0.625138
+Mean SNR is 2.93015.
+Total number of peaks is 189.
+Average control peaks is 0.123567.
+Average signal peaks is 0.0586376.
+Ratio of control to true signal is 2.10731.
+Feature number 0.
+Median of feature is -0.000220111.
+Ratio of control to true signal is 1.90433.
+Correlation is 0.550288
+Feature number 1.
+Median of feature is 0.0177921.
+Ratio of control to true signal is 2.31672.
+Correlation is 0.699988
+-Runs:
+	Run 1: Calibration
+	Run 2: Warm-up ~100 trials, 5 min break
+	Run 3: TS 29 - Training, 420 trials
+	Run 4: TS29 - Validation, 100 trials, followed by break to train net
+	Run 5: NN - 1200 Iterations, Locked up MRS (no targets acquired for MRS)
+	Run 6: set offset to 0 didnt really help
+	Run 7: Forgot to load the decoder
+	Run 8: NN - 1600 Iterations, still couldn't move MRS effectively (no targets acquired for MRS)
+	Run 9: NN - 2000 Iterations  -switched to 500 ms hold time at trial 11, now able to move both fingers, not really able to acquire anything but getting better
+	Run 10: Decoder not loaded
+	Run 11: NN - 2400 Iterations - seems similar to 2000, can move but not really get to targets, MRS still struggles
+	Run 12: NN - 2800 Iterations - more volatile, seems to have more control, but very shaky/very fast.
+	Run 13: NN - 3200 Iterations - super fast super volatile, gonna try him again on this and just leave it for a second
+	Run 14: NN - 3200 Iterations - nope way too fast
+	Run 15: NN - 800 Iterations - seemed to work in small bursts, but then would go back to failing
+	Run 16: NN - 3200 Iterations
+	Run 17: NN - 3600 Iterations
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];

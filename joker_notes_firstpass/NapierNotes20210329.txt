@@ -1,0 +1,128 @@
+Napier: 3/29/2021
+
+- Goals: Sparse NN (95%), Testing new simulink_connect code
+
+- Experiment: Joey, Hisham, Sam
+
+- Recording start: 11:05am
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000 (repeat target on failure)
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders: 
+Sparse Network:
+Epoch 11, Iteration 3500, loss = 0.9423
+Checking accuracy on validation set
+Mean Correlation is 0.718867
+Mean SNR is 2.87442.
+Total number of peaks is 156.
+Average control peaks is 1.80377.
+Average signal peaks is 0.0516776.
+Ratio of control to true signal is 34.9042.
+Feature number 0.
+Median of feature is -0.0604519.
+Ratio of control to true signal is 40.0607.
+Correlation is 0.696808
+Feature number 1.
+Median of feature is 0.228799.
+Ratio of control to true signal is 31.2986.
+Correlation is 0.740926
+
+sparsePctiles = [  60,   70,   80,   90,   95,   95]
+sparseIters =   [2500, 2700, 2900, 3100, 3300, 99999]
+
+
+Normal:
+Epoch 11, Iteration 3500, loss = 0.9354
+Checking accuracy on validation set
+Mean Correlation is 0.734002
+Mean SNR is 2.60028.
+Total number of peaks is 239.
+Average control peaks is 1.63247.
+Average signal peaks is 0.0516776.
+Ratio of control to true signal is 31.5896.
+Feature number 0.
+Median of feature is -0.126122.
+Ratio of control to true signal is 37.2792.
+Correlation is 0.709771
+Feature number 1.
+Median of feature is 0.18527.
+Ratio of control to true signal is 27.6111.
+Correlation is 0.758232
+
+Retraining:
+Sparse:
+Epoch 11, Iteration 3500, loss = 0.9289
+Checking accuracy on validation set
+Mean Correlation is 0.69877
+Mean SNR is 2.48639.
+Total number of peaks is 257.
+Average control peaks is 1.55697.
+Average signal peaks is 0.0451924.
+Ratio of control to true signal is 34.4521.
+Feature number 0.
+Median of feature is -0.0747363.
+Ratio of control to true signal is 39.0399.
+Correlation is 0.663374
+Feature number 1.
+Median of feature is -0.0135181.
+Ratio of control to true signal is 30.6706.
+Correlation is 0.734167
+
+Normal:
+Epoch 11, Iteration 3500, loss = 0.9297
+Checking accuracy on validation set
+Mean Correlation is 0.714321
+Mean SNR is 2.6923.
+Total number of peaks is 206.
+Average control peaks is 1.59122.
+Average signal peaks is 0.0451924.
+Ratio of control to true signal is 35.21.
+Feature number 0.
+Median of feature is 0.0252642.
+Ratio of control to true signal is 38.8156.
+Correlation is 0.684888
+Feature number 1.
+Median of feature is 0.129233.
+Ratio of control to true signal is 32.2382.
+Correlation is 0.743754
+
+-Runs:
+	Run 1: Calibration
+	Run 2: Warm-up: 150 
+	Run 3: Training: 400 
+	Run 4: Validation: 100 - Followed by a break for network training
+	Run 5: model crash
+	Run 6: sparse network - worked for ~100 trials then having trouble
+	Run 7: model crash
+	Run 8: normal network - MRP stuck at flex
+	Run 9: crash
+	... crashes, messing with biasing
+	Run 16: normal network - working slightly when significantly reduced the MRP bias
+	Run 17: TS-34 training - 400 trials
+	Run 18: validation set - 100 trials
+	Run 19: crash
+	Run 20: normal network - working now. 200 trials. BR=1.6. **biasing/scaling was using the sparse values
+	Run 21: crash
+	Run 22: sparse network. 200 trials. BR=1.6-1.7
+	Run 23: crash
+	Run 24: normal network. 200 trials. BR=1.6-1.8 (correct biasing/scaling, different from run 20). Idx sometimes stuck at extend
+
+	
+-Notes:
+	No EMG - was seeing 60hz noise even with grounding, but no noise on neural
+
+	**Simulink_Connect_NHP_V2 works, but on the very first decode it causes the xpc to crash (but python keeps running). 
+	Likely something needs to be loaded faster on the firs time. (This doesn't happen with the v1 code)

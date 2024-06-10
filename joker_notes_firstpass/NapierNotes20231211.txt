@@ -1,0 +1,47 @@
+Napier: 12/11/2023
+
+- Goals: 
+ 
+- Experimenters: Olivia, Luis
+
+- Recording Start Time: 10:00 am
+- Recording Stop Time:   pm
+
+- xPC Model: Rig_main_Cortical_Parasite_v2
+- Recorded Array: Motor (Patient cable/cerebus) + EMG (CPD)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPass
+- Drink: Apple Juice
+
+- Params:
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 5000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34/29
+	* Visualization Style: ALL
+	* Manipulandum: old
+	
+-Decoders:
+
+
+-Runs:	
+	Run 1: Calibration
+	Run 2: 800 trials, TS34. Bitrate ~4.2.
+	-- 2 min break
+	Run 3: 800 trials, TS29. Bitrate ~4.2. He's not willing to do the MRS extension targets many times. Bitrate down to 3.8 at the end.
+	-- 5 min break
+	Run 4: TS27. He isn't really trying anymore. 
+	
+Summary:
+
+
+TODO:
+
+Notes:	
+
+	
+
+
+

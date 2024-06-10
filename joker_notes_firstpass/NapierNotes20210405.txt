@@ -1,0 +1,96 @@
+Napier: 4/5/2021
+
+- Goals: Sparse NN, nonlinear velocity scaling
+
+- Experiment: Joey, Mender
+
+- Recording start: 11:00am
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous ***actually NO RAW***
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000 (repeat target on failure)
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRS
+	
+-Decoders: 
+
+** 30ms bins **
+
+Sparse:
+sparsePctiles = [  60,   70,   80,   90,   95,   97,  97]
+sparseIters =   [1800, 2000, 2200, 2400, 2600, 2800, 99999] (99% dropped correlation by ~0.05)
+
+Epoch 10, Iteration 3300, loss = 0.9511
+Checking accuracy on validation set
+Mean Correlation is 0.647987
+Mean SNR is 2.85365.
+Total number of peaks is 371.
+Average control peaks is 1.53801.
+Average signal peaks is 0.0325297.
+Ratio of control to true signal is 47.28.
+Feature number 0.
+Median of feature is -0.00501375.
+Ratio of control to true signal is 35.9542.
+Correlation is 0.592812
+Feature number 1.
+Median of feature is -0.220901.
+Ratio of control to true signal is 59.511.
+Correlation is 0.703161
+
+Normal:
+Epoch 11, Iteration 3500, loss = 0.0396
+Checking accuracy on validation set
+Mean Correlation is 0.586837
+Mean SNR is nan.
+Total number of peaks is 387.
+Average control peaks is nan.
+Average signal peaks is 0.0325297.
+Ratio of control to true signal is nan. *********************** not sure why nan
+Feature number 0.
+Median of feature is 0.00992958.
+Ratio of control to true signal is nan.
+Correlation is 0.482124 *************************this is a lot lower than the sparse nn
+Feature number 1.
+Median of feature is 0.030796.
+Ratio of control to true signal is 12.4122.
+Correlation is 0.69155
+
+-Runs:
+	Run 1: Calibration
+	Run 2: Warm-up: 350 
+	Run 3: TS-29 random training: 400 trials. BR~3.4
+	Run 4: test set - 100 trials 
+
+	Run 5: normal network - not great but ok. somewhat slugglish.
+	Run 6: 97% sparse - much better than normal nn. somewhat slow (xpcBinsize=50 - maybe this is wrong?) BR=1.5
+	Run 7: 97% sparse - xpcbinsize=30. crashed since xpcbinsize!=parasitebinsize --> need to debug. 30ms bins set in the matlab training code
+	Run 8: 97% sparse - gain doubled. *gain only doubled on idx finger*. BR=1.7
+	Run 9: 97% sparse - gain doubled (both fings). way more responsive now but harder to stop. BR=1.85
+	Run 10: 97% sparse, nonlinear vel scaling on the output: v>0.1 doubled, v<0.1 cut in half. Is somewhat sticky, like in ridges
+	Run 11: same as Run10, but v>0.1 * 2, v<0.1 * 0.75. Still not ideal. BR=1.55
+	Run 12: 97% sparse, v = 0.2(v/0.2)^3. Cubic is too much - couldn't move it
+	Run 13: (same) v = 0.2(v/0.2)^2 quadratic is better but still too much
+	Run 14: (same) v = 0.1(v/0.1)^2
+	Run 15: (same) v = 0.05(v/0.05)^2. able to stop really well, but still somewhat slow. BR=1.55
+	Run 16: (same) v = 0.02(v/0.02)^2. very fast and able to stop, but hard to fine tune. BR=1.8
+	Run 17: (same) v = 0.04(v/0.04)^2. little bit slower than 0.02. BR=1.8
+	Run 18: (same) v = 0.04(v/0.04)^2.5. fast, somewhat hard to finetune. BR=1.8
+	Run 19: (same) v = 0.04(v/0.04)^2.5. generally very good. somewhat hard to finetune. BR=1.7-2.1
+	
+	-> need a function that has slightly higher small velocities, but still large vels
+	seems like adding slight position decode could help to stabilize since tends to overshoot a bit with the huge vels
+
+	
+-Notes:
+	Seems like the normal network didn't train well - correlation was nan for IDX. 
+
+

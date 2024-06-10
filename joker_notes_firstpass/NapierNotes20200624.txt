@@ -1,0 +1,37 @@
+Napier: 06/24/2020
+
+- Goals: Get Napier to practice the task, do a spring task if going well.
+
+- Experiment: Matt M and Paras
+
+- Recording Start Time: 9:30am
+- Recording Stop Time:  
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous, 97-102 Raw
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 34, 29
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',4,false,[2,4],32,0,goodChans,goodChans,1,{'act_thresh',1},true);
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 34 - 300 trials, he took a break around 260. MRP seems very sticky.
+	Run 3: TS 34 - 65 trials - went back to clean the stanchion
+	Run 4: TS 34 - Looking much better now that MRP slot is clean. 600 trials
+	Run 5: TS 34 - Springs on both fingers. Paused around trial 440, i think index finger is tired. Restarted at about 455.
+	Run 6: TS 34 - No springs. He didn't do trials to start, went back and helped him through some trials. 
+
+-Notes:
+	goodChans = [1,3:5,7,8,11,15,17,33,35,37,38,40,43,49:51,53,56:59,62,65,67:69,71:76,78:88,90:92];

@@ -1,0 +1,66 @@
+Napier: 08/08/2022
+
+- Goals: Error Correction Parasite Test (2D) - New Detector Training Correction Test 14 (Debugging CAR and good_chans)
+ 
+- Experiment: Dylan, Mender 
+
+- Recording Start Time: 9:35 am
+- Recording Stop Time:  11:45 pm
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [2, 2] - 0 lag picked) - 0.788 CC
+
+	
+-Runs:
+	-- CAR OFF --
+	Run 1: Calibration and warm-up (~200 trials)
+	Run 2: Training TS34 - 500 trials, good performance (4.42 bps), 99% SR;
+	Run 3: KF0 (0 lag) 500 ms hold time - online by trial 10; good performance for Napier (2.20 bps), ~530 trials, 99% SR;
+		try_data: T = 4: 29 - 52% TPR for 5% FPR
+	
+	Run 4: Test run, looking pretty good already, going to save to terminal
+
+	-- Good chans, no CAR, no delay --
+	Run 5: Error detection run 1 (correction OFF) - online by trial 10; ~160 trials, good performance for Napier (2.41 bps), 100% SR; Finger 1: 12.61% TPR, 2.59% FPR; Finger 2: 11.03% TPR, 2.51% FPR
+
+	-- Going to try proper correction comparison --
+	Run 6: Error detection run 2 (correction OFF) - online by trial 10; ~455 trials, good performance for Napier (2.31 bps), 99% SR; Finger 1: 16.87% TPR, 3.04% FPR; Finger 2: 11.45% TPR, 2.86% FPR
+	Run 7: Error detection run 3 (correction ON, T-2T) - online by trial 10; ~455 trials, good performance for Napier (2.14 bps), 100% SR; Finger 1: 12.21% TPR, 4.26% FPR; Finger 2: 8.63% TPR, 3.45% FPR
+	Run 8: Error detection run 4 (correction OFF) - online by trial 10; ~455 trials, good performance for Napier (2.07 bps), 100% SR; Finger 1: 14.75% TPR, 4.23% FPR; Finger 2: 9.16% TPR, 2.77% FPR
+	Run 9: Error detection run 5 (correction ON, T-2T) - online by trial 10; ~465 trials, good performance for Napier (2.18 bps), 100% SR; Finger 1: 16.51% TPR, 5.45% FPR; Finger 2: 7.41% TPR, 2.44% FPR
+
+
+	Run 10: Test run, forgot to turn on decode
+
+	-- Debugging target and neural mismatch -- 
+
+	Run 11: Error detection run 6 (correction OFF) - online by trial 10; ~140 trials, good performance for Napier (1.89 bps), 100% SR; Finger 1: 18.16% TPR, 7.55% FPR; Finger 2: 9.69% TPR, 2.19% FPR
+	
+	
+-Notes:
+	good_chans_SBP = [1:3,5:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,72:76,78,80:88,90:92,96];
+
+	CAR: [1,1,1,0,1,1,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1,1,0,1,0,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,0,0,1,1,0,0,0,1] (Not Used)
+	
+	
+	
+	
+	
+	
+	
+	

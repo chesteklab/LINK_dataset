@@ -1,0 +1,35 @@
+Napier: 10/19/2020
+
+- Goals: Wrist angle offline data
+
+- Experiment: Mender, Dylan, Joey
+
+- Recording Start Time: 11:00 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders: 
+
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 34 564 trials
+	Run 3: TS 34 567 trials - I entered the rig and stopped the run at the end
+	Run 4: TS 34 - wrist flexed - 1250 trials
+	Run 5: TS 34 - normal hand control until out of juice. About 967 trials.
+	
+-Notes:

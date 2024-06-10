@@ -1,0 +1,43 @@
+Napier: 05/26/2022
+
+- Goals: Offline 2D Context - Random Targets
+ 
+- Experiment: Hisham, Mender
+
+- Recording Start Time: 10:25 am
+- Recording Stop Time:  11:30 am
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:
+	
+	
+-Runs:
+	Run 1: Calibration + 130 trials TS29 warmup + 5 min break
+	Run 2: TS29 - Normal 600 Trials
+	Run 3: TS29 - Spring 600 Trials
+	Run 4: TS29 - SprWrt 600 Trials *note: took a little bit longer to setup than normal->spring
+	Run 5: TS29 - Wrist  185 Trials. Around 130 took a break. stopped at 180
+	Run 6: TS29 - 25 trials. stopped to go recalibrate
+	Run 7: Calibration
+	Run 8: TS29 Wrist 300 Trials. Around 130 adjust MRP range slightly. Trouble with MRP extension
+	Run 9: TS29 Wrist 120 Trials. Adjusted MRP range again.
+-Notes:
+	- some noise debugging
+	- small breaks between each run. (For setting up contexts and trying to mitigate fatigue)
+	- add normal at the end
+	- may have been getting tired with the wrist trials.
+	

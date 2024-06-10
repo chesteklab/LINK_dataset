@@ -1,0 +1,142 @@
+Napier: 01/26/2022
+
+- Goals: Test 5 identically-trained networks
+ 
+- Experiment: Hisham, Matt Mender
+
+- Recording Start Time: 8:20 am
+- Recording Stop Time:  11:30 am
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR_noise
+- Recorded Array: Motor (Patient Cable) + Sensory (CPE)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:
+TestNN0:
+Epoch 11, Iteration 3500, loss = 0.9064
+Checking accuracy on validation set
+Mean Correlation is 0.572826
+Mean SNR is 2.68623.
+Total number of peaks is 327.
+Average control peaks is 1.41307.
+Average signal peaks is 0.0657124.
+Ratio of control to true signal is 21.5039.
+Feature number 0.
+Median of feature is 0.176378.
+Ratio of control to true signal is 21.328.
+Correlation is 0.56985
+Feature number 1.
+Median of feature is -0.115293.
+Ratio of control to true signal is 21.7416.
+Correlation is 0.575802
+Finger 0 RR Calculated Gain, Offset: 0.037198, -0.003204
+Finger 1 RR Calculated Gain, Offset: 0.033279, 0.005008
+
+TestNN1:
+Epoch 11, Iteration 3500, loss = 0.9014
+Checking accuracy on validation set
+Mean Correlation is 0.584975
+Mean SNR is 2.39166.
+Total number of peaks is 463.
+Average control peaks is 1.15667.
+Average signal peaks is 0.0657124.
+Ratio of control to true signal is 17.602.
+Feature number 0.
+Median of feature is -0.00184918.
+Ratio of control to true signal is 15.478.
+Correlation is 0.603373
+Feature number 1.
+Median of feature is -0.0987355.
+Ratio of control to true signal is 20.4743.
+Correlation is 0.566576
+Finger 0 RR Calculated Gain, Offset: 0.043536, -0.002989
+Finger 1 RR Calculated Gain, Offset: 0.034139, 0.002716
+
+TestNN2:
+Epoch 11, Iteration 3500, loss = 0.9060
+Checking accuracy on validation set
+Mean Correlation is 0.575163
+Mean SNR is 2.49585.
+Total number of peaks is 353.
+Average control peaks is 1.45457.
+Average signal peaks is 0.0657124.
+Ratio of control to true signal is 22.1354.
+Feature number 0.
+Median of feature is 0.0716831.
+Ratio of control to true signal is 19.489.
+Correlation is 0.586884
+Feature number 1.
+Median of feature is 0.138248.
+Ratio of control to true signal is 25.7141.
+Correlation is 0.563442
+Finger 0 RR Calculated Gain, Offset: 0.035966, -0.000677
+Finger 1 RR Calculated Gain, Offset: 0.027617, -0.002307
+
+TestNN3:
+Epoch 11, Iteration 3500, loss = 0.9135
+Checking accuracy on validation set
+Mean Correlation is 0.572603
+Mean SNR is 2.53257.
+Total number of peaks is 357.
+Average control peaks is 1.46712.
+Average signal peaks is 0.0657124.
+Ratio of control to true signal is 22.3264.
+Feature number 0.
+Median of feature is 0.0177861.
+Ratio of control to true signal is 21.4401.
+Correlation is 0.582766
+Feature number 1.
+Median of feature is 0.0980053.
+Ratio of control to true signal is 23.5248.
+Correlation is 0.562439
+Finger 0 RR Calculated Gain, Offset: 0.035221, -0.000288
+Finger 1 RR Calculated Gain, Offset: 0.028700, -0.001128
+
+TestNN4:
+Epoch 11, Iteration 3500, loss = 0.9029
+Checking accuracy on validation set
+Mean Correlation is 0.576883
+Mean SNR is 2.3134.
+Total number of peaks is 478.
+Average control peaks is 1.21799.
+Average signal peaks is 0.0657124.
+Ratio of control to true signal is 18.5352.
+Feature number 0.
+Median of feature is 0.0228003.
+Ratio of control to true signal is 18.0343.
+Correlation is 0.587491
+Feature number 1.
+Median of feature is 0.0575869.
+Ratio of control to true signal is 19.2126.
+Correlation is 0.566275
+Finger 0 RR Calculated Gain, Offset: 0.039271, -0.001751
+Finger 1 RR Calculated Gain, Offset: 0.031717, -0.000564
+
+-Runs:
+	Run 1: Calibration & Warmup TS29, ~150 Trials, followed by 5 min break
+	Run 2: Training TS29, 400 Trials
+	Run 3: Validatoin TS29, 100 Trials
+	~training break~
+	
+	Run 4: TestNN0 TS29 - 100 Trials
+	Run 5: TestNN1 TS29 - 100 Trials
+	Run 6: TestNN2 TS29 - 100 Trials
+	Run 7: TestNN3 TS29 - 100 Trials
+	Run 8: TestNN4 TS29 - 100 Trials (ended up going a little longer to 140)
+-Notes:
+	Have definitely run this experiment before, but more formalized this time
+	Train each network to 3500 iters
+	*Trained two networks before the network now titled NN0, did not change network name in training code so they kept getting overwritten
+
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];

@@ -1,0 +1,81 @@
+Napier: 10/10/2022
+
+- Goals: Error Correction Parasite Test (2D) - Error Detection Week Day 10
+ 
+- Experiment: Dylan, Hisham
+- Recording Start Time: 9:45 am
+- Recording Stop Time: 12:40 pm 
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 60
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [1, 1] - 0 lag picked) - 0.801 CC
+	
+
+-Runs:
+
+	-- CAR OFF --
+	Run 1: Calibration and warm-up (~300 trials)
+	-- CAR ON --
+	Run 2: Training TS34 - 500 trials, great performance (4.69 bps), 99% SR;
+
+	
+	Run 3: KF0 (0 lag) 500 ms hold time - online by trial 10; great performance for Napier (2.56 bps), 1050 trials, 100% SR;
+		try_data_Z: T = 4: 41.40% Finger 1 EXT, 33.57% Finger 1 FLEX, 31.92% Finger 2 EXT, 28.02% Finger 2 FLEX TPR for 4-5% FPR
+		try_data_Err: T = 4: 37.11% Finger 1 EXT, 21.13% Finger 1 FLEX, 25.77% Finger 2 EXT, 13.39% Finger 2 FLEX TPR for 4-5% FPR
+		
+	Run 4: Error detection attempt, CPU overload at trial 193
+	
+	Run 5: Error detection attempt, CPU overload at trial 311; set threshold very high, so no TCFR past this point
+	
+	-- try_data_Z, no delay, detection --
+	Run 6: Error detection run 1 (correction OFF) - online by trial 20; ~490 trials, good performance for Napier (2.70 bps), 100% SR; Finger 1 Ext: 8.97% TPR, 2.14% FPR; Finger 1 Flex: 11.84% TPR, 5.42% FPR; Finger 2 Ext: 15.18% TPR, 2.79% FPR; Finger 2 Flex: 7.90% TPR, 4.07% FPR; extension bias making full flexion trials harder
+	
+	-- try_data_Z, no delay, correction --
+	Run 7: Error detection run 2 (correction ON, T-2T) - online by trial 10; ~415 trials, fair performance for Napier (2.07 bps), ?% SR; Finger 1 Ext: 6.37% TPR, 1.95% FPR; Finger 1 Flex: 7.31% TPR, 4.45% FPR; Finger 2 Ext: 11.56% TPR, 3.82% FPR; Finger 2 Flex: 4.33% TPR, 2.25% FPR; extension bias even stronger now
+	
+	-- try_data_Err, no delay, detection --
+	Run 8: Error detection run 3 (correction OFF) - online by trial 10; ~185 trials, slow performance for Napier (0.93 bps), 82% SR; Finger 1 Ext: 27.22% TPR, 12.94% FPR; Finger 1 Flex: 19.37% TPR, 17.56% FPR; Finger 2 Ext: 33.76% TPR, 19.34% FPR; Finger 2 Flex: 27.14% TPR, 21.61% FPR; bias seems to be affecting performance
+	
+	Run 9: xPC crashed at trial 35, bias getting worse
+	
+	-- try_data_Err, no delay, correction --
+	Run 10: Error detection run 4 (correction ON, T-2T) - online by trial 10; ~140 trials, slow performance for Napier (0.84 bps), 79% SR; Finger 1 Ext: 29.64% TPR, 10.14% FPR; Finger 1 Flex: 8.76% TPR, 23.58% FPR; Finger 2 Ext: 40.19% TPR, 29.13% FPR; Finger 2 Flex: 27.42% TPR, 19.77% FPR; split bias now, MRP ext and index flex
+	
+	Run 11: Attempt with bias correction, xPC crashed at trial 123
+	Run 12: Test run
+	
+	-- try_data_Err, no delay, detection, bias correction --
+	Run 13: Error detection run 5 (correction OFF) - online by trial 10; ~435 trials, good performance for Napier (2.23 bps), 98 SR; Finger 1 Ext: 8.45% TPR, 0.43% FPR; Finger 1 Flex: 22.95% TPR, 19.09% FPR; Finger 2 Ext: 45.25% TPR, 21.74% FPR; Finger 2 Flex: 23.81% TPR, 10.31% FPR; seeded bias at -0.0002 & 0.00015
+	
+	-- try_data_Err, no delay, correction, bias correction --
+	Run 14: Error detection run 6 (correction ON, T-2T) - online by trial 10; ~ trials,  performance for Napier ( bps), % SR; Finger 1 Ext: % TPR, % FPR; Finger 1 Flex: % TPR, % FPR; Finger 2 Ext: % TPR, % FPR; Finger 2 Flex: % TPR, % FPR; seeded bias at -0.0002 & 0.00015; xPC crashed at trial 243, so no DebugResults, but no time for antoher run
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,22:25,33:40,43,45:47,50:53,55:60,62,64,65,67:76,78,81:87,90:93,95,96];
+
+	CAR: [1,1,1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,1,0,1,1,1,0,0,1,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,0,0,1,1,1,1,1,1,1,0,0,1,1,1,1,0,1,1]
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

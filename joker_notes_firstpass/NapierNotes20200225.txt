@@ -1,0 +1,58 @@
+Napier: 2/25/2020
+
+- Goals: Neural Network stuff
+
+- Experiment: Willsey, Ensel
+
+- Recording Start Time: 9:30am
+- Recording Stop Time:  
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous, 97-102 Raw
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 34
+	* Visualization Style: MRP
+	
+-Decoders: 
+	First set of good_chans from today
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','2020-02-25', 2, false, [2, 4], 50, 0, good_chans_TCFR, good_chans_SBP, 1, {'act_thresh',1}, true);
+
+	RF0: should be same thing as RF1, I retrained because I wasnt sure I had the KF0 in the workspace to train properly
+
+	RF1: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','2020-02-25',3,7,0,[2,4],50,xpcBinLag,xpcA,xpcW,good_chans_TCFR,good_chans_SBP, 1, {[], []}, true);
+
+	
+	NN in NNDecode.py used was: FC4Lp05_CNN1L16N_BN
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS34
+	Run 3: KF0 TCFR avg bit rate is 1.579
+	Run 4: NN with TCFR 
+	Run 5: NN, started with 16 epoch one but gain is too low, trial 30 is _4300 NN
+	Run 6: Full trained NN with gain of 2.42
+	Run 7: KF0 to get some SBP trials for refit kalman
+	run 8: RF0 but it RF1 in folder, ran it twice to make sure I did it correct, gain was around 1.53
+	Run 9: Refit NN that was refit on run 4, around trail 120 he stopped for a while a fully extended and had trouble bringing it back to center. Extended at 206 again until 226
+	Run 10: Refit NN refit on run 6
+	Run 11-13: swapped in a bunch of weights and settings, system kept crashing and forching us to start new runs
+	Run 14: Back to weights refit on run 4 but used a gain of 0.05*0.5 instead of 0.05*0.3
+	Run 15: RF
+	
+	
+-Notes:	
+	these channels are used for TCFR
+	good_chans_TCFR = [1, 3, 4, 5, 7, 8, 11, 15, 23, 33, 34, 35, 37, 38, 40, 51, 53, 57, 58, 62, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 79, 80, 81, 82, 83, 84, 86, 90, 91, 92];
+
+	These channels are used for SBP
+	good_chans_SBP = [1:9, 11, 13, 15, 17, 23, 33, 35, 37, 38, 40, 43, 45:47, 49, 50:53, 55:59, 60, 62, 64, 65, 67:69, 71:76, 78:88, 90, 91, 92, 94, 96];
+	

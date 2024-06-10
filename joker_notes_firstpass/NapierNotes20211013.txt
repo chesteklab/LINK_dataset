@@ -1,0 +1,66 @@
+Napier: 10/13/2021
+
+- Goals: Hand control with variable noise (random walk)
+
+- Experiment: Joey, Sam
+
+- Recording Start Time: 9:00 am
+- Recording Stop Time:  
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR_noise
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+
+
+- Noise info:
+	- at every 1ms, an error of size +-errormag is added to handoffset with probability Perror
+	- at the end of every trial, handoffset = handoffset * 0.9
+
+-Runs:
+	Run 1: Calibration
+	Run 2: TS34 - Warm-Up - 100 trials
+	
+	Run 3: TS34 - Perror = 0.00, ErrorMag = 0.00. 200 trials. BR=5.1. A little trouble reaching the idx far extension
+	Run 4-5: error in code where msms shows noise but it's not taken into account for hitting target. Fixed it.
+	
+	Run 6: TS34 - Perror = 0.01, ErrorMag = 0.01. 140 trials. BR=3.8. Slight jitter but barely noticeable. had some trouble with mrp full flex, but might've been from noise.
+	Run 7: TS34 - Perror = 0.02, ErrorMag = 0.01.  70 trials. BR=    . A bit more jittery now. At trial 70 starting to have a hard time hitting some targets
+	Run 8: TS34 - Perror = 0.03, ErrorMag = 0.01.  75 trials. BR=1.9. somewhat hard. much higher frequency noise than we see with actual decoders. getting frustrated trial 60+
+	Run 9: TS34 - Perror = 0.005, ErrorMag = 0.05. errormag jumps are too high
+	Run 10: TS34 - Perror = 0.005, ErrorMag = 0.02. 75 trials. BR=. More realistic looking noise, somewhat large jumps a couple times a second (need to add decay)
+	Run 11: TS34 - Perror = 0.001, ErrorMag = 0.04. 75 trials. BR=. Jumps once or twice a second. targets starting to get out of range at 20 trials
+	Run 12: TS34 - normal. 100 trials. Br = 5.6
+	Run 13: TS34 - Perror = 0.003, ErrorMag = 0.04. 25 trials. BR=. offset getting too big after 20 trials.
+	Run 14: TS34 - Perror = 0.1, ErrorMag = 0.005. 75 trials. BR=. Like constant high frequency jitter. (Perror=0.2 was a little too much)
+	Run 15: TS34 - Perror = 0.4, ErrorMag = 0.0025. Very high frequency, barely noticeable, but drifting
+
+	
+	TODO:
+	 - cap noise offset around 0.1 (need to be able to hit targets still) or use smaller targ range
+	 - apply exponential decay every 1ms, instead of trial
+	 - would gaussian magnitude distribution be better instead of constant? or every step pick noise from gaussian
+	 - may want to only add noise every 30-50ms like decoders do
+	
+	
+-Notes:
+	
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	
+	
+	
+
+	

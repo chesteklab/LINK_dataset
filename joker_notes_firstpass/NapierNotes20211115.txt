@@ -1,0 +1,87 @@
+Napier: 11/12/2021
+
+- Goals: NN in different contexts?
+ 
+- Experiment: Mender, Eric
+
+- Recording Start Time: 9:45 am
+- Recording Stop Time:  11:15 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,0,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: All
+	
+-Decoders:
+	GenerateOnlineTrainingDataSBPV4('Joker', '2021-11-15', '005', '006', [], 50, [2,4], good_chans_SBP, 'tri', '')
+	GenerateOnlineTrainingDataSBPV4('Joker', '2021-11-15', '003', '003', [], 50, [2,4], good_chans_SBP, 'tri', '')
+
+Normal model (NN1)
+Epoch 11, Iteration 3500, loss = 0.9238
+Checking accuracy on validation set
+Mean Correlation is 0.549923
+Mean SNR is 2.56904.
+Total number of peaks is 376.
+Average control peaks is 1.668.
+Average signal peaks is 0.0564952.
+Ratio of control to true signal is 29.5246.
+Feature number 0.
+Median of feature is -0.0736516.
+Ratio of control to true signal is 24.8211.
+Correlation is 0.505708
+Feature number 1.
+Median of feature is -0.0680419.
+Ratio of control to true signal is 36.1649.
+Correlation is 0.594138
+Finger 0 RR Calculated Gain, Offset: 0.022531, 0.002422
+Finger 1 RR Calculated Gain, Offset: 0.019607, 0.001921
+	
+	
+	
+	
+Off context model (NN2)
+Epoch 11, Iteration 3500, loss = 0.9146
+Checking accuracy on validation set
+Mean Correlation is 0.620637
+Mean SNR is 2.48766.
+Total number of peaks is 474.
+Average control peaks is 1.42871.
+Average signal peaks is 0.0622051.
+Ratio of control to true signal is 22.9677.
+Feature number 0.
+Median of feature is 0.000296001.
+Ratio of control to true signal is 19.027.
+Correlation is 0.577189
+Feature number 1.
+Median of feature is 0.114576.
+Ratio of control to true signal is 27.3084.
+Correlation is 0.664086
+Finger 0 RR Calculated Gain, Offset: 0.029420, 0.000449
+Finger 1 RR Calculated Gain, Offset: 0.028549, -0.002441	
+	
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 34 - 350 trials
+	Run 3: TS 34 - wrist flexed and springs 2/4 - 350 trials	
+	Run 4: TS 34 - wrist flexed and springs 2/4 - 150 trials
+	Run 5: TS 34 - normal again - 350 trials
+	Run 6: TS 34 - normal - 150 trials
+
+	~Training Break~
+
+	Run 7: NN1 - TS 34 - index stuck extended and MRS stuck flexed. Tried updating gain/offset multiple ways and it didn't work well. 
+	Run 8: NN2 - TS 34 - also did not work. Somewhat useable using the peak finding gain/offsets, let him use it this way for a few minutes.
+	Run 9: NN1 - TS 34 - retried gain/offsets with peak finding method. Shaky control but was able to get some trials. MRS still biased towards flexion. Only ever got a handful of trials.
+
+	good_chans_SBP = [2 3 4 7 8 9 12 17 32 33 35 38 58 65 67 68 69 70 71 72 73 74 75 76 77 78 81 82 83 84 86 87 90 91];

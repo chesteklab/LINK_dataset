@@ -1,0 +1,49 @@
+Napier: 07/08/2020
+
+- Goals: Spring data set with Napier, hopefully online runs
+
+- Experiment: Matt M and Eric
+
+- Recording Start Time: 9:30am
+- Recording Stop Time:  
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 34
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2,4],32,0,goodChans,goodChans,1,{'act_thresh',1},true); % normal decoder
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',4,false,[2,4],32,0,goodChans,goodChans,1,{'act_thresh',1},true); % spring decoder
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 34 - no springs. Making sure the calibration works and then giving him a 4 minute break. 
+	Run 3: TS 34 - no springs, training set.
+	Run 4: TS 34 - springs on both fingers, training set 2
+	Run 5: TS 34 - no springs, Grab while we train the models for future offline comparison.
+	Run 6: TS 34 - KF0 - stopped and changed the hold time
+	Run 7: TS 34 - KF0 - hold time 500ms, about 220 trials online, then 50 trials with hand. 
+	Run 8: TS 34 - KF1 - Decodes were very low to start. Had a good string of about 150 trials (ending around 180ish). Really starting to strubble with index flexion. About 210-220 trials online, then 70 trials with hand control.
+	Run 9: TS 34 - KF0 - About 150 trials, really struggling to control index finger. 
+	Run 10: TS 34 - KF1 - Started online about 30 trials in, he's doing really well. 150 trials into online control he's struggling more but still giving effort. 
+	Run 11: TS 34 - KF0 - Forgot to actually change the decoder
+	Run 12: TS 34 - KF0 - About 100 good online trials and then he couldn't control index finger again
+	Run 13: TS 12 - tried to see if he would do MRP only, he didn't do the task.
+	Run 14: TS 34 - Back to two fingers, he didn't do the task. 
+	
+	
+
+-Notes:
+	goodChans = [1,3:7,9,11,15:19,33,35,37:41,49:51,53,58:62,65,67:69,71:76,78:88,90:92]; %These have some spiking
+	goodChans = [4:7,33,37,38,40,51,58,62,65,67,68,69,71:76,78,81:87,90:92]; % These chans look > 1spk/s

@@ -1,0 +1,103 @@
+Napier: 08/17/2022
+
+- Goals: RNN/GRU/LSTM/FNN/KF
+ 
+- Experimenters: Joey, Luis, Hisham
+
+- Recording Start Time: 9:45 am
+- Recording Stop Time:  12:00 pm
+
+- xPC Model: Rig_main_Cortical_Parasite_v2
+- Recorded Array: Motor (Patient cable/cerebus)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:	
+	- all decoders trained with tri vel redistribution, RR scaler, RNNs with *20* time history
+	RNN0 - GRU with x&y norm, noise
+	RNN1 - LSTM with x&y norm, noise
+	RNN2 - RNN with x&y norm, noise
+	NN0 - FNN with x&y norm, 400/400/100 structure
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); 
+		SBP KF correlation = 0.79879
+		SBP KF lag = 0
+	
+	Run 11:
+	RNN2 - GRU with x&y norm, noise
+	RNN3 - GRU with x norm, noise
+	RNN4 - GRU with x norm, noise. Stopped at 500 iters
+	RNN5 - GRU with x&y norm, noise. Stopped at 500 iters
+	NN1 - FNN with x norm, noise. 
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',11,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); 
+	
+	
+	
+-Runs:
+	Run 1: calibration
+	Run 2: warmup - 300 trials. 2 min break.
+	Run 3: TS29 training - 500 trials. BR~4.5  #HC1#.
+	-- 10min training break --
+	
+	Run 4-5: scaler had a bug, have to retrain 
+	Run 6: some hand control to keep him happy
+	(1 hour in)
+	Run 7: RNN0, biased
+	Run 8: RNN0, 30sec partial hand. norm locked at 30sec. biased
+	Run 9: RNN0, 30sec partial hand (norm locked at start). 
+	Run 10: NN0. biased immediately. Going to train again
+	
+	Run 11: TS29 training - 500 trials. BR~4.5  #HC1#.
+	Run 12: RNN2 - Starting to figure out trial 40. It seems good, but he can't quite figure it out. Is very fast or stopped
+	Run 13: RNN3 - able to control from start, somewhat slow. Biased slightly toward flex. Overall: working, but too slow
+	Run 14: RNN5 (short training) - moving more than RNN2, but soon biased. Working for trial 20-30 poorly.
+	Run 15: RNN4 (short training)- barely working, but very biased toward extend.
+	Run 16: RNN4 (short training) with 30sec partial hand, norm locked 30 sec. Working now trial 30! A little noisy but that might actually be helping. Occasionally having some trouble. Stuck around trial 70.
+	Run 17: messup
+	Run 18: RNN3 with 30sec partial hand, norm locked 30 sec. Stuck at start.
+	Run 19: NN1 with 30sec partial hand, norm locked at start. Both fingers move together, but not indepedently very well.
+	Run 20: KF0 - barely working
+	Run 21: KF1 - Barely working, and getting stuck at flex.
+
+	RNNs2-5 and NN1 having hard time with split movements
+
+
+Summary:
+	- Overall poor performance day. Might've been since the first round had some issues so started actually testing 90min in
+		- hard to make any conclusions
+	- Offline, RNNs had really high performance (0.8 corr). 
+	- Example of really good offline but didn't work online well (all decoder types). 
+	- In poor performance case, early stopping may be better since there's more noise to make use of
+	
+
+Summary 8/10/22:	
+	RNNs are running consistently:
+		- **training with noise helps a little - when switching to online it works immediately
+		- training with 20 history seems more stable than the 5 we used before
+		- parasite seems to be crashing occasionally, maybe due to storing long neural history
+		- **no need to do neural norm adjustment
+		
+		- get about 2.4-2.5 bitrate consistently without refit
+		
+TODO:
+	- LSTMs get an error when trying to load online
+
+
+	
+	
+-Notes:	
+	From 8/3/22:
+	good_chans_SBP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 17, 20, 23, 24, 33, 35, 37, 38, 39, 40, 42, 43, 45, 46, 47, 49, 50, 51, 52, 53, 55, 56, 57, 58, 59, 60, 61, 62, 64, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 93, 94, 96]
+
+	Removed a couple noisy channels:
+	good_chans_SBP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 20, 23, 24, 33, 35, 37, 38, 39, 40, 42, 43, 45, 46, 47, 49, 50, 51, 52, 53, 55, 56, 57, 58, 59, 60, 61, 62, 64, 65, 67, 68, 69, 71, 74, 75, 76, 78, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 93, 94, 96]
+	

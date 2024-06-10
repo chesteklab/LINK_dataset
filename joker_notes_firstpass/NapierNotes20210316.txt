@@ -1,0 +1,92 @@
+Napier: 3/16/2021
+
+- Goals: Test training/testing instability.
+
+- Experiment: Hisham, Sam
+
+- Recording start: 11:05am
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000 (repeat target on failure)
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRS
+	
+-Decoders: 
+Epoch 11, Iteration 3500, loss = 0.8978
+Checking accuracy on validation set
+Mean Correlation is 0.580986
+Mean SNR is 2.68308.
+Total number of peaks is 371.
+Average control peaks is 1.49152.
+Average signal peaks is 0.0682998.
+Ratio of control to true signal is 21.8379.
+Feature number 0.
+Median of feature is -0.180298.
+Ratio of control to true signal is 23.8044.
+Correlation is 0.563657
+Feature number 1.
+Median of feature is 0.0156317.
+Ratio of control to true signal is 19.2633.
+Correlation is 0.598315
+
+Re-Train:
+Epoch 11, Iteration 3500, loss = 0.9001
+Checking accuracy on validation set
+Mean Correlation is 0.61951
+Mean SNR is 2.6536.
+Total number of peaks is 361.
+Average control peaks is 1.43826.
+Average signal peaks is 0.06073.
+Ratio of control to true signal is 23.6828.
+Feature number 0.
+Median of feature is -0.0547878.
+Ratio of control to true signal is 21.8683.
+Correlation is 0.56635
+Feature number 1.
+Median of feature is 0.142898.
+Ratio of control to true signal is 25.5335.
+Correlation is 0.67267
+
+Epoch 20, Iteration 6500, loss = 0.0007
+Checking accuracy on validation set
+Mean Correlation is 0.578388
+Mean SNR is 2.88781.
+Total number of peaks is 351.
+Average control peaks is 0.0821467.
+Average signal peaks is 0.06073.
+Ratio of control to true signal is 1.35265.
+Feature number 0.
+Median of feature is 0.0147814.
+Ratio of control to true signal is 1.52565.
+Correlation is 0.52817
+Feature number 1.
+Median of feature is -0.00101351.
+Ratio of control to true signal is 1.17621.
+Correlation is 0.628605
+
+-Runs:
+	Run 1: Calibration
+	Run 2: Warm-up: 150 (flogger crash at 128, probably did >150)
+	Run 3: Training: 400 
+	Run 4: Validation: 100 - Followed by a break for network training
+	Run 5: NN - 3.5k - 100 Trials - failed a lot
+	Run 6: Tried again, failed a lot
+	Run 7: Disconnected EMG and tried again
+	Run 8: Training: 400 - trying with EMG disconnected
+	Run 9: Validation: 100
+	Run 10: 3.5k NN - ~200 Trials: better, need to compare to a day where I do the same thing w/out disconnecting EMG
+	Run 11: 6.5k NN - not so good
+	
+-Notes:
+	making sure EMG isn't affecting things
+	- need to repeat today but leaving emg connected

@@ -1,0 +1,51 @@
+Napier: 6/04/2021
+
+- Goals: Trying NNKF for the first time
+
+- Experiment: Hisham, Dylan, Eric
+
+- Recording Start Time: 12:00 PM
+- Recording Stop Time:  1:35 PM
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 20000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRS
+	
+-Decoders:
+
+		
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 29 - 147 Trials, warm-up, following w a break
+	Run 3: TS 29 - 400 Trials - Training - segfault file logger at 392
+	Run 4: TS 29 - 400 Trials - Training (again)
+	Run 5: TS 29 - 100 Trials - Validation - actually~120
+	Run 6: TS 29 - 100 Trials - Training KF - actually ~130, followed by break while training network
+	Run 7: NNKF broke when turning on, debugging
+	Run 8: NNKF w/ KF on - not really working, definitely has some control but then gets pulled up - need to see how it's working/if it's working correctly in all circumstances
+	Run 9: NNKF w/ KF off - even with no gain/offset definitely has some control
+	Run 10: NNKF w/ KF on again
+	
+	
+-Notes:
+	- still need to determine if 3 runs or 2 runs is best. 
+	- filelogger sefgaulted 
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	- got it running by run 8, some debugging necesarry
+		- updated onlinedecoders, simulink_connect_v2, generateOnlineSBPV4 - make sure to put each on the SVN.
+		
+	Maybe no covariance between velocities is best. will need to try offline and online.
+	
+

@@ -1,0 +1,65 @@
+Napier: 7/08/2021
+
+- Goals: Optimal gain scaling w/ RFKF
+ 
+- Experiment: Joey, Hisham
+
+- Recording Start Time: 10:50 am
+- Recording Stop Time:  12:30 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 (off/on)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90/100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29/36
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+		SBP KF correlation = 0.81411
+		SBP KF lag = 1
+		
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',5,5,false,[2,4],50,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Warm-up: 100 Trials, TS29, followed by 5 min break
+	Run 3: TS29 - Training 400
+	Run 4: TS29 - Validation 100, followed by break for decoder training
+	Run 5: TS29 - KF0 200 trials - refit training folled by training break. BR~1.3
+	---- ~40 min break while debugging refit ----
+	Run 6: TS36 - RF0 50 Trials - *ignore since it was actually TS-29*
+	
+	Run 7: TS36 - RF0 100 Trials - Gain 100%, BR~2.25
+	Run 8: TS36 - RF0 100 Trials - Gain 110%, BR~2.05
+	Run 9: TS36 - RF0 100 Trials - Gain 120%, BR~2.25
+	Run 10: TS36 - RF0 100 Trials - Gain 130%, BR~2.0. a bit more jittery now
+	Run 11: TS36 - RF0 100 Trials - Gain 150%, BR~1.65. a lot more orbiting but could be good with smoothing
+	Run 12: TS36 - RF0 100 Trials - Gain 120%, BR~2.0
+	Run 13: TS36 - RF0 100 Trials - Gain 100%, BR~2.0
+	
+	Run 14: TS36 - RF0 100 Trials - Gain 120%, smooth 0.75, BR~2.0. Seems worse. seems like we need more smoothing
+	Run 15: TS36 - RF0 100 Trials - Gain 120%, smooth 1.25, BR~2.35 **looks like best of the day**
+	Run 16: TS36 - RF0 100 Trials - Gain 150%, smooth 1.25, BR~1.8
+	Run 17: TS36 - RF0 100 Trials - Gain 100%, smooth 1.25, BR~2.1. slow but controlled
+	Run 18: TS36 - RF0 100 Trials - Gain 100%, smooth 1.0, BR~2.15
+	
+	
+
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	- note: minor 120 Hz noise has been showing up in Napier's signals. Does not seem to have any major effects on results.
+	
+	
+	
+	

@@ -1,0 +1,36 @@
+Napier: 04/27/2022
+
+- Goals: 2D with springs, wrist flex, and rubbed bands
+ 
+- Experimenters: Mender, Hisham
+
+- Recording Start Time: 10:30 am
+- Recording Stop Time:  11:30 am
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:	
+	
+-Runs:
+	Run 1: Calibration and warm-up
+	Run 2: TS 34 - Normal - 400 - accidentally had repeat after failure on
+	Run 3: TS 34 - wrist flexed - 600 - made IF slightly easier because sometimes the bend sensor wasn't letting him get to target (happened 2 more times)
+	Run 4: TS 34 - springs 2/4 - 800 trials - a few times IF wasn't working but i let him skip those. It started happening more throughout the run
+	Run 5: TS 34 - 2 bands - 450 trials - may not be strong enough to flex index - taking many breaks with index. Let him go for 20 minutes. 
+	Run 6: TS 34 - normal - 400
+
+	
+-Notes:

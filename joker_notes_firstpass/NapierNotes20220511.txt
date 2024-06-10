@@ -1,0 +1,54 @@
+Napier: 05/10/2022
+
+- Goals: Spring NN vs KF on Normal
+ 
+- Experimenters: Hisham, Matt
+
+- Recording Start Time: 9:30 am
+- Recording Stop Time:  11:20 am
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:	
+	NN0: pybmi, trained on runs 2,3, springs.
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true);
+	
+	NN1: pybmi, trained on run 9, springs.
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',9,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true);
+-Runs:
+	Run 1: Calibration + 100 Warm-up + 5min break (and spring setup)
+	Run 2: TS34 - 400 Training (spring)
+	Run 3: TS34 - 100 Validation (spring)
+	~Training Break~
+	
+	~decoders tested on normal~
+	Run 4: TS34 200 Trials - NN0. See a clear bias towards extension. Figured it out by 35.
+	Run 5: TS34  KF0. bugged out immediately
+	Run 6: TS34 250 Trials - KF0. Figured it out quickly
+	Run 7: TS34 250 Trials - NN0. No major problems
+	Run 8: TS34 200 Trials - KF0. Doing pretty well honestly
+	
+	Run 9: TS29 - 500 Training/Validation (normal)
+	Run 10: TS29 - NN1. Not great
+	Run 11: TS29 - KF1. 
+	
+-Notes:
+	good_chans_SBP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 23, 24, 33, 35, 37, 38, 39, 40, 43, 45, 46, 47, 49, 50, 51, 52, 53, 55, 56, 57, 58, 59, 60, 62, 64, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 95, 96]
+
+	Less distractions/problems than yesterday
+	He's actually doing great on these decoders. Last KF was at 2.2 BR
+	Probably due to center out.
+	KF1 was trained on 500

@@ -1,0 +1,107 @@
+Napier: 3/10/2021
+
+- Goals: Test different training times
+
+- Experiment: Hisham, Sam
+
+- Recording Start Time: 11:25 am
+- Recording Stop Time:  pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 7500
+	* Auto Juice: 0
+	* Target Pos Style: 34
+	* Visualization Style: MRP
+	
+-Decoders: 
+Epoch 11, Iteration 3500, loss = 0.9015
+Checking accuracy on validation set
+Mean Correlation is 0.247941
+Mean SNR is 3.44732.
+Total number of peaks is 14.
+Average control peaks is 2.30003.
+Average signal peaks is 0.0614295.
+Ratio of control to true signal is 37.4418.
+Feature number 0.
+Median of feature is -0.244607.
+Ratio of control to true signal is 40.2297.
+Correlation is 0.214354
+Feature number 1.
+Median of feature is 0.0444633.
+Ratio of control to true signal is 34.842.
+Correlation is 0.281527
+
+Epoch 22, Iteration 6900, loss = 0.0020
+Checking accuracy on validation set
+Mean Correlation is 0.214784
+Mean SNR is 3.42031.
+Total number of peaks is 19.
+Average control peaks is 0.103332.
+Average signal peaks is 0.0614295.
+Ratio of control to true signal is 1.68213.
+Feature number 0.
+Median of feature is 0.0142927.
+Ratio of control to true signal is 1.97756.
+Correlation is 0.197841
+Feature number 1.
+Median of feature is -0.0100011.
+Ratio of control to true signal is 1.40663.
+Correlation is 0.231727
+
+Epoch 11, Iteration 3500, loss = 0.8967
+Checking accuracy on validation set
+Mean Correlation is 0.242311
+Mean SNR is 3.37554.
+Total number of peaks is 17.
+Average control peaks is 2.16621.
+Average signal peaks is 0.0614295.
+Ratio of control to true signal is 35.2633.
+Feature number 0.
+Median of feature is -0.140455.
+Ratio of control to true signal is 36.6654.
+Correlation is 0.221214
+Feature number 1.
+Median of feature is -0.119322.
+Ratio of control to true signal is 33.9559.
+Correlation is 0.263408
+
+Epoch 22, Iteration 6900, loss = 0.0013
+Checking accuracy on validation set
+Mean Correlation is 0.22164
+Mean SNR is 2.90353.
+Total number of peaks is 292.
+Average control peaks is 0.0762238.
+Average signal peaks is 0.0614295.
+Ratio of control to true signal is 1.24083.
+Feature number 0.
+Median of feature is -0.000673901.
+Ratio of control to true signal is 1.28874.
+Correlation is 0.209128
+Feature number 1.
+Median of feature is 0.00234461.
+Ratio of control to true signal is 1.19616.
+Correlation is 0.234151
+
+-Runs:
+	Run 1: Calibration
+	Run 2: 400 Trials - Training
+	Run 3: 100 Trials - Validation
+	Run 4-6: Wrong Bin size
+	Run 7: 100 Trials - 3.5k decoder - lots of failures
+	Run 8: 65 Trials - 6.9k  decoder - had to stop because he just wasn't getting any
+	Run 9: 100 Trials - new 3.5k decoder - lots of fails
+	Run 10-11: Idx seems stuck, went to fix (outof time=`1
+	
+-Notes:
+	- first set of decoders had very low correlations relative to what we normally see
+	- second set still not great, seems maybe better?
+	- for either one it seems like it's either it works and is decently fast or it doesnt work at all.

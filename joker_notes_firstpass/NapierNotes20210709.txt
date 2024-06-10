@@ -1,0 +1,54 @@
+Napier: 7/09/2021
+
+- Goals: 0 vs 1 ABABAB comparison (w/ EMG)
+ 
+- Experiment: Dylan, Sam
+
+- Recording Start Time: 9:30 am
+- Recording Stop Time:  11:30 am
+
+- xPC Model: Rig_main_Cortical_SBP_spikes_CAR
+- Recorded Array: Motor (Patient Cable) + EMG
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 (offline/online)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); (optimal lag [2, 1])
+		SBP KF correlation = 0.76284
+		SBP KF lag = 1
+		
+	KF1: KF0 w/ 0 bin lag
+	
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Warm-up: 150 Trials, TS34
+	Run 3: Training TS34, 500 trials
+	Run 4: KF1 (0 lag) - 250 trials; online before trial 10
+	Run 5: KF0 (1 lag) - 300 trials (oops); online before trial 10
+	Run 6: KF1 (0 lag) - 250 trials; online before trial 10
+	Run 7: KF0 (1 lag) - 250 trials; online before trial 10
+	Run 8: KF1 (0 lag) - 250 trials; online before trial 10
+	Run 9: KF0 (1 lag) - 250 trials; online before trial 10
+
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	Very good online performance today despite relatively low KF correlations
+	
+	- note: minor 120 Hz noise has been showing up in Napier's signals. Does not seem to have any major effects on results.
+	
+	
+	
+	

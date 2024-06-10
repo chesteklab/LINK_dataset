@@ -1,0 +1,91 @@
+Napier: 08/01/2022
+
+- Goals: Error Correction Parasite Test (2D) - New Detector Training Correction Test 13 (Debugging CAR and good_chans)
+ 
+- Experiment: Dylan, Luis 
+
+- Recording Start Time: 9:35 am
+- Recording Stop Time:  12:15 pm
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [2, 2] - 0 lag picked) - 0.764 CC
+
+	
+-Runs:
+	-- CAR ON --
+	Run 1: Calibration and warm-up (~200 trials)
+	Run 2: Training TS34 - 500 trials, great performance (5.00 bps), 99% SR;
+
+
+	Run 3: KF is already biased, seemes like chan 71 became very noisy; going to train new KF without it
+	Run 4: Test run
+
+	Run 5: KF0 (0 lag) 500 ms hold time - online by trial 10; good performance for Napier (2.35 bps), ~500 trials, 99% SR;
+		try_data_no_mask: T = 4: 9 - 56% TPR for 5% FPR
+		try_data_good_chans: T = 4: 22 - 58% TPR for 5% FPR
+	
+	-- try_data_no_mask, no vel delay --
+	Run 6: Error detection run 1 (correction OFF) - online by trial 10; ~170 trials, good performance for Napier (2.27 bps), 100% SR; Finger 1: 15.17% TPR, 4.89% FPR; Finger 2: 5.42% TPR, 1.55% FPR
+
+	-- try_data_no_mask, vel delay 1 --
+	Run 7: Error detection run 2 (correction OFF) - online by trial 10; ~165 trials, good performance for Napier (2.35 bps), 100% SR; Finger 1: 12.16% TPR, 6.11% FPR; Finger 2: 6.43% TPR, 4.37% FPR
+
+	-- try_data_no_mask, vel delay 2 --
+	Run 8: Error detection run 3 (correction OFF) - online by trial 10; ~180 trials, good performance for Napier (2.50 bps), 100% SR; Finger 1: 11.12% TPR, 9.85% FPR; Finger 2: 7.58% TPR, 5.60% FPR
+
+
+	Run 9: Test run for good_chans mask
+
+	-- try_data_good_chans, no vel delay --
+	Run 10: Error detection run 4 (correction OFF) - online by trial 10; ~160 trials, good performance for Napier (2.50 bps), 100% SR; Finger 1: 21.96% TPR, 6.46% FPR; Finger 2: 17.13% TPR, 5.62% FPR
+
+	-- try_data_good_chans, vel delay 1 --
+	Run 11: Error detection run 5 (correction OFF) - online by trial 10; ~165 trials, good performance for Napier (2.31 bps), 100% SR; Finger 1: 26.64% TPR, 11.33% FPR; Finger 2: 18.14% TPR, 10.69% FPR
+
+	-- try_data_good_chans, vel delay 2 --
+	Run 12: Error detection run 6 (correction OFF) - online by trial 10; ~180 trials, good performance for Napier (2.54 bps), 100% SR; Finger 1: 26.73% TPR, 17.81% FPR; Finger 2: 18.65% TPR, 16.69% FPR
+
+
+	-- trying a correction comparison, using try_data_good_chans, no vel delay --
+
+	Run 13: Error detection run 7 (correction OFF) - online by trial 10; ~165 trials, good performance for Napier (2.22 bps), 100% SR; Finger 1: 21.28% TPR, 5.42% FPR; Finger 2: 13.12% TPR, 5.18% FPR
+
+	Run 14: Error detection run 8 (correction ON, T-2T) - online by trial 10; ~139 trials, good performance for Napier (2.09 bps), 100% SR; Finger 1: 18.92% TPR, 8.62% FPR; Finger 2: 9.67% TPR, 4.84% FPR; CPU overload, so did not finish the run, going to repeat
+
+	Run 15: Error detection run 9 (correction ON, T-2T) - online by trial 10; ~160 trials, good performance for Napier (2.15 bps), 100% SR; Finger 1: 15.53% TPR, 6.07% FPR; Finger 2: 8.09% TPR, 4.66% FPR;
+
+	Run 16: Error detection run 10 (correction OFF) - online by trial 10; ~175 trials, good performance for Napier (2.45 bps), 100% SR; Finger 1: 21.31% TPR, 7.06% FPR; Finger 2: 12.35% TPR, 4.57% FPR
+
+	Run 17: Error detection run 11 (correction ON, T-2T) - online by trial 10; ~170 trials, good performance for Napier (2.32 bps), 100% SR; Finger 1: 19.25% TPR, 6.06% FPR; Finger 2: 10.38% TPR, 4.57% FPR;
+	
+	
+	
+-Notes:
+	good_chans_SBP = [1:3,5:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,72:76,78,80:88,91:92,96]; (KF)
+	
+	good_chans_SBP = [1:3,5:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,68,69,72:76,78,80:88,91:92,96]; (err detector)
+
+	CAR: [1,1,1,0,1,1,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1,1,0,1,0,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,0,0,1,1,0,0,0,1]
+	
+	
+	
+	
+	
+	
+	
+	

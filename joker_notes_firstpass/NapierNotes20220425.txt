@@ -1,0 +1,56 @@
+Napier: 04/25/2022
+
+- Goals: Error Correction Parasite Test (2D) - Extended Stopping Significance Test 6
+ 
+- Experiment: Dylan, Mender
+
+- Recording Start Time: 9:30 am
+- Recording Stop Time:  11:30 am
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [1, 1] - 0 lag picked) - 0.825 CC
+	
+	
+-Runs:
+	Run 1: Calibration and warm-up
+	Run 2: Training TS34 - 500 trials, good performance (4.33 bps), 100% SR;
+	Run 3: KF0 (0 lag) - online by trial 10; fair performance for Napier (1.68 bps), ~400 trials, 89% SR; some index flexion bias present through last half of run
+		T = 3 chosen; reasonable FPR and some really high TPR on ext for both fingers
+	
+	Run 4: Error detection run 1 (correction OFF) - online by trial 10; ~180 trials, poor performance for Napier (1.74 bps), 88% SR;
+	Run 5: Error detection run 2 (correction ON, extended stopping (T-2T)) - online by trial 10; ~140 trials, poor performance for Napier (1.24 bps), 81% SR; extremely bad bias, got a bit better toward the end
+	Run 6: Error detection run 3 (correction OFF) - online by trial 10; ~160 trials, poor performance for Napier (1.43 bps), 85% SR;
+	Run 7: Error detection run 4 (correction ON, extended stopping (T-2T)) - online by trial 10; ~120 trials, bad performance for Napier (1.04 bps), 71% SR;
+	
+	Run 8: Testing new manual biases
+	
+	Run 9: Error detection run 5 (correction OFF) - online by trial 10; ~290 trials, good performance for Napier (2.01 bps), 99% SR;
+	Run 10: Error detection run 6 (correction ON, extended stopping (T-2T)) - online by trial 10; ~310 trials, good performance for Napier (2.16 bps), 100% SR;
+	Run 11: Error detection run 7 (correction OFF) - online by trial 10; ~300 trials, good performance for Napier (2.26 bps), 98% SR;
+	Run 12: Error detection run 8 (correction ON, extended stopping (T-2T)) - online by trial 10; ~280 trials, fair performance for Napier (1.89 bps), 94% SR; saw some bias issues at end again, may have been running out of juice
+
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,96];
+	
+	CAR: [1,1,1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,0,1,1]
+	
+	
+	Some bias issues, but essentially got 2 sets of ABAB 
+	
+	

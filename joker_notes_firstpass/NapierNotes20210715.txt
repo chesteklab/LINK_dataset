@@ -1,0 +1,77 @@
+Napier: 7/15/2021
+
+- Goals: RFKF lag & Optimal gain scaling
+ 
+- Experiment: Joey, Sam
+
+- Recording Start Time: 8:30 am
+- Recording Stop Time:  11:00 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 (off/on)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 7500
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29/36
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+		SBP KF correlation = 0.8161
+		SBP KF lag = 1
+	KF1: same as KF0, but with optimal lag=0
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',5,5,false,[2,4],50,[1,1],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	RF1: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',6,6,false,[2,4],50,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	
+	
+-Runs:
+----- SETUP AND TRAINING -----
+	Run 1: Calibration
+	Run 2: Warm-up: 100 Trials, TS29, followed by 5 min break
+	Run 3: TS29 - Training 400. BR~3.6-4.2
+	Run 4: TS29 - Validation 100, followed by break for decoder training
+	
+	Run 5: TS29 - KF0 (1 lag) 250 trials - refit training. BR~1.6
+	Run 6: TS29 - KF1 (0 lag) 250 trials - refit training. BR~2.0-2.3. Break for decoder training. Looks much more responsive with 0 lag.
+
+----- 0 VS 1 LAG REFIT  -----	(note this is TS29 on accident)
+	Run 7: TS29 - RF0 (1 lag, 1 lag) 100 Trials - Gain 100%, BR~1.85
+	Run 8: TS29 - RF1 (0 lag, 0 lag) 100 Trials - Gain 100%, BR~2.05
+	Run 9: TS29 - RF0 (1 lag, 1 lag) 100 Trials - Gain 100%, BR~1.80
+	
+----- GRAIN AND SMOOTHING ----- (using RF1 0-lag)
+	Run 10: TS36 - RF1 100 Trials - Gain 100%, BR~2.1
+	Run 11: TS36 - RF1 100 Trials - Gain 120%, BR~2.0
+	Run 12: TS36 - RF1 100 Trials - Gain 150%, BR~2.1. More orbiting
+	Run 13: TS36 - RF1 100 Trials - Gain 120%, BR~2.3
+	Run 14: TS36 - RF1 100 Trials - Gain 100%, BR~2.25
+	
+	Run 15: TS36 - RF1 100 Trials - Gain 120%, smooth 1.25, BR~2.25
+	Run 16: TS36 - RF1 100 Trials - Gain 120%, smooth 1.5 , BR~2.05. Seems like too much smoothing - tends to go past target then come back
+	Run 17: TS36 - RF1 100 Trials - Gain 150%, smooth 1.5 , BR~2.1
+	Run 18: TS36 - RF1 100 Trials - Gain 100%, smooth 1.25, BR~2.15
+	Run 19: TS36 - RF1 100 Trials - Gain 100%, smooth 1.0 , BR~2.0
+	Run 20: TS36 - RF1 100 Trials - Gain 100%, smooth 0.9 , BR~2.15
+	Run 22: TS36 - RF1 100 Trials - Gain 120%, smooth 1.25, BR~2.3  ***best of the day, and agrees with last week's test***
+	
+	Run 23: TS34 - Yesterday's amazing KF0 (7/14/21) - binsize wrong in matlab
+	Run 24: TS34 - " " - gain/smoothing were still 120/1.25
+	Run 25: TS34 - " " - KF is working ok, but not nearly as good as yesterday. Some noise around trial 50.
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	- Seems like if the KF is already very good, then refit doesn't do much or makes it slower/worse
+	
+	
+	
+	

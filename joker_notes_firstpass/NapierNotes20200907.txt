@@ -1,0 +1,97 @@
+Napier: 9/07/2020
+
+- Goals: ReFIT a NN
+
+- Experiment: Mender, Willsey
+
+- Recording Start Time: am
+- Recording Stop Time:  pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- REFERENCING OFF OF CHANNEL 14
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 29,36
+	* Visualization Style: MRP
+	
+-Decoders: 
+good_chans_SBP = [1,3:7,9,13,15,17,23,33, 35,37:38,40,43,45:47,49:53,55:60,62,64,67:68,71:76,79:87,90:92,94]; 
+TrainOnline_Cortical_KalmanFilter_Multi('Joker','',5,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); % Normal
+
+load('Z:\Data\Joker\2020-09-07\decodeParamsKF0.mat')
+RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',8,8,0,[2,4],50,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true);
+
+
+Tri Redis:
+Epoch 11, Iteration 3500, loss = 0.8564
+Checking accuracy on validation set
+Mean Correlation is 0.456751
+Mean SNR is 2.86974.
+Total number of peaks is 103.
+Average control peaks is 1.59818.
+Average signal peaks is 0.06504.
+Ratio of control to true signal is 24.5723.
+Feature number 0.
+Median of feature is -0.168753.
+Ratio of control to true signal is 28.7229.
+Correlation is 0.415355
+Feature number 1.
+Median of feature is 0.109858.
+Ratio of control to true signal is 20.7638.
+Correlation is 0.498147
+
+ReFIT:
+Epoch 2, Iteration 500, loss = 0.7057
+Checking accuracy on validation set
+Mean Correlation is 0.610967
+Mean SNR is 2.49867.
+Total number of peaks is 1519.
+Average control peaks is 2.83003.
+Average signal peaks is 1.61466.
+Ratio of control to true signal is 1.75271.
+Feature number 0.
+Median of feature is -0.0123684.
+Ratio of control to true signal is 1.52274.
+Correlation is 0.626252
+Feature number 1.
+Median of feature is 0.0634832.
+Ratio of control to true signal is 2.05924.
+Correlation is 0.595682
+
+
+-Runs: where there are missing runs means there was a crash
+	Run 1: crash
+	Run 2: Calibration
+	Run 3: TS 29 - Warmup run - 250 trials
+	Run 4: TS 29 - Warmup Run - 100 trials
+	
+	wait 15 min until 10:02
+	
+	Run 5: TS 29 - Training set - 400 trials
+	Run 6: TS 29 - file logger crash
+	Run 7: TS 29 - Validation set - 100 trials
+	Run 8: TS 36 - KF, 250 trials
+	Run 9: TS 36 - NN, 250 trials
+	Run 10: TS 36 - ReFIT KF, 250 trials
+	Run 11: TS 36 - ReFIT NN, 250 trials
+	Run 12: TS 36 - ReFIT KF, had to be restarted around trial 76; tried juice and everything but couldn't get him restarted
+	Run 13: TS 36 - ReFIT NN
+	Run 14: TS 34 - Never started anything inc hand control
+	break
+	Run 15: TS 34 - Switch to TS 34 at trial 24
+	Run 16: crashed
+	Run 17: attempted hand control but no dice	
+	
+
+-Notes:
+good_chans_SBP = [1,3:7,9,13,15,17,23,33, 35,37:38,40,43,45:47,49:53,55:60,62,64,67:68,71:76,79:87,90:92,94]; 

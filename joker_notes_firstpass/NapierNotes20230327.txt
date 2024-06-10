@@ -1,0 +1,80 @@
+Napier: 3/27/2023
+
+- Goals: KalmanNet
+ 
+- Experimenters: Luis, Julianna, Matt
+
+- Recording Start Time: 9:20 am
+- Recording Stop Time:   pm
+
+- xPC Model: Rig_main_Cortical_Parasite_v2
+- Recorded Array: Motor (Patient cable/cerebus)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPass + EMG 10ksps
+- Drink: Apple Juice
+
+- Params: s
+	* Movement Mask: [0,1,0,0,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 5000/10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29, 37, 35
+	* Visualization Style: MRP
+	
+-Decoders:
+	- KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','2023-03-27',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true)
+		SBP KF correlation = 0.72342
+		SBP KF lag = 0
+	- KNet0: 300 iterations, ABA test stuff with new arch.
+		Best corr: 0.678 at iteration 300
+		[0.69867188 0.76394691 0.62597431 0.62531843]
+	- KNet1: 600 iterations, same as KNet0.
+		Best corr: 0.693 at iteration 560
+		[0.7413729  0.74670533 0.64386814 0.63836116]
+	- KNet2: 300 iterations, old arch.
+		Best corr: 0.676 at iteration 180
+		[0.73918213 0.8262994  0.54548134 0.59164685]
+
+-Runs:	
+	Run 1: calibration.
+	Run 2: 500 TS37 hand control. Bitrate ~3.3.
+	Run 3: 500 TS29 hand control. Bitrate ~4.5.
+	Run 4: 500 TS35 hand control. Bitrate ~4-4.5
+
+	-- 5 min break
+	-- KF0
+	Run 5: 31 TS29. MRS can move freely, but index is completely biased towards flexion. Can't do any trials.
+	-- KNet0
+	Run 6: 35 TS29, beta=0.98. Both fingers somewhat biased towards flexion. He can still do some trials, but doesn't seem to be moving with much intention. He can mostly move the MRS, and seems to force the index to move by moving the MRS. I think he got frustrated at the end and stopped trying.
+	-- KF0
+	Run 7: 34 TS29. Index completely biased towards flexion. MRS can move a little. Can't do any trials.
+	-- KNet0
+	Run 8: 75 TS29, beta=0.98. He can definitely do some trials, but gets stuck very often. Success rate of about 30%. He also stops trying after a few trials. Then, he started doing trials again. He's not fast, but faster than before.
+	
+	-- 5 min break
+	-- KNet1
+	Run 9: TS29, beta=0.98. Very biased towards flexion, has trouble with extension trials. Doesn't seem to have a lot of control. Can't do trials.
+Summary:
+
+
+TODO:
+	- 
+
+Notes:
+	artifact on channels 2, 77. (other chans to watch: 79 88)
+	good_chans_SBP = [1, 3, 4, 5, 7, 8, 9, 11, 14, 15, 17, 20, 22, 23, 24, 25, 26, 28, 29, 31, 33, 35, 36, 37, 38, 39, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 94, 96];
+	
+	chans with >1 Hz
+	good_chans_SBP = [4,5,7,25,33,35,46,65,67,68,69,71,72,73,74,75,76,82,90]
+	
+	Managed to fix the MRS sensor: there was a cable that was getting disconnected a lot. Now, hand control is much better. Hopefully I see the effect on the Kalman Filter as well.
+	
+	Velocity and position correlation seem low today. Maybe not many related channels? Or fixing MRS sensor had an effect on that somehow. Would be interesting to check which channels we lost since last time.
+	
+	
+	
+	
+
+
+

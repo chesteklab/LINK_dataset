@@ -1,0 +1,40 @@
+Napier: 7/01/2021
+
+- Goals: Switch between 1D and 2D and a few target styles
+
+- Experiment: Mender, Dylan
+
+- Recording Start Time: 12:00 PM
+
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRS
+	
+-Decoders:
+
+		
+-Runs:
+	Run 1: TS 29 - 678 trials
+	Run 2: TS 35 
+	Run 3: TS 14 (still 2 fingers) - center out but fingers always together
+	Run 4: TS 14 (index) - changed visualization to 'all' after 30 trials
+	Run 5: TS 14 (MRS)
+	Run 6: TS 14 (Both) - changed visualization style back to MRS here
+	Run 7: TS 35
+	Run 8: TS 29
+	
+-Notes:
+
+	

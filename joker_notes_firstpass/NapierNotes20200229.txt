@@ -1,0 +1,59 @@
+Napier: 2/29/2020
+
+- Goals: Neural Network stuff
+
+- Experiment: Willsey, Mender
+
+- Recording Start Time: 8:50 am
+- Recording Stop Time:  
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous, 97-102 Raw
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 29, 34-36
+	* Visualization Style: MRP
+	
+-Decoders: 
+	First set of good_chans from today
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','', 2, false, [2, 4], 50, 0, good_chans_TCFR, good_chans_SBP, 1, {'act_thresh',1}, true);
+
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',5,5,0,[2,4],50,xpcBinLag,xpcA,xpcW,good_chans_TCFR,good_chans_SBP, 1, {[], []}, true);
+
+	
+	NN in NNDecode.py used was: FC4Lp05_CNN1L16N_BN
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS29 from 5 to 305; bland screen from 306-324 for 1/3 total time, then 100 trials (325-425) on target style 35
+	Run 3: TS35 on accident so stopped the trials
+	Run 4: TS29 from 5 to 305; bland screen from 306-325 for 1/3 total time, then 100 trials (326-426) on target style 35
+	Run 5-6: NN after 2000 iterations, not working, debuggins and system crashed
+	Run 7: NN after 1500 iterations, better, requires a filter
+	Run 8: NN after 1500 iterations, 500 ms hold time, filter, gain of 0.075 (empiric) calculated was 0.055.
+	Run 9: Kalman filter. Can't hit target, attempted to restart around trial 20, still difficult; will have to stop because it's terrible
+	Run 10: NN after 1500 iterations, 500 ms hold time, filter, gain of 0.075 (empiric) calculated was 0.055. Bit rate of 1.5-1.6
+	Run 11: KF but struggles to hit targets attempted to restart him at single digit trials.
+	Run 12: NN after 1500 iterations, 500 ms hold time, filter, gain of 0.075 (empiric) calculated was 0.055.
+	Run 13: NN after the second training data set, gain calculated to be 0.04 and no filter. very high bit rates but didn't calculate correctly. beat hand control?
+	Run 14: KF trained on second training data set. Can't hit trials. having trouble controlling index finger. Will have to stop to prevent demotivation.
+	Run 15: NN after the second training data set, gain calculated to be 0.04 and no filter. bit rate around 1.7
+	Run 16: KF trained on second training data set. bit rate around 1.3 but file logger crashed so restarted
+	Run 17: KF restarted after file logger crashed
+	Run 18: Attempted a REFIT NN run but monkey not motivated to move hand in hand control
+	Run 19: Threshold crossing KF, monkey can't see the screen
+	Run 20: Trying to get him working
+	Run 21: Matt mender moving fingers with various decoders
+	
+
+	These channels are used for SBP
+	good_chans_SBP = [1:9, 11, 13, 15, 17, 23, 33, 35, 37, 38, 40, 43, 45:47, 49, 50:53, 55:59, 60, 62, 64, 65, 67:69, 71:76, 78:88, 90, 91, 92, 94, 96];
+	

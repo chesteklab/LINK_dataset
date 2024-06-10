@@ -1,0 +1,66 @@
+Napier: 7/31/2021
+
+**NOTE: This notes file was re-written after the first was not saved on Saturday
+- Goals: RFKF vs RKNN optimal gain
+ 
+- Experiment: Hisham, Willsey
+
+- Recording Start Time: 8:05 am
+- Recording Stop Time:  10:15 am
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 (off/on)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 7500
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29/36
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},-1,true);     	# Note: lag param is new (-1 sets optimal)
+
+	KF1: same as KF0, but with optimal lag=0
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',6,6,false,[2,4],50,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], 	[]},true);
+		
+	NN0:
+	Epoch 11, Iteration 3500
+	gain = 0.061, 0.055
+	offset = [0.091, 0.069]
+	
+	RN0:
+	Epoch 2, Iteration 500, 
+	gain = 0.45, 0.49
+	offset = [-0.011, 0.084]
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Warm-up: 100 Trials, TS29, followed by 5 min break
+	Run 3: TS29 - Training 400. BR~3.7-4.5
+	Run 4: TS29 - Validation 100, followed by break for decoder training
+	
+	Run 5: TS29 - NN0 250 trials - refit training.
+	Run 6: TS29 - KF1 250 trials - refit training.
+	Break for decoder training.
+	
+	Run 7:  TS36 - RN0 250 Trials - Gain 100%
+	Run 8:  TS36 - RK0 250 Trials - Gain 120%, smooth 1.25
+	Run 9:  TS36 - RN0 100 Trials - Gain 100%
+	Run 10: TS36 - RK0 100 Trials - Gain 120%, smooth 1.25
+	-- End of ABAB Comparison --
+
+	Run 11: TS34 - RN0 250 Trials - Gain 100%
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	
+	
+	

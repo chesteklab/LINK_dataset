@@ -1,0 +1,71 @@
+Napier: 7/29/2020
+
+- Goals: Neural Network test with no velocity redistribution
+
+- Experiment: Sam, Matt M
+
+- Recording Start Time: 10:40 am
+- Recording Stop Time: 11:00 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 29, 36
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: Trained in parasite using run 3
+	KF1: Also trained in parasite (accidentally) using run 3
+
+	RF0: Trained in parasite. Use run 9 - didn't work, need to debug
+	
+Epoch 19, Iteration 3500, loss = 0.9340
+Checking accuracy on validation set
+Mean Correlation is 0.661016
+Mean SNR is 1.94143.
+Total number of peaks is 693.
+Average control peaks is 3.10389.
+Average signal peaks is 0.0650145.
+Ratio of control to true signal is 47.7416.
+Feature number 0.
+Median of feature is -0.171562.
+Ratio of control to true signal is 46.8082.
+Correlation is 0.633626
+Feature number 1.
+Median of feature is 0.116027.
+Ratio of control to true signal is 48.7169.
+Correlation is 0.688406
+
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 29 - about 200 trials, warmup
+	Run 3: TS 29 - 400 trials for training
+	Run 4: TS 29 - 100 trials for validation
+	Run 5: TS 29 - NN online - can't flex MRP very well without flexing index finger
+	Run 6: TS 29 - KF 0
+	Run 7: TS 36 - went to do KF 0 but something crashed
+	Run 8: TS 36 - accidentally trained a second model so he just ended up doing 100 trials hand control
+	Run 9: TS 36 - KF0 - about 5 hand control trials to start
+	Run 10: 
+	Run 11: TS 36 - testing out the neural network with different offsets
+	Run 12: Parasite crashed
+	Run 13: TS 36 - NN online again. 370 trials online
+	Run 14: TS 29 - Until he ran out of juice - about 665 trials. 
+	
+
+-Notes:
+Last experiment there was a lot of noise so this time Sam: 
+ -Moved reference from Ref 1 to Ref 2
+ -Grounded the HDMI cable on the CPD
+ 		
+goodChans = [1,3:7,9,11,15:19,33,35,37:41,49:51,53,58:62,65,67:69,71:76,78:88,90:92]; %These have some spiking

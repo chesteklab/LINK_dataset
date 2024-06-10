@@ -1,0 +1,52 @@
+Napier: 1/27/2021
+
+- Goals: Mote Intervals - how low can we go
+
+- Experiment:  Joey C, Sam
+
+- Recording Start Time: 9:40 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_motePackets10
+- Recorded Array: Motor (Patient Cable) + EMG (CPD via CPA)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100/120
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+
+-Decoders: 
+	(final 3 numbers are threshNum,avgMode,intLagMs)
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',2,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,25);
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',9,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,15);
+	KF2: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',9,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,0);
+
+-Runs:
+	Run 1: threshold setting (150 trials): xpcMoteThresholds = calcOnlineMoteThresholds(20,'Joker');
+	Run 2: 20pps training TS-34. 400 trials
+	Run 3: KF0 20pps 25lag 32msbins - Mint working decently, somewhat hard time stopping. crash ~t30
+	Run 4: KF0 20pps 25lag 32msbins - 200 trials Mint BR=0.9. 200 trials SBP BR=1.05. 				***index out of stanchion sometime during run.
+	Run 5: (same as above, continued. Index back in) - 100 trials Mint BR=0.9. MRP having hard time. crash
+	Run 6: finger out again from start. ***stanchion was loose and wrist was flexed
+	Run 7: calibration
+	Run 8: more calibration
+	Run 9: 33pps training. 400 trials. (before starting ran: xpcMoteThresholds = calcOnlineMoteThresholds(33,'Joker','2021-01-27',1,True);)
+	Run 10: KF1 33pps 15lag 32msbins - better than prev decoders. 200 mint BR=1.2. 200 SBP  BR=1.35. 200 mint BR=1.25
+	Run 11: KF2 33pps  0lag 32msbins - (nearly no delay after prev run). 200 mint BR=1.3. 200 SBP BR= crash
+	Run 12: (run11 continued) - 100 SBP BR=1.6. 100 mint BR= (out of juice)
+	
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+
+
+
+

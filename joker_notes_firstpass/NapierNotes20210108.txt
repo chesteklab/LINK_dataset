@@ -1,0 +1,36 @@
+Napier: 1/8/2021
+
+- Goals: Measure EMG with and without springs
+
+- Experiment: Mender, Hisham
+
+- Recording Start Time: 10:30 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders: 
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS34 - No springs, ~500 trials
+	Run 3: TS34 - Springs, started run, Matt accidentally unplugged a bend sensor while addning the springs... oh man
+	Run 4: Calibration after fixing bend sensor
+	Run 5: TS34 - Springs - first ~20 trials Matt was still in the rig. ~875 total
+	Run 6: TS34 - No Springs - running until juice is out - about 900 trials.
+	
+-Notes:
+Plugged in EMG connector so that arrow is towards pin 2 - incorrectly plugged in so EMG isn't really valid

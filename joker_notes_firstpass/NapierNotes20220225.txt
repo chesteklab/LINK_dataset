@@ -1,0 +1,73 @@
+Napier: 2/25/2022
+
+- Goals: RNN online (it works!)
+ 
+- Experiment: Joey, Dylan
+
+- Recording Start Time: 9:30 am
+- Recording Stop Time:  12 am
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: ALL
+	
+-Decoders:
+	NN0: input_size = 96
+		conv_size = 100
+		hidden_size = 512
+		num_states = 2
+		num_layers = 1
+		dropout_p = 0.0
+		model_type = 'RNNDecoders.GRUModel'
+		scaler_type = 'regression' 
+		binsize = 32
+		
+	NN1: same but conv_size=20
+	NN2: same but wih 50ms bins
+	NN3: 50ms bins. (trained using runs 11-12, TS34)
+	NN4: standard FNN (without end BN layer). 50ms bins (trained using runs 11-12, TS34)
+	NN5: standard FNN (wilseynet). 50ms bins (trained using runs 11-12, TS34)
+	NN6: RNN with 1500 hiddne size
+
+-Runs:
+	Run 1: Calibration
+	Run 2: TS29 - 400 Training
+	Run 3: TS29 - 100 Validation
+	~Training Break~
+	
+	Run 4: TS29 - NN0: debugging
+	
+	Runs 5-10: RNN NN0-NN2 testing. They work, but are somewhat slow. Somewhat "wandering" around. Index correlation pretty low (0.35-0.4)
+	
+	Run 11: TS34 training. 400 trials.
+	Run 12: TS34 - 100 validation
+	
+	Run 13: TS34 - NN3 - 200 trials. BR~1.85. working pretty well - a lot better than the previous ones. still somewhat slow. index having some trouble
+	Run 14: TS29 - NN3 - 150 trials. BR~1.5. A bit slower on random targets
+	Run 15: TS29 - NN4 (FNN) - 150 trials. BR~1.6. Looks a lot snappier - doesn't have as many midrange velocities. got stuck at end
+	Run 16: TS34 - NN4 (FNN) - 150 trials. BR~2.0. 
+	Run 17: TS34 - NN4 (willseynet) - 100 trials. BR~1.5.
+	Run 18: TS34 - NN6 (RNN 1500) - 60 trials - working ok, but either having bias issues or he's getting tired
+	
+	
+-Notes:
+
+	Probably need to optimize the RNN offline more - the velocity correlations are a lot lower than the FNN.
+	
+	RNN looks more like the KF since not as snappy.
+
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	
+	

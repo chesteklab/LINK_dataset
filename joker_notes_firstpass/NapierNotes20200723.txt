@@ -1,0 +1,56 @@
+Napier: 7/23/2020
+
+- Goals: Spring dataset and online trials with the current setup.
+
+- Experiment: Matt M and Sam
+
+- Recording Start Time: 10:30 am
+- Recording Stop Time: 1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training), 500 (online)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 29,34
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2,4],32,0,goodChans,goodChans,1,{'act_thresh',1},true); % normal decoder - did not use the correct goodChans
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2,4],32,0,goodChans,goodChans,1,{'act_thresh',1},true); % normal decoder
+	KF2: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',4,false,[2,4],32,0,goodChans,goodChans,1,{'act_thresh',1},true); % spring decoder
+	KF3: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',5,false,[2,4],32,0,goodChans,goodChans,1,{'act_thresh',1},true); % second normal decoder
+
+	
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 34 - normal - cerebus was recording broadband so we stopped the recording session
+	Run 3: TS 34 - 350 trials.
+	Run 4: TS 34 - with springs. 350 trials.
+	Run 5: TS 34 - without springs. 350 trials.
+	Run 6: TS 34 - KF2 - decodes were more extended than actual hand position at start. Start online at trial 20. Doing it pretty well but I forgot to turn the hold times down. Stopped after 45 trials online :(
+	Run 7: TS 34 - KF1 - hold time 500 - KF1 because he just practiced KF2 so switching it up a bit. Decoder isn't doing well. Let him do some hand control and then restart, it's very extended still. Essentially unuseable for him.
+	Run 8: TS 34 - KF2 - decoder is still very extended at first. Was able to do the task at least. A little over 200 trials. 
+	Run 9: TS 34 - KF3 - online started around trial 20. Performance seems way better. A little over 200 trials. 
+	Run 10: TS 34 - KF2 - Looks pretty good, still more biased to extension. Cannot flex MRP all the way. Couldn't use it very well around trial 80 and stopped. Stopped run around 105 trials in. 
+	Run 11: TS 34 - KF3 - online start around 15 - decode is looking better than KF2 albeit still more extended than hand control. Ended at trial 223. About 200 online trials. 
+	Run 12: TS 34 - to compare early activity vs late activity. Only 100 trials before he ran out of juice.
+	
+Notes:
+	With the later onlines run I gave him 3-5 minutes break. He seems to get tired when doing online trials back to back sometimes. 
+	The decoder predictions all seem to have an offset towards extension and it's worse for the decoders trained earliest. 
+	SBP and TCFR decodes seem significantly different. I.e. the SBP decode was at 0 and the TCFR was at 0.6-0.9 at one point. 
+	
+	goodChans = [1,3:7,9,11,15,19,33,35,37:41,43,50,51,53,56:59,62,65,67:69,71:76,78:88,90:92]; %These have some spiking
+		goodChans = [1,3:5,7,8,11,15,17,33,35,37,38,40,43,49:51,53,56:59,62,65,67:69,71:76,78:88,90:92]; % old from march
+		
+		
+	*MJM 2022-02-04 - Added Models used folder because some things didn't save to the server on this day and they were sitting on the desktop.  

@@ -1,0 +1,49 @@
+Napier: 2/23/2021
+
+- Goals: 0, 1, 2, 3 lag comparison (randomized)
+
+- Experiment: Dylan, Sam
+
+- Recording Start Time: 8:45 am
+- Recording Stop Time:  11:30 am
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); (optimal bin lag picked is [2, 0])
+	KF1: Same as KF0 but with 0 bin lag
+	KF2: Same as KF0 but with 1 bin lag
+	KF3: Same as KF0 but with 2 bin lag
+	KF4: Same as KF0 but with 3 bin lag
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Training - TS34
+	Run 3: Aborted early to change hold time back to 500 ms
+	Run 4: KF2 (1 lag) - online around trial 26
+	Run 5: Aborted early, seem slike he got his mrp out at the end of last run
+	Run 6: KF3 (2 lag) - online around trial 40
+	Run 7: Aborted early, got whole hand out this time
+	Run 8: KF1 (0 lag) - online around trial 20; juice tube came out near end of run, and hand came out at very end again
+	Run 9: KF4 (3 lag) - online around trial 30; offline for trials 120-135 and 145-155 for soft reset
+	Run 10: KF3 (2 lag) - online around trial 10; hand popped out for trials 60 - 80; had a lot of issues with hand coming out during this run
+	Run 11: KF1 (0 lag) - online around trial 13; was really speeding up near the end, seems like hand problems are fixed now
+	Run 12: KF4 (3 lag) - online around trial 10; hand out for trials 50 - 60
+	Run 13: KF2 (1 lag) - online around trial 10; 
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];

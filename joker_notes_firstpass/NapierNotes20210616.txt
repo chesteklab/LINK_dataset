@@ -1,0 +1,74 @@
+Napier: 6/15/2021
+
+- Goals: Error Classification Parasite Test
+ 
+- Experiment: Hisham, Joey, Mender
+
+- Recording Start Time: 10:40 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRS
+	
+-Decoders:
+
+TrainNNKF.py
+Epoch 22, Iteration 4500, loss = 0.0006
+Checking accuracy on validation set
+Mean Correlation is 0.678832
+Mean SNR is 2.88535.
+Total number of peaks is 450.
+Average control peaks is 0.0609981.
+Average signal peaks is 0.0722989.
+Ratio of control to true signal is 0.843694.
+Feature number 0.
+Median of feature is -0.0116982.
+Ratio of control to true signal is 1.0956.
+Correlation is 0.69747
+Feature number 1.
+Median of feature is -0.000276276.
+Ratio of control to true signal is 0.573573.
+Correlation is 0.660194
+Finger 0 RR Calculated Gain, Offset: 1.361809, 0.013527
+Finger 1 RR Calculated Gain, Offset: 1.042600, 0.00676
+
+
+-Runs:
+	Run 1: Calibration
+	Run 2: Warm-Up 125 Trials, Followed by 5 min break.
+	Run 3: Training 450 Trials - went slightly longer than intended
+	Run 4: Validation 1 - 130 Trials
+	Run 5: Validation 2 - 130 Trials
+	Run 6: NNKF 0 - KF ON: Hold time was too high until trial 20. 135 trials(some failures mixed in) 
+	Run 7: NNKF 0 - KF OFF: NN got stuck for a while, at 64 switched back to hand for a trial or two. Got stuck again. stopping at 90
+	Run 8: NNKF 0 - KF ON: got stuck pretty quick, at 12 went back to hand for 10ish trials. got stuck intermittently as things kept going. Stopped at 120
+	Run 9: NNKF 0 - KF OFF: did fine. Suspecting KF may not have been on this whole time. stopped at 125
+	
+	Run 10: turns out kf was off, debugging run. run crashed at 652
+	Run 11: starting again, more debugging. debugging ended, works! (i mean need to change certain things w the kf itself but overall good) 
+	
+-Notes:
+	- keep in mind, no g/o stuff in Run 6 and 7.
+	- For a fair comparison, need to compare to a bn5 enabled network.
+	- as a first real working day though, not so bad!
+	- lots of bias towards extension on both fingers.
+	
+	- SCRATCH THAT
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	
+	
+	
+	

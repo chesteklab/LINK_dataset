@@ -1,0 +1,40 @@
+Napier: 1/16/24
+
+- Goals: 2D Offline
+ 
+- Experimenters: Hisham, Miranda, Maddi
+
+- Recording Start Time: 10 am
+- Recording Stop Time:  10:50 am
+
+- xPC Model: Rig_main_Cortical_Parasite_v2
+- Recorded Array: EMG + Motor
+- Data recorded: 2kSps 100-500HzBPass Cerebus (96chans version) + EMG Cereplex
+- Drink: Apple Juice
+
+- Params:
+	* Movement Mask: [0,0,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 120
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	* Manipulandum: old
+	
+-Decoders:
+
+-Runs:	
+	Run 1: calibration + Warm-up
+	Run 2: TS29 Offline - 1400 trials, until he ran out of juice.
+
+
+
+Notes:	
+	had some trouble extending mrp today
+	neural activity was basically non existent
+	
+
+
+

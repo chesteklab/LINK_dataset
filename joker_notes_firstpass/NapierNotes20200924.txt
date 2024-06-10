@@ -1,0 +1,44 @@
+Napier: 9/24/2020
+
+- Goals: RFKF Trained on Center-Out Tested on Random
+
+- Experiment: Sam, Joey C
+
+- Recording Start Time: 8:35 am
+- Recording Stop Time:  1:00pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5, referenced to Ch14) + Raw + 2kSps 300-1000HzBPas continuous (referenced to Ch14, turned off for second set of recordings)
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 34/36
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',4,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',5,5,0,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true);
+	RF1: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',7,7,0,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true);
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS34 training.
+	Run 3: KF0 SBP: Pretty smooth control, not much orbiting, but the fingers seem to want to split up. Should be fixed by RF though. A matrix terms are high on the diagonal and low off the diagonal. Having lots of trouble around trials 30-35. MRS seems to want extend today. Not a good decoder, so turned off channel referencing to see if it does better.
+	Run 4: TS34 training.
+	Run 5: KF1 SBP: Seems a little bit better thank KF0. Having trouble getting index flexion/MRS extension. A matrix is fairly similar to KF0. Bit rate is much better. TCR at 266.
+	Run 6: RF0 SBP: Looks about the same as KF1, we'll see how it does over trials. TS36 later. Doing TS36 just fine in brain control. Back to TS34 in the late 300s.
+	Run 7: KF1 SBP: TS35. Training on TS35 to see if this gives a better RFKF. Still having trouble with index flexion/MRS extension. TCR at 285.
+	Run 8: RF1 SBP: TS34. Looks okay so far, slow to start but we'll see how it progresses. TS36 at 145. TS34 at 297.
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+
+	Spike and LFP data referenced to Channel 14, no additional grounds connected. This corresponds to the first neural data folder. Channel referencing turned off before run 4, so the remainder of the experiment corresponds to the second neural data folder.

@@ -1,0 +1,95 @@
+Napier: 08/10/2022
+
+- Goals: Refit NN, old code/new code?
+ 
+- Experimenters: Hisham, Joey
+
+- Recording Start Time: 10:25 am
+- Recording Stop Time:   pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient cable/cerebus)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous + broadband
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:	
+
+NN0 - Old Code
+	Epoch 11, Iteration 3500, loss = 0.8813
+	Checking accuracy on validation set
+	Mean Correlation is 0.658611
+	Mean SNR is 2.72332.
+	Total number of peaks is 333.
+	Average control peaks is 1.32437.
+	Average signal peaks is 0.0707597.
+	Ratio of control to true signal is 18.7165.
+	Feature number 0.
+	Median of feature is 0.149137.
+	Ratio of control to true signal is 19.3304.
+	Correlation is 0.610377
+	Feature number 1.
+	Median of feature is -0.00713025.
+	Ratio of control to true signal is 18.0725.
+	Correlation is 0.706846
+	Finger 0 RR Calculated Gain, Offset: 0.054066, -0.002558
+	Finger 1 RR Calculated Gain, Offset: 0.049141, 0.001801
+
+NN1 - New Code
+	iter 3500: val corr = [0.7056784006481122, 0.7557495432516694]
+	Test Correlation:[0.7056784006481122, 0.7557495432516694]
+	MSE:2.2939634323120117
+	
+RN0
+	Epoch 2, Iteration 500, loss = 0.6049
+	Checking accuracy on validation set
+	Mean Correlation is 0.541306
+	Mean SNR is 3.15383.
+	Total number of peaks is 415.
+	Average control peaks is 3.91042.
+	Average signal peaks is 1.3263.
+	Ratio of control to true signal is 2.94837.
+	Feature number 0.
+	Median of feature is -0.00632093.
+	Ratio of control to true signal is 3.57695.
+	Correlation is 0.532556
+	Feature number 1.
+	Median of feature is -0.0737845.
+	Ratio of control to true signal is 2.4146.
+	Correlation is 0.550056
+	Finger 0 RR Calculated Gain, Offset: 0.221861, -0.074966
+	Finger 1 RR Calculated Gain, Offset: 0.258585, -0.017477
+-Runs:
+	Run 1: calibration + warmup (~300) + 5 minute break
+	Run 2: 400 Training - TS29
+	Run 3: 100 Validation  - TS29
+	
+	Run 4: NN0 - ReFIT Training 250 - TS29
+	Run 5: NN1 - 250 - TS29  
+	
+	Run 6: Bugged, forgot to comment out some lines
+	Run 7: RN0 - 250 - TS36 BR ~1.9
+	Run 8: NN1 - 250 - TS36 BR ~1.45
+	Run 9: NN0 - 250 - TS36 BR ~1.9 at the end
+	Run 7: RN0 - 250 - TS36 BR ~1.8-2?
+-Notes:	
+
+	Between Runs 4 and 5, bit rates are comparable (~1.5,~1.4, respectively). brief analysis seems to show that NN1 might have shorter acq time but higher orb time.
+	
+	Reran NN0 after, weird stuff.
+	Need to run more formal old v new and nn v rn
+	
+	From 8/3/22:
+	good_chans_SBP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 17, 20, 23, 24, 33, 35, 37, 38, 39, 40, 42, 43, 45, 46, 47, 49, 50, 51, 52, 53, 55, 56, 57, 58, 59, 60, 61, 62, 64, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 93, 94, 96]
+
+
+	

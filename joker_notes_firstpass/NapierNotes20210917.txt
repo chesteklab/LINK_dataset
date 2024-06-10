@@ -1,0 +1,129 @@
+Napier: 9/15/2021
+
+- Goals: Smooth NN further tests
+
+- Experiment: Hisham, Dylan
+
+- Recording Start Time: 12:10PM
+- Recording Stop Time: 10:00 AM
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable) + Medial (Cereplex)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29/34
+	* Visualization Style: MRS
+
+-Decoders: 
+Epoch 11, Iteration 3500, loss = 0.8884
+Checking accuracy on validation set
+Mean Correlation is 0.461298
+Mean SNR is 2.26539.
+Total number of peaks is 704.
+Average control peaks is 1.19539.
+Average signal peaks is 0.0723058.
+Ratio of control to true signal is 16.5324.
+Feature number 0.
+Median of feature is -0.0214023.
+Ratio of control to true signal is 16.7864.
+Correlation is 0.463984
+Feature number 1.
+Median of feature is -0.011341.
+Ratio of control to true signal is 16.2931.
+Correlation is 0.458612
+Finger 0 RR Calculated Gain, Offset: 0.032351, 0.002304
+Finger 1 RR Calculated Gain, Offset: 0.035639, -0.000103
+
+Epoch 11, Iteration 3500, loss = 0.8841
+Checking accuracy on validation set
+Mean Correlation is 0.507792
+Mean SNR is 2.28955.
+Total number of peaks is 566.
+Average control peaks is 1.11522.
+Average signal peaks is 0.0739654.
+Ratio of control to true signal is 15.0776.
+Feature number 0.
+Median of feature is 0.161707.
+Ratio of control to true signal is 16.3298.
+Correlation is 0.547775
+Feature number 1.
+Median of feature is -0.0225853.
+Ratio of control to true signal is 13.6725.
+Correlation is 0.46781
+Finger 0 RR Calculated Gain, Offset: 0.044963, -0.003782
+Finger 1 RR Calculated Gain, Offset: 0.039748, 0.003317
+
+REFIT 0:
+Epoch 3, Iteration 500, loss = 0.5789
+Checking accuracy on validation set
+Mean Correlation is 0.648108
+Mean SNR is 2.60829.
+Total number of peaks is 514.
+Average control peaks is 3.35669.
+Average signal peaks is 1.32891.
+Ratio of control to true signal is 2.5259.
+Feature number 0.
+Median of feature is 0.0712725.
+Ratio of control to true signal is 2.50263.
+Correlation is 0.648063
+Feature number 1.
+Median of feature is -0.0298744.
+Ratio of control to true signal is 2.55056.
+Correlation is 0.648154
+Finger 0 RR Calculated Gain, Offset: 0.281812, -0.062245
+Finger 1 RR Calculated Gain, Offset: 0.268040, 0.020982
+
+REFIT 1:
+Epoch 3, Iteration 500, loss = 0.5805
+Checking accuracy on validation set
+Mean Correlation is 0.655286
+Mean SNR is 2.54426.
+Total number of peaks is 723.
+Average control peaks is 3.11164.
+Average signal peaks is 1.32891.
+Ratio of control to true signal is 2.34149.
+Feature number 0.
+Median of feature is 0.0665519.
+Ratio of control to true signal is 2.48404.
+Correlation is 0.651598
+Feature number 1.
+Median of feature is 0.01456.
+Ratio of control to true signal is 2.19038.
+Correlation is 0.658973
+Finger 0 RR Calculated Gain, Offset: 0.292843, -0.037210
+Finger 1 RR Calculated Gain, Offset: 0.293851, 0.018706
+
+-Runs:
+	(parasite model wasn't updated for FL mac address, so calibration and warmup weren't logged)
+	Run 1: Calibration
+	Run 2: Warm-Up 125 TS29, followed by 5 min break
+	
+	Run 3: TS29 400 Training
+	Run 4: TS29 100 Validation
+	Break for NN training
+	
+	Run 5: NN0 - No Smooth, No Gain/ Stopped at 10 - Finger out
+	Run 6: Think had got out earlier than expected, retraining all.
+	
+	Run 7: TS29 - 400 Training
+	Run 8: TS29 - 100 Validation
+	
+	Run 9: TS36 - 250, ReFIT Training
+	Run 10: TS36 - 250 RSNN - no smooth no gain change - stopped for debug
+	Run 11: debugging net, trained new net.
+	Was running out of time already, called it and putting him back
+	
+-Notes:
+	somewhat low correlations today
+	
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	

@@ -1,0 +1,112 @@
+Napier: 04/06/2022
+
+- Goals: NN Spring and Normal, tested on Normal
+ 
+- Experiment: Hisham, Eric, Mender
+
+- Recording Start Time: 10:20 am
+- Recording Stop Time:   am
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:
+NN0 - SPRING
+Epoch 11, Iteration 3500, loss = 0.8821
+Checking accuracy on validation set
+Mean Correlation is 0.610752
+Mean SNR is 3.03207.
+Total number of peaks is 185.
+Average control peaks is 1.61849.
+Average signal peaks is 0.0773228.
+Ratio of control to true signal is 20.9315.
+Feature number 0.
+Median of feature is -0.115981.
+Ratio of control to true signal is 19.0388.
+Correlation is 0.537445
+Feature number 1.
+Median of feature is 0.175615.
+Ratio of control to true signal is 23.0744.
+Correlation is 0.684059
+Finger 0 RR Calculated Gain, Offset: 0.038788, 0.002454
+Finger 1 RR Calculated Gain, Offset: 0.044874, -0.007501
+
+NN1: Normal
+Epoch 11, Iteration 3500, loss = 0.8919
+Checking accuracy on validation set
+Mean Correlation is 0.619399
+Mean SNR is 2.4336.
+Total number of peaks is 416.
+Average control peaks is 1.24172.
+Average signal peaks is 0.0774667.
+Ratio of control to true signal is 16.0291.
+Feature number 0.
+Median of feature is 0.0115561.
+Ratio of control to true signal is 15.5324.
+Correlation is 0.579098
+Feature number 1.
+Median of feature is 0.113801.
+Ratio of control to true signal is 16.5283.
+Correlation is 0.6597
+Finger 0 RR Calculated Gain, Offset: 0.045013, -0.002806
+Finger 1 RR Calculated Gain, Offset: 0.049511, -0.005656
+
+NN2: normal
+Epoch 11, Iteration 3500, loss = 0.8745
+Checking accuracy on validation set
+Mean Correlation is 0.612191
+Mean SNR is 2.45964.
+Total number of peaks is 305.
+Average control peaks is 1.33413.
+Average signal peaks is 0.0860382.
+Ratio of control to true signal is 15.5063.
+Feature number 0.
+Median of feature is 0.0646349.
+Ratio of control to true signal is 14.8405.
+Correlation is 0.579316
+Feature number 1.
+Median of feature is -0.0394365.
+Ratio of control to true signal is 16.2944.
+Correlation is 0.645066
+Finger 0 RR Calculated Gain, Offset: 0.049482, -0.001251
+Finger 1 RR Calculated Gain, Offset: 0.045669, -0.000295
+
+-Runs:
+	Run 1: Calibration + 100 Spring Warmup TS29 + 5 min break
+	Run 2: TS29 - 400 Normal Spring
+	Run 3: TS29 - 100 Validation Spring
+	Run 4: recalibration after removing springs
+	~5 Minute break~
+	
+	Run 5: TS29 - 400 Training Normal
+	Run 6: TS29 - 100 Validation Normal
+	~Training Break~ Starting 11:09. Had lab tour. Finished training and started at 11:30. Maybe too long of a break.
+	
+	Run 7: TS29 - NN1 - may need some time to acclimate. didnt.
+	Run 8: TS29 - NN0 - also no
+	~5 min break~
+	
+	Run 9: TS29 - NN1 - no
+	
+	Run 10: TS29 - 400 Training Normal
+	Run 11: TS29 - 100 Validation Normal
+	~retrain~
+	
+	Run 12: Still no.
+
+-Notes:
+	from previous attempts, fatigue might be a big issue. Going to be very liberal with breaks (but make sure not to give him hand control just break)
+	still not working. might be confusion. thinking of scaling back further, just training on spring and testing on normal, no normal set in between.
+	Spike panel seems weird. Thresholding shouldn't change anything but might indicate problems

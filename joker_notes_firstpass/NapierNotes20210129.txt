@@ -1,0 +1,38 @@
+Napier: 1/25/2021
+
+- Goals: Measure EMG with and without springs
+
+- Experiment: Mender, Joey C
+
+- Recording Start Time: 10:45 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 35/29
+	* Visualization Style: MRS
+	
+-Decoders: 
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS35 - Normal, Matt was in the rig for the first ~30 trials. ~930 trials
+	Run 3: TS29 - Normal, ~350 trials
+	Run 4: TS35 - Springs 2/4, ~1000 trials, accidentally turned screen off at trial 410.
+	Run 5: TS34 - Springs 2/4, ~300 trials
+	Run 6: TS34 - Normal, ~335 trials, first 10 matt was in the rig.
+	Run 7: TS35 - Normal, went until juice ran out. About 750 trials
+
+
+	
+-Notes:

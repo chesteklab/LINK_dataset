@@ -1,0 +1,77 @@
+Napier: 6/16/2023
+
+- Goals: KalmanNet encoder model testing and RNN comparison
+ 
+- Experimenters: Luis, Maddi
+
+- Recording Start Time: 10:00 am
+- Recording Stop Time:   am
+
+- xPC Model: Rig_main_Cortical_Parasite_v2
+- Recorded Array: Motor (Patient cable/cerebus)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPass
+- Drink: Apple Juice
+
+- Params:
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 37, 29
+	* Visualization Style: MRS
+	* Manipulandum: old
+	
+-Decoders:
+	- RNN0: trained on run 2.
+		Test Correlation:[0.9078029010190809, 0.9155529186231404, 0.7006976126242414, 0.7163036754191278]
+	- KNet0: trained with parameters from yesterday, run 2.
+		Best corr: 0.823 at iteration 300
+		[0.86088117 0.89413351 0.76939182 0.76657055]
+		Messed up and trained it without a GPU, which then Parasite complained a lot about.
+	- KNet1: same as KNet0
+		Best corr: 0.823 at iteration 300
+		[0.86127878 0.88552347 0.78101006 0.76607385]
+
+-Runs:	
+	Run 1: Calibration
+	Run 2: 500 TS37. Bitrate ~3.
+	Run 3: 500 TS29. Bitrate ~4.5
+	
+	-- RNN0
+	Run 4: 100 TS29. He has a lot of trouble moving to the targets. Movement is jumpy and not accurate in general. Can't do most trials. Success rate around 10%. Could be even lower. Bitrate 0.2
+	
+	--KNET0
+	Run 5: test
+	
+	-- Hand control
+	Run 6: 500 TS35.
+	
+	-- KNet1
+	Run 7: test
+	Run 8: 200 TS35, beta=0.98. Seems to struggle a lot to do movements in general. Maybe a neural shift happened, or something. He started moving after around 25 trials. He has trouble extending the index though (especially the splits). Bitrate ~1.4. The index velocity is definitely biased towards flexion.
+	
+	-- RNN0
+	Run 9: TS35. Fingers are moving, but he has trouble reaching the targets. Can't do any trials.
+	
+	-- KNet1
+	Run 10: TS29. He's bored or ran out of juice. Stopping.
+	
+	
+Summary:
+
+TODO:
+	- 
+
+Notes:
+	artifact on channels 4, 77.
+	
+	chans with >1 Hz
+	good_chans_SBP = [7,8,9,11,15,33,65,67,68,69,71,72,73,74,75,76,78,81,82,83,84,90,91]
+
+	Signals don't look very good today.
+	
+
+
+

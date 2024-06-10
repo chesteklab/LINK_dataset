@@ -1,0 +1,84 @@
+Napier: 6/12/2023
+
+- Goals: KalmanNet encoder model testing
+ 
+- Experimenters: Luis, Hisham
+
+- Recording Start Time: 09:40 am
+- Recording Stop Time:   am
+
+- xPC Model: Rig_main_Cortical_Parasite_v2
+- Recorded Array: Motor (Patient cable/cerebus)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPass
+- Drink: Apple Juice
+
+- Params:
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 37, 29
+	* Visualization Style: MRS
+	* Manipulandum: old
+	
+-Decoders:
+	- KNet0: no encoder model, optimized from long run from yesterday
+		Best corr: 0.820 at iteration 280
+		[0.86859456 0.91196706 0.73273835 0.76813401]
+	- KNet1: encoder model, ridge with hist=5 (250ms)
+		Best corr: 0.621 at iteration 500
+		[0.81161852 0.88856147 0.31095242 0.47424177]
+	- KNet2: encoder model, ridge with hist=2 (100ms)
+		Best corr: 0.611 at iteration 440
+		[0.82116525 0.89260895 0.28066536 0.45072144]
+	- RNN0:
+		Test Correlation:[0.9057807468872462, 0.9227082430778798, 0.6790688202083496, 0.6973050049393634]
+		MSE:0.4037629961967468
+-Runs:	
+	Run 1: Calibration
+	Run 2: 500 TS37 hand control. Bitrate ~2.9.
+	Run 3: 500 TS29, bitrate 4.
+	
+	-- KNet0
+	Run 4: 320 TS29, beta=0.98. Movements are a little jumpy, but generally fast and towards the targets. Has trouble with index extension, MRS flexion. Bitrate ~1.6 to ~1.8. He doesn't seem to be stopping very well. 
+
+	-- KNet1
+	Run 5: 115 TS29, beta=0.98. He has trouble flexing the index. Fingers are generally moving very slowly, but at least are not biased. Success rate of around 0.6. At around trial 80 he seems to have stopped trying, for the most part. Then, he started again.
+	
+	-- KNet0
+	Run 6: 330 TS29, beta=0.98. Bitrate ~1.8. Went up to 2.1. Crashed at 330 trials.
+	
+	-- KNet1
+	Run 7: 80 TS29. 0.5 bitrate.
+	
+	-- KNet2
+	Run 8: 50 TS29. Movements are much faster, but he has trouble stopping. He stopped doing trials after a while.
+
+	-- KNet0
+	Run 9: 200 TS29. Bitrate ~1.8
+	
+	-- KNet3
+	Run 10: 200 TS29, bitrate ~1.7.
+	
+	-- Tests for Omer
+	Run 11: Had to stop it.
+	Run 12: Second test.
+	
+Summary:
+
+TODO:
+	- 
+
+Notes:
+	artifact on channels 77.
+	good_chans_SBP = [1, 3, 4, 5, 7, 8, 9, 11, 14, 15, 17, 20, 22, 23, 24, 25, 26, 28, 29, 31, 33, 35, 36, 37, 38, 39, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 79, 81, 82, 83, 84, 85, 86, 87, 88, 91, 92, 94, 96];
+	
+	chans with >1 Hz
+	good_chans_SBP = [4,7,8,15,33,37,38,51,65,67,68,69,71,72,73,74,75,76,78,81,82,83,84,90,91]
+	
+	Having 250ms of history may have made the fingers too slow to react to changes in neural data.
+
+
+

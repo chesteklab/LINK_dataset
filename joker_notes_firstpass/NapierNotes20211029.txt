@@ -1,0 +1,64 @@
+Napier: 10/29/2021
+
+- Goals: 2D DS vs NN?
+ 
+- Experiment: Hisham, Dylan
+
+- Recording Start Time: 10:30 am
+- Recording Stop Time:  12:45 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,0,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 70
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: All
+	
+-Decoders:
+	TrainOnline_Cortical_DualStateDecoder('Joker','','Run-003','',[2,4],50,0,good_chans_SBP)
+
+Epoch 11, Iteration 3500, loss = 0.9111
+Checking accuracy on validation set
+Mean Correlation is 0.652578
+Mean SNR is 2.51397.
+Total number of peaks is 426.
+Average control peaks is 1.46092.
+Average signal peaks is 0.0636529.
+Ratio of control to true signal is 22.9514.
+Feature number 0.
+Median of feature is 0.0780222.
+Ratio of control to true signal is 22.5227.
+Correlation is 0.591947
+Feature number 1.
+Median of feature is -0.129449.
+Ratio of control to true signal is 23.3551.
+Correlation is 0.713209
+Finger 0 RR Calculated Gain, Offset: 0.035362, -0.001798
+Finger 1 RR Calculated Gain, Offset: 0.040647, 0.002031
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Warm-up 125, 5 min break
+	Run 3: Training 400
+	Run 4: Validation 100
+	~Training Break~
+	
+	Run 5: DS - 250 Trials
+	Run 6: NN - 250 Trials - had to revert to hand control at ~70 for 10 trials, thne switch back - File logger crashed, restarting
+	Run "6.5" (not saved): NN - 250 Trials - filelogger crashed again, needed to empty trash
+	Run 7: NN - Trying for 250, slowed down a lot around 45. Might switch back to DS. Truned off decode 60-70
+	Run 8: DS - 285
+	Run 9: NN - Trying for another 250, seems like NN is bad today, going to swap to doing more DS smooth testing
+	Run 10: DS - smooth 0.2, gain 1.75 - 570 trials
+	Run 11: DS - smooth 0.1, gain 1.75
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+

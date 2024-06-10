@@ -1,0 +1,70 @@
+Napier: 8/10/2020
+
+- Goals: Neural Network test run
+
+- Experiment: Matt M, Hisham
+
+- Recording Start Time: 10:45 am
+- Recording Stop Time:  pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 29,36
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',4,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); % Normal
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',7,7,0,[2,4],50,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true);
+	RF1: Same as RF0 except I didn't zero out the TCFR C matrix
+	RF2: Tried training with a breakpoint and labeling more trials as TCFR decodes.
+	RF3: Specified TCFR channels - too many still and got a singular matrix.
+	RF4: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',7,7,0,[2,4],50,xpcBinLag,xpcA,xpcW,good_chans_TCFR,good_chans_SBP, 1, {[], []}, true);
+
+
+Epoch 76, Iteration 3500, loss = 0.9218
+Checking accuracy on validation set
+Mean Correlation is 0.668128
+Mean SNR is 2.35162.
+Total number of peaks is 645.
+Average control peaks is 3.40378.
+Average signal peaks is 0.0663749.
+Ratio of control to true signal is 51.2812.
+Feature number 0.
+Median of feature is -0.264233.
+Ratio of control to true signal is 45.6952.
+Correlation is 0.624222
+Feature number 1.
+Median of feature is -0.264872.
+Ratio of control to true signal is 57.2415.
+Correlation is 0.712034
+
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 29 - Warmup run - 250 trials
+	Run 3: TS 29 - Warmup run - 110 trials 
+	Run 4: TS 29 - training set - 400 trials
+	Run 5: TS 29 - validation set - 150 trials
+	Run 6: TS 36 - KF0 - forgot to turn on parasite.....
+	Run 7: TS 36 - KF0
+	Run 8: TS 36 - ReFIT - singular matrix - updated C matrix so that TCFR are 0s instead of nans
+	Run 9: Not getting decodes
+	Run 10: Tried again with a different ReFIT
+	Run 11: TS 36 - ReFIT (RF04)
+
+
+-Notes:
+good_chans_SBP = [1:9,11,13,15,17,23,33,35,37:38,40,43,45:47,49:53,55:60,62,64,65,67:68,71:76,78:87,90:92,94,96];
+good_chans_TCFR = [     4     7    11    33    35    38    40    51    57    67    68    71    72    73    74 75    81    82    83    84    90    91];
+
+Hisham's first day (in lab) !!!!!!!!!!!!!!!!!!!!!!!!!!
+

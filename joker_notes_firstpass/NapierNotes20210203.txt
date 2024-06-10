@@ -1,0 +1,63 @@
+Napier: 2/3/2021
+
+- Goals: Mote Intervals - how low can we go. (30pps lag/nolag, 20pps lag)
+
+- Experiment:  Joey C, Sam
+
+- Recording Start Time: 8:40 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_motePackets10
+- Recorded Array: Motor (Patient Cable) + EMG (CPD via CPA)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100/100 		**normal targets today
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+
+-Decoders: 
+	(final 3 numbers are threshNum,avgMode,intLagMs)
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',3,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,15);
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',3,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,0);
+	KF2: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',8,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,25);
+	KF3: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',8,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,0);
+
+-Runs:
+	Run 1: calibration
+	Run 2: threshold setting (150 trials): xpcMoteThresholds = calcOnlineMoteThresholds(30,'Joker');
+	Run 3: 30pps training TS-34. 400 trials
+	
+	Run 4: KF0 30pps 15lag 32msbins - normal size targets - seems better than last week, better stopping. crash trial 40.
+	Run 5: KF0 30pps 15lag 32msbins - 200 mint BR=1.5, 200 SBP BR=1.4-1.6, 200 mint BR=1.15, 100 SBP BR=1.6, crash . Trouble with index-ext/mrp-flex.
+	Run 6: (continued) 70 mint BR=1.4. (30sec break at end before run 7.)
+	Run 7: KF1 30pps 0lag 32msbins - 100 mint BR=1.6, 100 SBP BR=1.9, 100 mint BR=1.8. Moving without refit!
+	
+	xpcMoteThresholds = calcOnlineMoteThresholds(20,'Joker','2021-02-03',2,true);
+	Run 8: 20pps training TS-34. 400 trials. BR=4.1
+	Run 9: KF2 20pps 25lag 32msbins - 150 mint BR=1.2, 150 SBP BR=1.7, 50? mint - crash.
+	Run 10: (continued) 100 mint BR=1.2. (30 sec before run 11). Not as smooth as 30pps-kinda shaky.
+	Run 11: KF3 20pps 0lag 32msbins - 100 mint nolag BR=1.4, 100 SBP BR=1.9, (crash)
+	Run 12: (continued) 100 mint nolag BR=1.5 (20 sec before run 13)
+	Run 13: back to KF2 (20pps 0lag). 50 mint nolag before crash. BR=1.1
+	crashes
+	Run 16: a few more 20pps 0lag. (Not good - some noisy signals - he might be moving around) (Juice was out at the end)
+	
+	Need more data for 20pps lag/nolag, but seems like nolag might be better.
+	
+
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	**Put a pad in index finger to reduce movement and maybe improve training data. Seems like better online control with less oscillation.
+	During training struggling a little to reach the furthest extension
+
+
+

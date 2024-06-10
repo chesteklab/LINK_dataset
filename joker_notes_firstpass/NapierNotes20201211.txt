@@ -1,0 +1,51 @@
+Napier: 12/11/2020
+
+- Goals: Decoder Lag Comparisons
+
+- Experiment:  Sam, Hisham, Dylan
+
+- Recording Start Time: 11:20 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',1,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); % used Wayne's channels on accident
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',1,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); % with Napier's channels
+	KF2: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',1,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	KF3: Same as KF2 but with xpcBinLag = [0, 0];
+	
+	Loaded KF2 here before RF0 training
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',4,4,false,[2,4],50,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	Loaded KF3 here before RF1 training
+	RF1: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',4,5,false,[2,4],50,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	
+-Runs:
+	Run 1: Training TS34
+	Run 2: KF0 SBP Vint=2: Having lots of trouble here. Used Wayne's channels on accident for training KF0
+	Run 3: KF1 SBP Vint=2: That's better. Nevermind, 32ms hold time...
+	Run 4: KF2 SBP Vint=2 bin lag = trained (1): For real this time. TCR at 267.
+	Run 5: KF3 SBP Vint=2 bin lag = 0: Looks no different. Maybe it is, had a higher bit rate.
+	
+	Run 6: RF0 SBP Vint=2 bin lag = trained (1): Looks really good, 2.2 bit rate before switching to TS36 at 204. Still has a 2.0 bit rate after 100 trials of TS36.
+	Run 7: RF1 SBP Vint=2 bin lag = 0: Also looks really good, perhaps better. TS36 at 206. 2.2 bit rate on TS36.
+	Run 8: RF0 SBP Vint=2 bin lag = trained (1): ABA action here, all on TS36.
+	Run 9: RF1 SBP Vint=2 bin lag = 0: TS36. RF1 performance seems to be better.
+	Run 10: RF0 SBP Vint=2 bin lag = trained (1): TS36
+	Run 11: RF1 SBP Vint=2 bin lag = 0: TS36. Letting him run out of juice here, so I would ignore after trial 150 or so. Notice index finger is out of stanchion in late 180s, which could be contributing to performance issues in this run. Don't know when index finger got out. Got his finger back in later in the early 200s. Out of juice come 230 though.
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];

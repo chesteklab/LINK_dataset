@@ -1,0 +1,75 @@
+Napier: 10/17/2022
+
+- Goals: Error Correction Parasite Test (2D) - Error Detection Week Day 11
+ 
+- Experiment: Dylan, Hisham
+- Recording Start Time: 9:45 am
+- Recording Stop Time:  pm 
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 70
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [1, 1] - 0 lag picked) - 0.785 CC
+	
+
+-Runs:
+
+	-- CAR OFF --
+	Run 1: Calibration and warm-up (~150 trials), xPC crashed before evaluating good chans
+	Run 2: Calibration and warm-up (~150 trials); set TCFR threshold very high for noise mitigation, so no TCFR
+	-- CAR ON --
+	Run 3: Training TS34 - 500 trials, good performance (4.69 bps), 99% SR;
+
+	
+	Run 4: KF0 (0 lag) 500 ms hold time - online by trial 10; amazing performance for Napier (2.62 bps), 1150 trials, 100% SR;
+		try_data_Z: T = 4: 53.97% Finger 1 EXT, 38.81% Finger 1 FLEX, 41.92% Finger 2 EXT, 21.84% Finger 2 FLEX TPR for 4-5% FPR
+		try_data_Err: T = 4: 48.48% Finger 1 EXT, 26.49% Finger 1 FLEX, 28.93% Finger 2 EXT (dropped of to 0/0 after this bin, so may be weird), 22.07% Finger 2 FLEX TPR for 4-5% FPR
+		try_data_Z_bug: T = 4: 44.85% Finger 1 EXT, 23.32% Finger 1 FLEX, 23.71% Finger 2 EXT, 16.25% Finger 2 FLEX TPR for 4-5% FPR
+
+	Run 5: KF0 to keep him busy, 750 trials, great performance (2.95 bps), 99% SR;
+	
+	-- try_data_Z_bug, no delay, detection --
+	Run 6: Error detection run 1 (correction OFF) - online by trial 10; ~540 trials, good performance for Napier (2.61 bps), 99% SR; Finger 1 Ext: 24.90% TPR, 4.61% FPR; Finger 1 Flex: 16.73% TPR, 7.11% FPR; Finger 2 Ext: 15.72% TPR, 4.33% FPR; Finger 2 Flex: 13.94% TPR, 4.12% FPR; used a weird version of try_data_Z here, accidentally used wrong binDataCont script in training.
+
+	-- try_data_Z, no delay, detection --
+	Run 7: Error detection run 2 (correction OFF) - online by trial 10; ~570 trials, great performance for Napier (2.75 bps), 99% SR; Finger 1 Ext: 16.22% TPR, 3.59% FPR; Finger 1 Flex: 14.21% TPR, 7.36% FPR; Finger 2 Ext: 23.39% TPR, 7.19% FPR; Finger 2 Flex: 7.66% TPR, 2.66% FPR;
+
+	Run 8: try_data_Z delay by 1 attempt, xPC crashed at trial 233
+	Run 9: try_data_Z delay by 1 attempt, xPC crashed at trial 422
+
+	-- try_data_Z, pos & vel delayed by 1, detection --
+	Run 10: Error detection run 3 (correction OFF) - online by trial 10; ~490 trials, fair performance for Napier (2.35 bps), 94% SR; Finger 1 Ext: 24.90% TPR, 5.73% FPR; Finger 1 Flex: 29.89% TPR, 11.48% FPR; Finger 2 Ext: 40.0% TPR, 10.68% FPR; Finger 2 Flex: 7.73% TPR, 4.35% FPR; a bit of bias, and some split trials hard to hit
+
+	-- try_data_Z, pos & vel delayed by 1, correction --
+	Run 11: Error detection run 4 (correction ON, T-2T) - online by trial 10; ~410 trials, fair performance for Napier (2.11 bps), 91% SR; Finger 1 Ext: % TPR, % FPR; Finger 1 Flex: % TPR, % FPR; Finger 2 Ext: % TPR, % FPR; Finger 2 Flex: % TPR, % FPR; issues with bias from time to time, especially during split trials
+
+	Run 12: try_data_Err attempt, but Napier won't do any more trials, even hand control.
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,22:25,33:40,43,45:47,50:53,55:60,62,64,65,67:76,78,81:87,90:93,95,96];
+
+	CAR: [1,1,1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,1,0,1,1,1,0,0,1,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,0,0,1,1,1,1,1,1,1,0,0,1,1,1,1,0,1,1]
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

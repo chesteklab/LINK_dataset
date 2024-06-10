@@ -1,0 +1,45 @@
+Napier: 8/10/2021
+
+- Goals: Error Classification Parasite Test
+ 
+- Experiment: Dylan, Hisham
+
+- Recording Start Time: 11:40 am
+- Recording Stop Time:  1:20 pm
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90/60
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [1, 1] - 0 lag picked) - 0.74 CC
+		
+-Runs:
+	Run 1: Calibration
+	Run 2: Warmup TS34
+	Run 3: Training TS34 - 500 trials
+	Run 4: KF0 - online by trial 10; low performance (1.5+ bps), 250 trials
+	Run 5: Error classsifier first run (online by trial 10), ~100 trials
+	Run 6: Offline run for motivation (juice time turned down to 60 for longevity) - 1200 trials
+	Run 7: Bad run, KF no longer good enough for online performance
+	Run 8: Another bad run while debugging 1D control
+	Run 9: Final offline run until he is out of juice (750 trials)
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	
+	
+	
+	

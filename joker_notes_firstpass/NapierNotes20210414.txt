@@ -1,0 +1,143 @@
+Napier: 4/13/2021
+
+- Goals: Test NN Solution Stability
+
+- Experiment: Hisham, Mender, Joey
+
+- Recording Start Time: 8:40 am
+- Recording Stop Time:  1:30 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRS
+	
+-Decoders:
+NN1 (500ms):
+Epoch 11, Iteration 3500, loss = 0.1111
+Checking accuracy on validation set
+Mean Correlation is 0.663635
+Mean SNR is 2.50123.
+Total number of peaks is 199.
+Average control peaks is 0.620933.
+Average signal peaks is 0.0829855.
+Ratio of control to true signal is 7.48243.
+Feature number 0.
+Median of feature is -0.0440329.
+Ratio of control to true signal is 7.47052.
+Correlation is 0.61885
+Feature number 1.
+Median of feature is -0.0114731.
+Ratio of control to true signal is 7.49661.
+Correlation is 0.708419
+
+NN1:
+Epoch 11, Iteration 3500, loss = 0.0038
+Checking accuracy on validation set
+Mean Correlation is 0.694123
+Mean SNR is 2.54883.
+Total number of peaks is 315.
+Average control peaks is 0.119544.
+Average signal peaks is 0.0625077.
+Ratio of control to true signal is 1.91248.
+Feature number 0.
+Median of feature is 0.00103577.
+Ratio of control to true signal is 1.09951.
+Correlation is 0.667769
+Feature number 1.
+Median of feature is 0.000988532.
+Ratio of control to true signal is 2.65694.
+Correlation is 0.720478
+
+NN3:
+Epoch 11, Iteration 3500, loss = 0.0019
+Checking accuracy on validation set
+Mean Correlation is 0.655194
+Mean SNR is 2.82123.
+Total number of peaks is 258.
+Average control peaks is 0.0997527.
+Average signal peaks is 0.0625077.
+Ratio of control to true signal is 1.59585.
+Feature number 0.
+Median of feature is -0.0075408.
+Ratio of control to true signal is 1.06797.
+Correlation is 0.612119
+Feature number 1.
+Median of feature is 0.00507496.
+Ratio of control to true signal is 2.07924.
+Correlation is 0.698268
+
+NN4:
+Epoch 11, Iteration 3500, loss = 0.0532
+Checking accuracy on validation set
+Mean Correlation is 0.712676
+Mean SNR is 2.58099.
+Total number of peaks is 319.
+Average control peaks is 0.35813.
+Average signal peaks is 0.0625077.
+Ratio of control to true signal is 5.72938.
+Feature number 0.
+Median of feature is 0.013839.
+Ratio of control to true signal is 3.959.
+Correlation is 0.666057
+Feature number 1.
+Median of feature is 0.0425591.
+Ratio of control to true signal is 7.35057.
+Correlation is 0.759294
+
+NN5:
+Epoch 11, Iteration 3500, loss = 0.0045
+Checking accuracy on validation set
+Mean Correlation is 0.716175
+Mean SNR is 2.43887.
+Total number of peaks is 353.
+Average control peaks is 0.133203.
+Average signal peaks is 0.0625077.
+Ratio of control to true signal is 2.13098.
+Feature number 0.
+Median of feature is 0.00490801.
+Ratio of control to true signal is 1.96795.
+Correlation is 0.681471
+Feature number 1.
+Median of feature is -0.00222748.
+Ratio of control to true signal is 2.28026.
+Correlation is 0.750878
+
+
+-Runs:
+	Run 1: Calibration
+	Run 2: 165 Trials - Warm-up, followed by 5 min break
+	Run 3: 400 Trials - Training, TS29 500ms
+	Run 4: 100 Trials - Validation, TS29 500ms
+	Run 5: NN1 - Realized all the training data was on 500ms, network was way too jittery
+	Run 6: 400 Trials - 400t Training 750
+	Run 7: 100 Trials - 100t Validation 750
+	Run 8-10: Dummy Runs/Mistakes
+	Run 11: NN1 - Super Volatile, high gains seems to mean low performance
+	Run 12: Dummy Crash
+	Run 13: NN3 - Super Volatile, same as NN1
+	Run 14: NN4 - Better, lower gains, still hard to control
+	Run 15: Dummy Crash
+	Run 16: NN5 - Back to garbage
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	In all the networks trained, 8/9 trained worked offline (one crashed to inf)
+	
+	In new networks:
+		- First 2 networks crashed/caused dummy run bug, also had relatively high gains and were uncontrollable
+		- Thirds Network was more controllable but had bias issues, did not cause the dummy stuff
+		
+	What might be going on:
+		NN has been getting much higher correlations recently with the same amount of previous iterations. Maybe it's just way overfitting, could be worth going back to basics.
+		Will try less next week.

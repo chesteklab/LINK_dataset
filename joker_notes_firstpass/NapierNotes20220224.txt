@@ -1,0 +1,127 @@
+Napier: 2/24/2022
+
+- Goals: Compare 50 and 32 ms Network
+ 
+- Experiment: Hisham, Mender
+
+- Recording Start Time: 10:50 am
+- Recording Stop Time:  12 am
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:
+
+32ms_NN0
+Epoch 11, Iteration 3500, loss = 0.9369
+Checking accuracy on validation set
+Mean Correlation is 0.519522
+Mean SNR is 2.70395.
+Total number of peaks is 422.
+Average control peaks is 1.40891.
+Average signal peaks is 0.0376144.
+Ratio of control to true signal is 37.4566.
+Feature number 0.
+Median of feature is 0.00241591.
+Ratio of control to true signal is 34.1839.
+Correlation is 0.4079
+Feature number 1.
+Median of feature is 0.161304.
+Ratio of control to true signal is 41.2779.
+Correlation is 0.631145
+Finger 0 RR Calculated Gain, Offset: 0.017767, 0.001087
+Finger 1 RR Calculated Gain, Offset: 0.019743, -0.002363
+
+32ms_NN0 - ADDED 1 BIN OF TIME HISTORY (4 total)
+Epoch 11, Iteration 3500, loss = 0.9310
+Checking accuracy on validation set
+Mean Correlation is 0.568328
+Mean SNR is 2.87546.
+Total number of peaks is 272.
+Average control peaks is 1.76827.
+Average signal peaks is 0.0376144.
+Ratio of control to true signal is 47.0105.
+Feature number 0.
+Median of feature is 0.112141.
+Ratio of control to true signal is 39.1488.
+Correlation is 0.471436
+Feature number 1.
+Median of feature is 0.278909.
+Ratio of control to true signal is 56.1902.
+Correlation is 0.66522
+Finger 0 RR Calculated Gain, Offset: 0.018080, -0.001176
+Finger 1 RR Calculated Gain, Offset: 0.017057, -0.003186
+
+32ms_NN2 - ADDED ANOTHER BIN (5 total)
+Epoch 11, Iteration 3500, loss = 0.9361
+Checking accuracy on validation set
+Mean Correlation is 0.59145
+Mean SNR is 2.37452.
+Total number of peaks is 627.
+Average control peaks is 1.24746.
+Average signal peaks is 0.0376144.
+Ratio of control to true signal is 33.1644.
+Feature number 0.
+Median of feature is 0.0147685.
+Ratio of control to true signal is 30.4346.
+Correlation is 0.455932
+Feature number 1.
+Median of feature is 0.0534529.
+Ratio of control to true signal is 36.3517.
+Correlation is 0.726967
+Finger 0 RR Calculated Gain, Offset: 0.020950, 0.000279
+Finger 1 RR Calculated Gain, Offset: 0.021176, -0.001374
+
+50ms_NN0
+Epoch 11, Iteration 3500, loss = 0.9019
+Checking accuracy on validation set
+Mean Correlation is 0.639862
+Mean SNR is 2.39974.
+Total number of peaks is 435.
+Average control peaks is 1.24171.
+Average signal peaks is 0.0604639.
+Ratio of control to true signal is 20.5363.
+Feature number 0.
+Median of feature is -0.000408007.
+Ratio of control to true signal is 17.845.
+Correlation is 0.547948
+Feature number 1.
+Median of feature is 0.117787.
+Ratio of control to true signal is 23.4471.
+Correlation is 0.731776
+Finger 0 RR Calculated Gain, Offset: 0.036978, 0.000469
+Finger 1 RR Calculated Gain, Offset: 0.033029, -0.002348
+
+
+-Runs:
+	Run 1: Calibration + 125 practice + 5min break
+	Run 2: TS29 - 400 Training
+	Run 3: TS29 - 100 Validation
+	~Training Break~
+	
+	Run 4: TS29 - ~80 - 32ms_NN0 - Note at ~30, hasn't been great so far. Blank screen at 40, HC till 47/48, resumed. Stopping at 81.
+	Run 5: TS29 - 100 - 50ms_NN0 - Not great to start, got the hang of it around ~50 trials. Still struggles a bit with some movements.
+	Run 6: TS29 - XXX - 32ms_NN1 - something bugged stopping at 15 - HARCODED HISTORY IN ONLINEDECODERS
+	Run 7: TS29 - ~80 - 32ms_NN1 - struggling a lot. could try better net or add another bin to capture 150ms. Kinda got better over time.
+	Run 8: TS29 - 100 - 32ms_NN2 - definitely still struggling, but maybe better?
+	Run 9: TS29 - 100 - 50ms_NN0 - back to 50ms. gave him 20 hc. maybe should do that in future
+	
+-Notes:
+	- offline correlations were lower w 32, figured it was because time history was now significantly shorter. need about 4.6 bins to get same amount, rounded down for now.
+	- training times could be different optimally for these.
+	- Lots of hardcoding still present when it comes to time history.. Need to check through Joey's new stuff.
+	- Lots of decoders tested, so he could be getting confused.
+	Maybe a bit ambitious today. but wanted to see a spread.
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];

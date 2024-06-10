@@ -1,0 +1,48 @@
+Napier: 2/24/2021
+
+- Goals: Checking decode performance with RFKF
+
+- Experiment:  Sam, Mender
+
+- Recording Start Time: 8:55 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable) + EMG (CPD via CPA)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100/100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',4,4,0,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true);
+	RF1: Same as above but xpcBinLag manually set to 0.
+	RF2: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',4,6,0,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true);
+
+-Runs:
+	Run 1: Calibration
+	Run 2: Training TS34
+	Run 3: Wrong decode params
+	Run 4: KF0 SBP Vint=0. Looks good to start. Index extension looks okay too. TCR at 274. Still working, a little tougher. Seems extension biased.
+	Run 5: RF0 SBP Vint=0. Still looks good, not sure if better though.
+	Run 6: RF1 SBP Vint=0. Really quick, 0 lag def seems the way to go. Really good bit rate in the middle.
+	Run 7: RF2 SBP Vint=0. Quick start again, we'll see if he keeps it up.
+	Run 8: RF0 SBP Vint=0. Comparison between lags.
+	Run 9: RF2 SBP Vint=0. Looks like it's better than RF0 just slightly. Up over a 2.7 bit rate at some point.
+	Run 10: TS 35 - Matt taking over to try a wrist position change - little more than 300 trials
+	Run 11: TS 35 - Wrist flexed - little over 600 trials - matt was in rig first 10
+	Run 12: TS 35 - normal wrist -little over 400 trials. matt was in rig first 10. The first 40 trials of this have very bad emg for some reason
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,94:96];
+	Channels 2, 95, and 96 have juicer artifacts despite being included

@@ -1,0 +1,75 @@
+Napier: 07/20/2022
+
+- Goals: Error Correction Parasite Test (2D) - New Detector Training Correction Test 10 (Debugging Delay)
+ 
+- Experiment: Dylan, Hisham, 
+
+- Recording Start Time: 9:55 am
+- Recording Stop Time:  11:55 am
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [2, 2] - 0 lag picked) - 0.746 CC
+
+	
+-Runs:
+	Run 1: Calibration and warm-up (~200 trials)
+	Run 2: Training TS34 - 500 trials, great performance (4.8 bps), 100% SR;
+	Run 3: KF0 (0 lag) 500 ms hold time - online by trial 10;  performance for Napier ( bps), ~ trials, % SR;
+		try_data: T = 4: 32 - 50% TPR for 5-7% FPR
+	
+	-- Taking previous bin of vel --
+	Run 4: Error detection run 1 (correction OFF) - online by trial 10; ~510 trials, good performance for Napier (2.17 bps), 100% SR; Finger 1: 21.64% TPR, 15.76% FPR; Finger 2: 26.35% TPR, 23.15% FPR
+	
+	 Run 5: Test run
+	
+	-- Taking same bin of vel as neural --
+	Run 6: Error detection run 2 (correction OFF) - online by trial 10; ~510 trials, good performance for Napier (2.48 bps), 100% SR; Finger 1: 6.78% TPR, 7.76% FPR; Finger 2: 15.49% TPR, 8.35% FPR
+	
+	
+	-- Training new err detector with good_chans --
+		try_data: T = 4: 33 - 50% TPR for 5-8% FPR
+	
+	Run 7: Test run
+	
+	-- Taking same bin of vel as neural --
+	Run 8: Error detection run 3(correction OFF) - online by trial 10; ~530 trials, good performance for Napier (2.69 bps), 100% SR; Finger 1: 6.89% TPR, 7.78% FPR; Finger 2: 3.16% TPR, 7.71% FPR
+	
+	Run 9: Test run
+
+	Run 10: Error detection run 4 (correction OFF) - online by trial 10; ~490 trials, good performance for Napier (2.41 bps), 100% SR; Finger 1: 7.07% TPR, 6.69% FPR; Finger 2: 3.99% TPR, 6.94% FPR;
+	
+	-- Switched flexion/extension directions in online code --
+	
+	Run 11: Test run
+	
+	Run 12: Error detection run 5 (correction OFF) - online by trial 10; ~380 trials, fair performance for Napier (1.72 bps), 95% SR; Finger 1: 11.24% TPR, 5.71% FPR; Finger 2: 3.76% TPR, 6.17% FPR;
+	
+	Run 13: Test run
+	
+-Notes:
+	good_chans_SBP = [1:3, 5:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78,80:88,91:92,96]; (not used in err detector training)
+	
+	CAR (NOT USED TODAY): [1,1,1,0,1,1,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1,1,0,1,0,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,0,0,1,1,0,0,0,1]
+	
+	
+	
+	
+	
+	
+	
+	

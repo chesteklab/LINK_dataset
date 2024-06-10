@@ -1,0 +1,59 @@
+Napier: 10/05/2021
+
+- Goals: Error Classification Parasite Test
+ 
+- Experiment: Dylan, Mender
+
+- Recording Start Time: 10:30 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [1, 1] - 0 lag picked) - 0.788 CC
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Warmup TS34, 260 trials
+	Run 3: Training TS34 - 500 trials (4.1 bps)
+	Run 4: KF0 (0 lag) - online by trial 10; xPC CPU crashed around trial 40
+	Run 5: KF0 (0 lag) - online by trial 10; ~100 trials, very poor performance for Napier (1.0 bps), KF got biased out to extension by trial 100
+	Run 6: KF0 (0 lag) - online by trial 10; ~210 trials, poor performance for Napier, but useable (1.15 bps)
+		T = 3 gives best FPR performance
+	Run 7: Error detection run 1 (no correction) - online by trial 10; ~40 trials, poor performance for KF, but detection seems to be going well (1.1 bps)
+	Run 8: Debug run
+	Run 9: Debug run
+	Run 10: Debug run
+	Run 11: Error detection run 2 (no correction) - online by trial 10; ~630 trials, fine performance for KF, but detection seems to be biased toward little detection (very low false positive though) (1.5 bps)
+		retrained try_data on previous run: T = 4 gives best performance
+		
+	Run 12: Debug run
+	Run 13: Error detection run 3 (no correction) - online by trial 10; ~500 trials, fine performance for KF (1.5 bps); KF got biased towards felxion after trial 200, couldnt fix it very well
+	run 14: test run to see if KF was still useable (it is not)
+	
+	
+		
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	Slow KF day and some noise, but still usable. 
+	
+	
+	
+	
+	
+	
+	

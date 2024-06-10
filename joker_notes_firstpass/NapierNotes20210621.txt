@@ -1,0 +1,73 @@
+Napier: 6/21/2021
+
+- Goals: Mote Intervals - 80pps, 50ms bins, 2DOF, new binning mode 5 (delay binning)
+
+- Experiment:  Joey, Mender
+
+- Recording Start Time: 11:45 am
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_motePackets13
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100/100
+	* Juice Time: 90/100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+
+-Decoders: 
+	(final 3 numbers are threshNum,avgMode,intLagMs)
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',3,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,5,0);
+		Mote KF correlation = 0.76428
+		Mote KF lag = 2
+		SBP KF correlation = 0.76756
+		SBP KF lag = 1
+		
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',6,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,5,0);
+		Mote KF correlation = 0.73634
+		Mote KF lag = 2
+		SBP KF correlation = 0.73693
+		SBP KF lag = 1
+
+-Runs:
+	Run 1: calibration
+	Run 2: threshold setting
+
+80pps
+	xpcMoteThresholds = calcOnlineMoteThresholds(80,'Joker');
+	xpcMoteBinDelayms = 30;
+	Run 3: TS-34 training. 400 trials. BR=4.2-4.8
+
+	xpcMoteBinDelayms = 25;
+	xpcBinLag = [0, 0];
+	Run 4: KF0 80pps 50ms bins - 100 SBP BR=2.0. 100 Mint BR=2.1. 100 SBP BR=2.1. 100 Mint BR=1.6. 100 SBP BR=2.1. 100 Mint BR=1.8. 
+	
+	xpcMoteBinDelayms = 50;
+	xpcBinLag = [0, 1];
+	Run 5: KF0 80pps 50ms bins - 100 SBP BR=1.7. 100 Mint BR=1.6. 100 SBP BR=1.3. 100 Mint BR=1.3.
+	
+30pps
+	xpcMoteThresholds = calcOnlineMoteThresholds(30,'Joker');
+	xpcMoteBinDelayms = 40;
+	Run 6: TS-34 training. 400 trials. BR=4.5
+
+	xpcMoteBinDelayms = 40;
+	xpcBinLag = [0, 0];
+	Run 5: KF1 30pps 50ms bins - 100 SBP BR=1.6. 100 Mint BR=. Mint oscillating a lot more - not really usable
+
+
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96]; 
+	
+
+	For reference: RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi_MoteIntervals('Joker','',17,17,0,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true, 1,5,0);
+	
+	
+	
+	

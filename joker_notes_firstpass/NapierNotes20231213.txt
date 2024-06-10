@@ -1,0 +1,18 @@
+Napier: 12/13/2023
+
+- Goals: Offline EMG + neural recording
+ 
+- Experimenters: Olivia, Luis
+- Recording Start Time: 08:44 am
+- Recording Stop Time:   am
+
+- xPC Model: Rig_main_Cortical_Parasite_v2
+- Recorded Array: Motor (Patient cable/cerebus)
+- Data recorded: SBP + Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPass + EMG
+- Drink: Apple Juice
+
+-Runs:	
+	Run 1: Calibration
+	Run 2: 900 TS34, 3.8 bitrate.
+	Run 3: 520 TS29. Bitrate ~4.3. Refusing to do the extension trials around ~400 for the most part. He stopped doing anything on trial 520.
+

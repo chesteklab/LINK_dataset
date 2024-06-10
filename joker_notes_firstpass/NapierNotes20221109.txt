@@ -1,0 +1,91 @@
+Napier: 11/9/2022
+
+- Goals: First try KalmanNet online
+ 
+- Experimenters: Luis, Dylan
+
+- Recording Start Time: am
+- Recording Stop Time:  pm
+
+- xPC Model: Rig_main_Cortical_Parasite_v2
+- Recorded Array: Motor (Patient cable/cerebus)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 5000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:
+	decodeParamsKNet0: regular KF with "pv" pred type trained on TS29
+		[0.27, 0.81, 0.30, 0.42]
+	decodeParamsKNet1: regular KF with "v" pred type trained on TS29
+		[0.42, 0.35]
+	decodeParamsKNet2: KNet with "pv" pred type trained on TS29
+		Training last performance: [0.64, 0.76, 0.19, 0.43]
+	
+	decodeParamsKNet3: KNet with "v" pred type trained on TS29
+		Validation last performance: [0.20, 0.30]
+	
+
+-Runs:
+	Run 0: calibration (saved in Test monkey)
+	Run 1: 550 TS29 offline
+	-- Train reg kf using KNet and "pv" pred type
+	-- Beta=0.98
+	Run 2: 150 TS29 with pv KF.
+		It works really bad. It gets stuck in the middle for some reason, and can't reach any of the further out targets. Especially the extension ones, there is probably some bias towards flexion. Switched to TS30 and it does a little bit better. bitrate of ~0.8
+	Run 3: few trials with TS30 with v KF. Did not work at all. The decoder did not move the virtual hand at all. It was moving, but really really slowly.
+	Run 4: 200 trials of TS30model trained on 2022-11-02 run 6. It moves the virtual hand, but isn't very good. Fingers can't move separately. There is also bias towards extension. Not huge bias though, it does not get stuck on full extension. It moves towards extension when a flexion target is presented. In theory, the refit would fix those issues.
+		Avg bitrate of ~0.7
+		Crashed because parasite took too long on one iteration, look into that.
+	Run 5: 500 trials of TS30 with KNet decoder trained today with pred type "pv". It is able to separate the fingers better. Can't handle MRS extension. Index can move to extension easily, but MRS can't. I tried TS29 for a few trials, and Napier was able to do a few. Bitrate is closer to 1.
+	-- beta=0.9
+	Run 6: ~300 trials TS30 and TS30, same as last run, but with the beta that controls the proportion of position and velocity set to 0.9. It does considerably better. It manages to reach the extension targets, which it was not doing with the last decoder. The bitrate was at around 1.3. I switched it to random targets after 100 trials. Good videos at trials ~160-180. With random targets, it gets to 1.5 avg bitrate.
+	-- beta=0.8
+	Run 7: ~240 TS29 same decoder as last run, with beta=0.8. The MRS movement seems to be great: fast, efficient, and stops well. MRS oscillates a little bit when resting though. The index fails a lot on extension trials. Bitrate of around 1.4-1.6 in avg.
+	-- beta=0.5
+	Run 8: ~240 TS29 same as above, but with beta=0.5. Seems to oscillate too much, especially the MRS. ~1.6 bitrate on average. Crashed at the end, same as the others.
+	Run 9: TS30. been testing the decodeParamsKNet3 decoder, which only decodes velocity. It outputs a velocity, but it is too small. When I scale it manually on OnlineDecoders, it gets biased right away. 
+	Run 10: Tried decodeParamsKNet2 decoder with beta=0.1. It becomes really hard to hit the targets. Too much oscillation. Also ran hand control, and decodeParamsKNet2 with beta =0.8.
+	Run 11: 180 TS29 hand control.
+
+
+Summary:
+	- The velocity only decoders worked awfully bad. Very biased and very hard to hit targets.
+	- The position and velocity decoders worked decently well. Modifying the beta helped a lot, as the velocities were mostly too small to move to the further targets. A beta of 0.8 seems like a good choice. The average bitrate for these was around 1.5
+	- In conclusion, it was a success! KalmanNet is working online.
+	
+
+TODO:
+	- Figure out if I really need to run the ZStructTranslator before training the model.
+	- Maybe check adding the velocity modifications that are done in the Matlab Kalman Filter code. That would help reduce oscillations during rest.
+	- Check why runs crash sometimes. Apparently it is Parasite taking too long on a decode iteration. Check it. On two runs, it was on the same number of trials: ~240. Maybe something memory related?
+
+	
+Notes:	
+	good_chans_SBP = [1, 2, 3, 4, 5, 7, 8, 9, 11, 14, 15, 17, 20, 22, 23, 24, 25, 26, 28, 29, 31, 33, 35, 36, 37, 38, 39, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 94, 96];
+	- The actual good channels used (12 total) are calculated every time the model is trained using a backward sequential feature search by doing multiple linear regressions.
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+

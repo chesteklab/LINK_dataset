@@ -1,0 +1,62 @@
+Napier: 9/21/2021
+
+- Goals: Error Classification Parasite Test
+ 
+- Experiment: Dylan, Mender
+
+- Recording Start Time: 11:15 am
+- Recording Stop Time:  1:20 pm
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [2, 2] - 0 lag picked) - 0.62 CC
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',7,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [1, 1] - 0 lag picked) - 0.62 CC
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Warmup TS34, 160 trials
+	Run 3: Training TS34 - 500 trials (4.11 bps)
+	Run 4: Debugging run for new data_send setup
+	Run 5: Debugging run for new data_send setup
+	Run 6: KF0 - not working very well, going to retrain
+	Run 7: Training TS34 - 400 trials (4.35 bps)
+	Run 8: Debuggin run to get predict_pos the right size
+	Run 9: KF1 - ran but crashed at trial 18 (may have been accidental button press)
+	Run 10: KF1 - online by trial 10; poor performance, but useable (0.9 bps), 130 trials, crashed due to large noise causing xPC CPU overload
+		try_data: T = 3, bad FPR, but useful for velocity debugging nonetheless.
+	Run 11: Debugging run for velocity data; pulled his hand out of manipulandum
+	Run 12: Debugging run for velocity data;
+	Run 13: Error classifer debug run 1; online by trial 10, ~22 trials total; File Logger not properly configured for new velocity data
+	Run 14: Error classifer debug run 2; online by trial 10, ~22 trials total;
+	Run 15: KF1 - online by trial 10; poor performance, but useable (1.0 bps), 210 trials
+		try_data: T = 4, bad FPR, but useful for velocity debugging nonetheless. Noise came back right after training, so will still porbably be poor performance compared to training.
+	Run 16: Error classifier online run 1 (correction OFF); online by trial 10, ~40 trials total; realized it is using old try_data
+	Run 17: Error classifier online run 2 (correction OFF); online by trial 10, ~45 trials total; performance looking fairly good, going to try correction for last run
+	Run 18: Bad run because of correction error
+	Run 19: Error classifier online run 3 (correction ON); wasn't working very well, will revisit on a future date
+		
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	Lots of noise on array today, resulting in poor KF performance; however, velocities do match up now, with some small offset
+	
+	
+	
+	
+	
+	
+	

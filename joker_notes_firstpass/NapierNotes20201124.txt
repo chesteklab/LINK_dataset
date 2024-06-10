@@ -1,0 +1,39 @@
+Napier: 11/24/2020
+
+- Goals: Online performance with ReFit KF and virtual spring
+
+- Experiment: Mender, Dylan, Joey C
+
+- Recording Start Time: 11:10 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	♦
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',4,3,false,[2,4],32,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	
+-Runs:
+	Run 1: TS 34 - 325 trials
+	Run 2: TS 34 - 300 trials
+	Run 3: KF0 - TS34 - SBP
+	Run 4: KF0 - TS34 - TCFR for a few trials because I forgot to get soem in run 3. Barely useable
+	Run 5: RF0 - TS34 - normal online
+	Run 6: RF0 - TS34 - online with hand fixed in place
+	Run 7: RF0 - TS34 - normal online
+	Run 8: TS 34 - started hand control, looks like calibration is off or the metal dowel is in the wrong spot.
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];

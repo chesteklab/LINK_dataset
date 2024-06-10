@@ -1,0 +1,70 @@
+Napier: 06/14/2022
+
+- Goals: RNN/FNN with EMA normalization
+ 
+- Experimenters: Joey, Mender, + Luis, Justin
+
+- Recording Start Time: 9:45 am
+- Recording Stop Time:  11:30 am
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (CPD)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:	
+	- all decoders trained with tri vel redistribution, RR scaler, RNNs with 5 time history
+	NN0 - willsey net, 3500 iters
+	NN1 - willsey net, 3500 iters, 1 min neural norm (5 min EMA online)
+	RNN0 - GRU with 1 min neural norm (5 min EMA online)
+
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [1, 1] - 0 lag picked) - 0.84 CC
+	
+	
+	
+-Runs:
+	Run 1: calibration
+	Run 2: warmup - 100 trials.
+	Run 3: TS29 training - 500 trials. BR~4.0-4.4  #HC1#
+	--- 10 min training break ---
+	
+	Run 4: NN0 - 90 trials. #NN0# BR~2.1 Fast and mostly able to stop, but somewhat shaky. Got stuck trial 90, needed a screen off reset.
+	Run 5-: debugging
+	Run 8: NN1 - 110 trials of mostly hand with some online before the norm was good and it worked. Smoother than NN0. Worked for 70 trials then stuck at flex.
+	Run 9: RNN0 - kinda working at 110, getting better by 130. Looking good - fast and smooth, but some trouble fine-tuning and fingers somewhat dependent. Worked well until 180 then having trouble
+	Run 10: NN0 - worked a little, then stuck at flex.
+	Run 11: debug
+	Run 12: KF0. 80 trials. Working ok for 30 trials then gettting stuck at flex. Working after a reset. Lots of oscillation
+	
+	Run 13: TS29 600 trials. Up to 5.2 BR (!)
+	
+	
+
+Summary:
+	- It's hard to get the normalization to stay in the right spot. Seems like need to pre-fill and then stop once the decoder is working well
+ 
+TODO:
+	- preload the EMA with the known average since it currently defaults to 0 and takes a long time to fill up
+	- LSTM crashing during training
+
+ 
+
+	
+	
+-Notes:
+	good_chans_SBP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 23, 24, 33, 35, 37, 38, 39, 40, 43, 45, 46, 47, 49, 50,
+					51, 52, 53, 55, 56, 57, 58, 59, 60, 62, 64, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 79,
+					80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 95, 96]
+
+
+	Recording on CPD and sending from deadpool to XPC

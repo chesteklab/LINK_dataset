@@ -1,0 +1,46 @@
+Napier: 9/21/2020
+
+- Goals: Hand control data set with Napier and then decoders similar to the spring days.
+
+- Experiment: Mender, Dylan
+
+- Recording Start Time: 11:30 am
+- Recording Stop Time:  1:00pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5, referenced to Ch14) + Raw + 2kSps 300-1000HzBPas continuous (referenced to Ch14)
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 35
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',4,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',5,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+
+	
+-Runs:
+	Run 1: Calibration.
+	Run 2: TS35 - warmup
+	Run 3: TS35 - 400 trials to look at later
+	Run 4: TS34 - training
+	Run 5: TS34 - training 2
+	Run 6: TS34 - KF0
+	Run 7: TS34 - KF1
+	Run 8: TS34 - KF0
+	Run 9: TS34 - KF1
+	Run 10: TS34 - KF0
+	Run 11: TS 35 - 185 trials and then ran out of juice.
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+
+	Spike and LFP data referenced to Channel 14, no additional grounds connected. 

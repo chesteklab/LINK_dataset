@@ -1,0 +1,48 @@
+Napier: 1/4/2021
+
+- Goals: Testing Mote Simulator/Interval Decoding
+
+- Experiment:  Joey C, Mender
+
+- Recording Start Time: 11:00 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_motePackets6
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	♦
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',6,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,1);
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',6,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 2,1);
+	KF2: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',6,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 3,1);
+	KF3: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',6,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 3,3);
+	KF4: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',6,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 3,1); ***code was changed to multiply interval SBP by 1000***
+	
+-Runs:
+	Run 1: mote model can't handle 30ksps data (looks like cpu overloaded/too long). Switching to 2ksps for rest of testing
+	Run 2: making sure 2ksps data works
+	Run 3: calibration
+	Run 4: seeing if Napier will run (not watered down) - he does
+	Run 5: tuning mote thresholds for 20/25/30 ppps (thresholds = 1130, 900, 700)
+	Run 6: training - 400 trials (BR~=3.2)
+	Run 7: KF2 - ~50 trials SBP. MInt decode is locked at 0/1
+	Run 8: KF3 - mode 3 decode crashed xpc
+	Run 8: KF0 - MInt decode locked 0/1
+	Run 9: KF0 - MInt decode locked 0/1. (In TrainOnline code, getting correlation =0.75)
+	Run 10: KF4 - MInt sbp now multiplied by 1000. Still locked 0/1
+	Run 11: the MInt sbp out alternates between values and infinite
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];

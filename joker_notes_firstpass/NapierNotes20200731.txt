@@ -1,0 +1,44 @@
+Napier: 7/31/2020
+
+- Goals: Testing fixed ReFIT code
+
+- Experiment: Sam, Eric
+
+- Recording Start Time: 9:25 am
+- Recording Stop Time:  pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 34
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2,4],32,0,goodChans,goodChans,1,{'act_thresh',1},true);
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',3,3,0,[2,4],32,xpcBinLag,xpcA,xpcW,goodChans,goodChans,0,{[], []},true);
+	RF1: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',3,3,0,[2,4],32,xpcBinLag,xpcA,xpcW,goodChans,goodChans,1,{[], []},true);
+	RF2: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',3,3,0,[2,4],32,xpcBinLag,xpcA,xpcW,goodChans,goodChans,2,{[], []},true);
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 34 training
+	Run 3: KF0 SBP, hold time switched to 500 at trial 13. Looks about normal for KF. Physical fingers are in the normal range. Few trials of TCR at the end.
+	Run 4: RF0 SBP, smoother, but slower control. Not sure if bit rate is actually any better. It is flipped velocities though. Looks like it's getting better later, ~88. Moving his physical hand.
+	Run 5: RF1 SBP. Seems like better control than RF0. Physical fingers moving, appears to be in normal range
+	Run 6: RF2 SBP. Might as well, got time. Looks like a combination of the two. I think RF1 still looked the most natural.
+	Run 7: Long hand control dataset with TS34 to track changes in neural activity over time. Slowing down come the 800s, taking some breaks.
+
+-Notes:
+ 		
+goodChans = [1:9,11,13,15,17,23,33,35,37:38,40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,94,96];	% taken from 2019-12-20
+
+Been having trouble with index flex/MRS extend targets in all kinds of brain control

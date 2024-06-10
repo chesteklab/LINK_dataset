@@ -1,0 +1,38 @@
+Napier: 4/2/2021
+
+- Goals: Online Brain Control 2D With Nerve Block??
+
+- Experiment: Sam, Eric, Srini
+
+- Recording Start Time: 8:30 am
+- Recording Stop Time:  
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',4,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Forgot to set up juice tube
+	Run 3: Training TS34 - juice tube came out of mouth
+	Run 4: Training TS34
+	Run 5: KF0 SBP: This is post-block. It's working! Playing around with biases. Biases didn't help, just needed to get a bit of practice in. Tried biases again, but makes it worse than it is. Next time, we need to train ReFIT first, give the decoder its best shot. He's having the greatest difficulty with splitting his fingers, but can get some of them. Turned on hand control again, block is gone. Very short block.
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	Sam sitting back with him today

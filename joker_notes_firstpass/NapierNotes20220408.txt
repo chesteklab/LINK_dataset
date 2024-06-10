@@ -1,0 +1,133 @@
+Napier: 04/08/2022
+
+- Goals: FNN/RNN (with/without vel redist)
+ 
+- Experiment: Joey, Dylan
+
+- Recording Start Time: 9 am
+- Recording Stop Time:  11 am
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:
+			
+	NN0: multilayer (standard sizes) with scheduler
+		Test Correlation:[0.6300227115912557, 0.6880954290590743]
+		MSE:0.00034872733522206545
+		Finger 0 RR Calculated Gain, Offset: 0.872325, 0.000188
+		Finger 1 RR Calculated Gain, Offset: 1.154613, -0.000500
+
+	RNN1: GRU
+		Test Correlation:[0.7023606083292918, 0.7390327950007961]
+		MSE:0.0003036642447113991
+		Finger 0 RR Calculated Gain, Offset: 0.826156, -0.002016
+		Finger 1 RR Calculated Gain, Offset: 1.105273, 0.001017
+	
+	NN2: FNN with velocity redist (triangle)
+		Test Correlation:[0.5686087572747373, 0.61043718411328]
+		MSE:0.0004086406552232802
+		Finger 0 RR Calculated Gain, Offset: 0.892980, -0.002773
+		Finger 1 RR Calculated Gain, Offset: 0.928751, -0.003186
+		
+	RNN3: GRU with velocity redist (triangle)
+		Test Correlation:[0.5641418733519885, 0.6370554419425808]
+		MSE:0.00040563286165706813
+		Finger 0 RR Calculated Gain, Offset: 0.764404, -0.002572
+		Finger 1 RR Calculated Gain, Offset: 0.876791, -0.000056
+
+	NN4: FNN refit (from NN2 run 6)
+		Test Correlation:[0.5471129126767791, 0.4157178049665681]
+		MSE:0.00012443469313438982
+		Finger 0 RR Calculated Gain, Offset: 1.044889, 0.000029
+		Finger 1 RR Calculated Gain, Offset: 1.556006, 0.002026
+	
+	--------
+	NN5: FNN with velocity redist (triangle) (2nd training set)
+		Test Correlation:[0.5185229964733481, 0.5740481561518302]
+		MSE:0.0004967282875441015
+		Finger 0 RR Calculated Gain, Offset: 0.877901, -0.003516
+		Finger 1 RR Calculated Gain, Offset: 0.665877, -0.000853
+			
+	RNN6: GRU with velocity redist (triangle)2nd training set)
+		Test Correlation:[0.575906168910525, 0.6483195471013531]
+		MSE:0.00043617983465082943
+		Finger 0 RR Calculated Gain, Offset: 0.894354, -0.001404
+		Finger 1 RR Calculated Gain, Offset: 0.739005, -0.000917
+
+	RNN7: GRU (no vel redist) (2nd training set)
+		iter 12400: val corr = [0.677391037348767, 0.7379071832871887]
+		Test Correlation:[0.677391037348767, 0.7379071832871887]
+		MSE:0.0003685243718791753
+		Finger 0 RR Calculated Gain, Offset: 1.534908, 0.000473
+		Finger 1 RR Calculated Gain, Offset: 1.254617, 0.001306
+
+	---------
+	NN8: FNN no vel redist - 3rd trianing set
+		iter 12100: val corr = [0.5794922182296826, 0.6361913732143536]
+		Test Correlation:[0.5794922182296826, 0.6361913732143536]
+		MSE:0.0001730313670122996
+		Epoch   120: reducing learning rate of group 0 to 1.0000e-04.
+		*** model done improving based on scheduler ***
+		Finger 0 RR Calculated Gain, Offset: 0.764879, -0.001205
+		Finger 1 RR Calculated Gain, Offset: 1.001799, -0.001172
+
+	RNN8: GRU no vel redist - 3rd trianing set
+		Test Correlation:[0.5898654057308718, 0.7340810943318188]
+		MSE:0.00015703734243288636
+		Finger 0 RR Calculated Gain, Offset: 0.923120, -0.002885
+		Finger 1 RR Calculated Gain, Offset: 1.070869, -0.001146
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: 120 warmup, 2min break
+	Run 3: TS29 - 500 trials. #HC# BR~3.7-4.4
+	~10 min Training Break~
+	
+	Run 4: TS29 - NN0 #FNN# ~100 trials. Hard to use - either extremely slow or very fast - hard to do medium velocity movements to adjust. But very controlled. Maybe fit too well to training set?
+	Run 5: TS29 - RNN1 #GRU#. 40 trials. Has a better range of velocities than the FNN, but not ideal. Idx having some trouble
+	~ break for training the 2nd set of decoders ~
+	
+	Run 6: TS29 - NN2 #FNN#. 200 trials. BR~1.4. A lot more jittery/harder to stop with the vel redist! But better able to make small adjustments. Overall ok, but not great
+	Run 7-8: TS29 - RNN3 #GRU#. strongly biased toward flex - couldn't get to work even with manual biases
+	Run 9: RNN1 again - strong biases - not working
+	Run 10: NN4(refit) - (brief test) - pretty slow but smooth control 
+	
+	Run 11: TS29 - 500 trials. #HC# BR~3.7-4.0. Retraining
+	~10 min Training Break~
+	
+	Run 12: TS29 - NN5 #FNN#. barely working, getting stuck
+	Run 13: RNN6 - barely able to control, stuck at extend/flex
+	Run 14: RNN7 - barely able to move, still getting stuck at extend/flex. No luck even messing with gains
+	
+	Run 15: TS34 - 400 trials. #HC# BR~3.7-4.5. Retraining
+	Run 16: NN8 - not working well - he might be giving up (but still willing to do hand control)
+	Run 17: RNN9 - same as before, stuck at split, not able to move much. Turned gain to 5x: MRP able to move but IDX not really
+
+-Notes:
+
+	Without vel redist both FNN/RNN stop well and then can go very fast, but not enough mid velocities to make adjustments
+	With vel redist, more jittery, less stopping control, but able to get more trials.å
+	
+	Unable to get a good enough base decoder to try refit
+
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];	
+	
+	
+	
+	
+	
+	
+	

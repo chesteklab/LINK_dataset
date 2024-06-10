@@ -1,0 +1,55 @@
+Napier: 3/13/2020
+
+- Goals: Neural Network stuff
+
+- Experiment: Willsey, Kennedy
+
+- Recording Start Time: 9:30 am
+- Recording Stop Time: 
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous, 97-102 Raw
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 29, 36
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','', 4, false, [2, 4], 50, 0, 1:96, good_chans_SBP, 1, {'act_thresh',1}, true);
+	KF2: TrainOnline_Cortical_KalmanFilter_Multi('Joker','', 3, false, [2, 4], 50, 0, 1:96, good_chans_SBP, 1, {'act_thresh',1}, true);
+	KF3: TrainOnline_Cortical_KalmanFilter_Multi('Joker','', 2, false, [2, 4], 50, 0, 1:96, good_chans_SBP, 1, {'act_thresh',1}, true);
+	
+	NN in NNDecoders.py 
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS29 hand control; 300 straight trials; had to adjust the calibration of ring finger 
+	Movie for 15 min
+	Run 3: TS29 until 201, then blank screen for 8 min (until 10:45a) then ~200 more trials (239-473) of TS29, hand control; 
+	Run 4: 100 trials on 29 in hand control
+	Run 5-8: KF0, TS36; clearly KF not working
+	Run 9: KF0; only got to run 70 and clearly stopped trying
+	Runs 10-11: attempted to get KF working but monkey wasn't trying
+	Run 12: NN; TS36, 250 trials, gain 0.052
+	Run 13: KF0; TS36; some TS34 at the end
+	Run 14-16: KF0; little effrt, TS34
+	Run 17: RF0; TS34
+	Run 18: NN, gain 0.052
+	Run 19: User error
+	Run 20: KF2 TS36 then switched to TS34
+	Run 21: KF3; cut it short
+	Run 22: KF3, TS36 but had trouble so switched to TS34 (stopped trying at 182)
+	Run 23: RF1, attempted ReFIT KF but is not trying
+	Run 24: attempted NN again
+
+	These channels are used for SBP
+	good_chans_SBP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 23, 33, 35, 37, 38, 40, 43, 45, 46, 47, 49, 50, 51, 52, 53, 55, 56, 57, 58, 59, 60, 62, 64, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 94, 96];
+	

@@ -1,0 +1,59 @@
+Napier: 8/18/2021
+
+- Goals: LR v PF G/O
+ 
+- Experiment: Mender, Hisham
+
+- Recording Start Time: 12:00 pm
+- Recording Stop Time:  12:45 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+	Epoch 11, Iteration 3500, loss = 0.9059
+Checking accuracy on validation set
+Mean Correlation is 0.56691
+Mean SNR is 2.28994.
+Total number of peaks is 483.
+Average control peaks is 1.33635.
+Average signal peaks is 0.0610667.
+Ratio of control to true signal is 21.8834.
+Feature number 0.
+Median of feature is 0.114897.
+Ratio of control to true signal is 23.6572.
+Correlation is 0.511366
+Feature number 1.
+Median of feature is 0.020501.
+Ratio of control to true signal is 20.1693.
+Correlation is 0.622455
+Finger 0 RR Calculated Gain, Offset: 0.029003, 0.000301
+Finger 1 RR Calculated Gain, Offset: 0.035816, -0.001959
+
+-Runs:
+	Run 1: Calibration
+	Run 2: Warmup TS29, 5 min break
+	Run 3: Training TS29 - 400
+	Run 4: Validation TS29 - 100
+	Run 5: NN0 - TS29 Peak Find gains/offsets (PF) ~60, 500ms
+	Run 6: NN0 - TS29 Lin Reg gains/offsets (LR) , 500ms - WRONG OFFSET
+	Run 7: NN0 - TS29 Lin Reg gains/offsets (LR) , 500ms - at 20 flipped sign on idx offset. Still too high but could actually control
+			
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	bit of a scrap day
+	
+	

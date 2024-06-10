@@ -1,0 +1,73 @@
+Napier: 04/04/2023
+
+- Goals: Compare Context Online - Spring and Normal tested on Normal
+ 
+- Experimenters: Hisham, Joey, Matt
+
+- Recording Start Time: ~10 am
+- Recording Stop Time:   pm
+
+- xPC Model: Rig_main_Cortical_Parasite_v2
+- Recorded Array: Motor (Patient cable/cerebus)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPass + EMG 10ksps
+- Drink: Apple Juice
+
+- Params:
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 5000/10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:
+
+NN0 (SPRING):
+	Test Correlation:[0.522638050972846, 0.6251951232817337]
+	MSE:0.4407399892807007
+	*** model done - stopped at iteration 3500 ***
+	Finger 0 RR Calculated Gain, Offset: 0.044170, 0.000669
+	Finger 1 RR Calculated Gain, Offset: 0.032874, -0.002135
+	decoder saved to: Z:/Data/Monkeys/Joker\2023-04-04\decodeParamsNN0.pkl
+	
+NN1 (NORMAL):
+	Test Correlation:[0.5501208296797337, 0.6001974666222157]
+	MSE:0.34892383217811584
+	*** model done - stopped at iteration 3500 ***
+	Finger 0 RR Calculated Gain, Offset: 0.035354, -0.001545
+	Finger 1 RR Calculated Gain, Offset: 0.044125, -0.008153
+	decoder saved to: Z:/Data/Monkeys/Joker\2023-04-04\decodeParamsNN1.pkl
+	
+-Runs:	
+	Run 1: TS29 - Calibration + Warmup (in Spring), followed by short break (~3min)
+	
+	Run 2: TS29 - Stopped at 84 - Ring Flexion calibration was too high. Adjusted, and restarted training run
+	Run 3: TS29 - 500 trials w/ springs - split 80/20 train/val. Giving him a break around 340, he's struggling a bit. resumed at 350. At ~370 reduced mrp flex  calibration by another 20. Had him go to 520 to make up for a bit of lost trials.
+	Run 4: Recalibrating for index
+	Run 5: TS29 - 500 trials normal - split 80/20 train/val.
+	
+	Run 6: NN0 - TS29 - 125 trials.
+	Run 7: NN1 - TS29 - 125 trials.
+	Run 8: NN0 - TS29 - 125 trials.
+	Run 9: NN0 - TS29 - 125 trials. (forgot to stop run, so went to 170)
+	~end of experiment~
+	
+	Run 10: NN2 - brief refit - does it improve? - actually way smoother. Maybe a bit slower
+	
+	
+Notes:
+	Overall - seemed to work for both. Unsure if spring was worse or not from first glance. BRs were a bit low for both.
+	Just as a test, want to make sure refit nn works. going to refit on run 7. this is the pybmi refit, so zeros velocities i think
+	
+	good_chans_SBP = [1, 3, 4, 5, 7, 8, 9, 11, 14, 15, 17, 20, 22, 23, 24, 25, 26, 28, 29, 31, 33, 35, 36, 37, 38, 39, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 94, 96];
+	
+	
+	
+	
+	
+	
+
+
+

@@ -1,0 +1,100 @@
+Napier: 05/27/2022
+
+- Goals: RNN with new regularization/normalization
+ 
+- Experimenters: Joey, Mender
+
+- Recording Start Time: 9:20 am
+- Recording Stop Time:  12:00 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 1002
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:	
+	- all decoders trained with tri vel redistribution, RR scaler, RNNs with 5 time history
+	NN0 - willsey net, 3500 iters, RR scaler
+	RNN0 - GRU 1 layer
+	RNN1 - GRU 2 layer
+	RNN2 - GRU with normalized neural
+	RNN3 - GRU with normalized neural and training noise
+	RNN4 - GRU with position/velocity decoding
+	NN1 - willsey net 3500 iters with normalized neural
+	RNN5 - GRU with normalized neural with position/velocity decoding 
+	
+	RNN6 - 1D (corr=0.82)
+	RNN7 - 1D with normalized neural (corr=0.84)
+	NN2 - 1D (corr=0.81)
+	
+	
+-Runs:
+	Run 1: calibration
+	Run 2: warmup
+	Run 3: TS29 training - 500 trials. BR~4.1  #HC#
+	--- 10 min training break ---
+	
+	---- For the following online tests, runs were started in brain control without any hand trials. ----
+	Run 4: RNN0 - worked for like 10 sec then got stuck at extend
+	Run 5: RNN0 try 2 - same as run 4. turned on autobias - unable to really control it. Even with extra bias help on top, still couldn't work
+	Run 6: RNN1 - immediately stuck at splits (not working). 
+	Run 7: NN0 - working at trial 8. 120 trials. A bit shaky, but overall fast and usable. BR~2.0
+	Run 8: RNN2, 1min neural normalization - much more usable now, but still a little hard! Fingers are somewhat not indepedent. 
+		Hand control, then switch back at trial 30 and doing really well until 60 got stuck at splits
+		Hand ctonrol, brain at 76. working reallly well until 97.
+		When working, movements look really clean and fast and stop well without any shaking, but fingers sometimes a little dependent.
+	Run 9: RNN2, 10sec norm. 50 trials. Kinda working at trial 20. Fingers tend to move together a lot - hard to split.
+		Works really well for a few trials at a time, then kinda drifts. BR~1.5 but probably bimodal distribution (some fail, some fast)
+	Run 10: RNN3, 1min norm. 70 trials. Similar problems. Switched between HC and brain a couple times. Working 60-65. MRP seems fine but IDX drifts a bit
+	Run 11: RNN3, 10sec norm. 30 trials. Working slightly better than run 10, but idx still drifting toward extend. 
+	Both fingers can move fast & clean, but during fine tuning Idx doesn't work well and somewhat drifts
+	Run 12: RNN3, 10sec norm + autobiasing. Autobiasing seems to make it even harder.
+	Run 13: RNN4 (PV). didn't work at all, immediately biased.
+	Run 14: RNN5 (PV), 10 sec norm. beta=0.9. no scaler. Very hard to control, moving very fast
+	Run 15: RNN5 (PV), 10 sec norm. beta=0.99. no scaler. still having a hard time, stuck at flex.
+	Run 16: RNN5 (PV), 10 sec norm. beta=0.99 WITH scaler. working for a couple trials a time, then getting stuck/drifting
+	Run 17: RNN5 (PV), 60 sec norm. beta=0.99 WITH scaler. working decently 25-40, but seems like position is making it noisier/harder to stop
+	Run 18-19: debug
+	Run 20: NN1, 60 sec norm. 35 trials. working at trial 15. Working for 15 trials, then drifting/biased.
+	Run 21: NN1, 10 sec norm. Biased toward extend and unable to use.
+	
+	Run 22: 1D TS29 training - 500 trials. BR~2.1. #HC#
+	Run 23: RNN6 - immediately biased to extend.
+	Run 24: RNN7, 60sec norm. 100 trials. Working really well. Super clean, fast, able to stop. A bit of overshooting, but looks like hand control.
+		Somewhat slow on extension, but very fast on flex. Stuck for a while trial 73-78, then mostly working.
+	Run 25: RNN7, 10sec norm. 100 trials. Working really well for 50 trials, but sometimes slow. After trial 50, briefly getting stuck
+	Run 26: debug.
+	Run 27: NN2 1D. 100 trials. BR~1.9. Looks really clean and fast, but slightly more shaky than RNN. 
+	Run 28: RNN7, 10sec norm. 130 trials. BR~1.5 Start at trial 10. Working well, but slow (sometimes stuck) on extension.
+	
+
+Summary:
+ - neural normalization is super helpful for the RNN (more testing needed for the FNN)
+	- seems like shorter normalization might work better
+	- still somewhat getting stuck
+ - no immediate benefit to the noisy training
+ - both 1/2 layer GRUs had the bias issues (when no normalization)
+ - PV decoding didn't seem to help much, adds more noise (need to double check the position scaler values)
+ 
+ 
+TODO:
+ - train with moving average normalization (like we do online)
+ - look at hidden state during trials when it gets stuck
+
+	
+	
+-Notes:
+	good_chans_SBP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 23, 24, 33, 35, 37, 38, 39, 40, 43, 45, 46, 47, 49, 50,
+					51, 52, 53, 55, 56, 57, 58, 59, 60, 62, 64, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 79,
+					80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 95, 96]
+

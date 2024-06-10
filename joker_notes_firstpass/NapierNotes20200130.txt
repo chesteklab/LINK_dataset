@@ -1,0 +1,39 @@
+Napier: 1/30/2020
+
+- Goals: Lots of 2D data
+
+- Experiment: Sunny, Sam, Scott
+
+- Recording Start Time: 10:15am
+- Recording Stop Time:  
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 34
+	* Visualization Style: MRP
+	
+-Decoders: 
+	
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: VisPC froze
+	Run 3: Hand control on TS34. Really good, long dataset. >2.6 bit rate for the first 1200 trials. Trial 1751 took first break. Second break 1905. Break 1959.
+	Break 2123.
+	Run 4: Testing 1D.
+	Run 5: Index TS14, index only moving (he's following index with MRP).
+	Run 6: MRS TS14, MRP only moving (seems like index is the primary one that's moving, with MRP following). Break at 260. Break at 306. Break 372. Break 384. Back 391. Break 503.
+	Run 7: Forgot to reset calibration.
+	Run 8: TS34 to finish juice.
+
+-Notes:

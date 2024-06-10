@@ -1,0 +1,109 @@
+Napier: 01/21/2022
+
+- Goals: Train an RFN
+ 
+- Experiment: Hisham, Dylan
+
+- Recording Start Time: 11:00 am
+- Recording Stop Time:  11:30 am
+
+- xPC Model: Rig_main_Cortical_SBP_Parasite
+- Recorded Array: Motor (Patient Cable) and EMG
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:
+
+NN0:
+Epoch 11, Iteration 3700, loss = 0.8983
+Checking accuracy on validation set
+Mean Correlation is 0.566622
+Mean SNR is 2.92925.
+Total number of peaks is 535.
+Average control peaks is 1.45562.
+Average signal peaks is 0.0621335.
+Ratio of control to true signal is 23.4273.
+Feature number 0.
+Median of feature is 0.216257.
+Ratio of control to true signal is 27.9785.
+Correlation is 0.509307
+Feature number 1.
+Median of feature is 0.0422458.
+Ratio of control to true signal is 19.0457.
+Correlation is 0.623937
+Finger 0 RR Calculated Gain, Offset: 0.031961, -0.003742
+Finger 1 RR Calculated Gain, Offset: 0.041729, 0.000230
+
+RN0:
+Epoch 5, Iteration 500, loss = 0.7451
+Checking accuracy on validation set
+Mean Correlation is 0.613006
+Mean SNR is 2.69294.
+Total number of peaks is 471.
+Average control peaks is 4.27847.
+Average signal peaks is 0.822595.
+Ratio of control to true signal is 5.20119.
+Feature number 0.
+Median of feature is -0.139526.
+Ratio of control to true signal is 3.98308.
+Correlation is 0.620777
+Feature number 1.
+Median of feature is -0.150482.
+Ratio of control to true signal is 7.47809.
+Correlation is 0.605235
+Finger 0 RR Calculated Gain, Offset: 0.113196, -0.094967
+Finger 1 RR Calculated Gain, Offset: 0.102515, 0.043463
+
+RN1: (DOUBLE REFIT)
+Epoch 2, Iteration 500, loss = 3.8597
+Checking accuracy on validation set
+Mean Correlation is 0.6983
+Mean SNR is 2.80435.
+Total number of peaks is 768.
+Average control peaks is 2.85084.
+Average signal peaks is 7.39278.
+Ratio of control to true signal is 0.385624.
+Feature number 0.
+Median of feature is 0.228051.
+Ratio of control to true signal is 0.416625.
+Correlation is 0.672589
+Feature number 1.
+Median of feature is 0.143571.
+Ratio of control to true signal is 0.358605.
+Correlation is 0.724011
+Finger 0 RR Calculated Gain, Offset: 1.444206, 0.277672
+Finger 1 RR Calculated Gain, Offset: 1.633898, 0.772864
+
+-Runs:
+	Run 1: Calibration + 130 Warm-up TS 29 (JT 100) + 5 min break
+	Run 2: Training - TS29 400 trials (did 415)
+	Run 3: Validation - TS29 100 trials (did 230)
+	~Training Break~
+	
+	Run 4: NN0 - 65 Trials - attempted 250, decoder was drifting.
+	Run 5: NN0 - 20-30 Trials - trying again, getting stuck at full extension.
+	~Training Break - Attempting to use Run 4 as RF training~
+	
+	Run 6: RN0 - 250 Trials - seems better, little orbity, maybe refit was mostly correcting for offset differences to begin with.
+	~Training Break - Refitting again using run 6 (double refit)~
+	
+	Run 7: RN1 - stopped at 38 - seems to be struggling with the offset at first.
+	Run 8: RN1 - 100 Trials - 0 Offsets, worked great. Going to try NN0 with no offsets next.
+	Run 9: NN0 - 26 Trials - 0 Offsets, not really working well, will stop at 25 after observing from 16. Fingers now split (MRS extend, IDX flex)
+	Run 10: NN0 - 23 Trials - RR G/O. Seem ok, Napier may be getting a bit tired too. He's still trying for it.
+	Run 11: RN0 - 100 Trials - RR G/O. Something didn't work.
+	Run 12: HC - 100 Trials
+
+-Notes:
+	-Let validation run go too long
+	

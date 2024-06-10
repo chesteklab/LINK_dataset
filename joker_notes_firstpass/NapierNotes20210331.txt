@@ -1,0 +1,115 @@
+Napier: 3/31/2021
+
+- Goals: Test Generalized Network
+
+- Experiment: Hisham, Joey, Mender
+
+- Recording Start Time: 11:10 am
+- Recording Stop Time:  12:00 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRS
+	
+-Decoders:
+
+V2/GEN APPROACH:
+Epoch 11, Iteration 3500, loss = 0.0009
+Checking accuracy on validation set
+Mean Correlation is 0.688108
+Mean SNR is 3.57296.
+Total number of peaks is 188.
+Average control peaks is 0.0646153.
+Average signal peaks is 0.0569381.
+Ratio of control to true signal is 1.13483.
+Feature number 0.
+Median of feature is 0.00109195.
+Ratio of control to true signal is 0.947528.
+Correlation is 0.648463
+Feature number 1.
+Median of feature is 0.0112413.
+Ratio of control to true signal is 1.36871.
+Correlation is 0.727753
+
+Normal Net:
+Epoch 11, Iteration 3500, loss = 0.9098
+Checking accuracy on validation set
+Mean Correlation is 0.711924
+Mean SNR is 2.59064.
+Total number of peaks is 378.
+Average control peaks is 1.37327.
+Average signal peaks is 0.0569381.
+Ratio of control to true signal is 24.1187.
+Feature number 0.
+Median of feature is -0.170446.
+Ratio of control to true signal is 26.0204.
+Correlation is 0.683184
+Feature number 1.
+Median of feature is 0.0369847.
+Ratio of control to true signal is 21.7443.
+Correlation is 0.740664
+
+2nd Normal Net:
+Epoch 11, Iteration 3500, loss = 0.9176
+Checking accuracy on validation set
+Mean Correlation is 0.607144
+Mean SNR is 2.61719.
+Total number of peaks is 508.
+Average control peaks is 1.37817.
+Average signal peaks is 0.0572865.
+Ratio of control to true signal is 24.0575.
+Feature number 0.
+Median of feature is 0.0230174.
+Ratio of control to true signal is 20.4165.
+Correlation is 0.558027
+Feature number 1.
+Median of feature is 0.117252.
+Ratio of control to true signal is 28.1676.
+Correlation is 0.656261
+
+2nd (no normalization):
+Epoch 11, Iteration 3500, loss = 0.0018
+Checking accuracy on validation set
+Mean Correlation is 0.468663
+Mean SNR is 5.14133.
+Total number of peaks is 96.
+Average control peaks is 0.0726665.
+Average signal peaks is 0.0572865.
+Ratio of control to true signal is 1.26848.
+Feature number 0.
+Median of feature is -0.0115744.
+Ratio of control to true signal is 1.20576.
+Correlation is 0.381033
+Feature number 1.
+Median of feature is -0.0117879.
+Ratio of control to true signal is 1.33927.
+Correlation is 0.556293
+
+-Runs:
+	Run 1: Calibration
+	Run 2: Warm-up, followed by short break
+	Run 3: TS29 - Training 400
+	Run 4: TS29 - Validation 100
+	Run 5-7: NN - v2 - seemed to get stuck, going to re-train a normal net.
+	Run 8: NN - original - getting suck in full split, not really sure what;s going on
+	Run 9 : TS29 - Training 400
+	Run 10: TS29 - Validation 100
+	Run 11: Hold time off
+	Run 12: New NN - original - not great, semi-functional
+	Run 13: Non-Normalized outputs 2: Didn't seem to work
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	Something's up with the first data set, seemingly super high correlations, but crap control online, got stuck almost immediately
+	Second seems better but control still challenging (might just be because later in the day, but he still does hand control)

@@ -1,0 +1,46 @@
+Napier: 9/18/2020
+
+- Goals: Replicate RFKF performance on random targets using xPC decoders (not Parasite)
+
+- Experiment: Sam, Dylan
+
+- Recording Start Time: 10:07 am
+- Recording Stop Time:  1:00pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5, referenced to Ch14) + Raw + 2kSps 300-1000HzBPas continuous (referenced to Ch14)
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 34, 29
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	KF2: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',6,5,0,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true);
+	RF1: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',9,8,0,[2,4],50,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], 140:167}, true);
+	
+-Runs:
+	Run 1: Calibration.
+	Run 2: TS34 training.
+	Run 3: KF0 SBP. VisPC running really slow, low framerates, so restarted MSMS.
+	Run 4: Tried again, no luck, rebooting VisPC.
+	Run 5: KF0 SBP after reboot. Index is extension biased, but he can overcome it for the most part.
+	Run 6: KF0 TCR.
+	Run 7: RF0 SBP. Starting with TS34 to get a sense of actual performance. Hold time at 750, so may be a lower bit rate compared to other days. Velocities are kind of slow too. Having a tough time with double flexions. TS 36 at 122.
+	Run 8: KF2 SBP. 50ms bin size. Both fingers are floating to extension in the 90s.
+	Run 9: KF2 TCR.
+	Run 10: RF0 SBP. About the same as RF1. Starting with TS34, switched to TS36 around 150.
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+
+	Spike and LFP data referenced to Channel 14, no additional grounds connected. 

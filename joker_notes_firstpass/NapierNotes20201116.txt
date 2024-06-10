@@ -1,0 +1,45 @@
+Napier: 11/16/2020
+
+- Goals: Online performance with KF and virtual spring
+
+- Experiment: Mender, Joey C, Dylan
+
+- Recording Start Time: 11:15 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',4,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 34 - 300
+	Run 3: TS 34 - Training set - 400 trials
+	Run 4: TS34 - with springs 2/4
+	Run 5: TS34 - wrong bin size, exit early
+	Run 6: TS34 - KF0 - normal Kalman Filter mode on Parasite
+	Run 7: TS34 - KF0 - with negligible spring constant - performance looks the same as run 6 by eye
+	Run 8: TS34 - KF0 - K=0.00001 - no noticeable effect, stop after 75 trials
+	Run 9: TS45 - KF0 - K=0.0001 - stuck at extension almost immediately - couldn't get the target. Change to 0.00005, very close to being able to do it but ends up stuck at extension. Change to 0.00003, can get center target but cannot get flexion well. Got a few index flexions. Change to 0.00002, getting more targets but can't really do MRS flexion still. 
+	Run 10: TS34 - KF1 - negligible spring constant. Hand was stuck flexed to start. 
+	Run 11: TS34 - KF1 - varying spring constants. Cant do 0.00005, almost got a center target. 0.00003, he got to the target and past it but didn't stay in the target. Not attempting to move either. Gave him a break and then he came back and was able to do it except for deeper extension targets. 
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	Fingers keep getting stuck with index more flexed than MRS throughout the online trials. Goes through periods where he can't get trials and then it gets unstuck and he's back to like 1.9 br. 

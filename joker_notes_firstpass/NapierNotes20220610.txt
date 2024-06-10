@@ -1,0 +1,56 @@
+Napier: 06/10/2022
+
+- Goals: Error Correction Parasite Test (2D) - New Detector Training Correction Test 2
+ 
+- Experiment: Dylan, Hisham
+
+- Recording Start Time: 9:45 am
+- Recording Stop Time:  11:30 am
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100/80/50
+	* Juice Time: 80
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [1, 1] - 0 lag picked) - 0.815 CC
+	
+	
+-Runs:
+	Run 1: Calibration and warm-up (~200 trials)
+	Run 2: Training TS34 - 500 trials, good performance ( bps), 100% SR;
+	Run 3: KF0 (0 lag), 80% scaling - online by trial 10; great performance for Napier (2.5 bps), ~400 trials, 100% SR;
+		T = 4 chosen; TPR between 28 - 50% for 5% FPR; T = 2 had lower TPR, but might try with correction to see faster effect
+	
+	Run 4: KF0 (0 lag), 50% scaling - online by trial 10; good performance for Napier (1.96 bps), ~300 trials, 100% SR;
+		T = 4 chosen; TPR between 40-55% for 5% FPR; going to use this try_data since it was better performing
+	
+	Run 5: Error detection run 1 (correction OFF) - online by trial 10; ~230 trials, good performance for Napier (1.85 bps), 100% SR;
+	Run 6: Error detection run 2 (correction ON, extended stopping (T-2T)) - online by trial 10; ~230 trials, good performance for Napier (1.89 bps), 99% SR;
+	Run 7: Error detection run 3 (correction OFF) - online by trial 10; ~240 trials, good performance for Napier (2.29 bps), 100% SR; forgot to save debug file :(
+	Run 8: Error detection run 4 (correction ON, extended stopping (T-2T)) - online by trial 10; ~255 trials, good performance for Napier (2.09 bps), 100% SR;
+	Run 9: Error detection run 5 (correction ON, neagtion) - online by trial 10; ~ trials,  performance for Napier ( bps), % SR; index flexion bias issues after trial 100
+
+	
+-Notes:
+	good_chans_SBP = [1:3, 5:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78,80:88,91:92,96];
+	
+	CAR: [1,1,1,0,1,1,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,0,0,1,1,0,0,0,1]
+	
+	
+	
+	
+	
+	
+	
+	

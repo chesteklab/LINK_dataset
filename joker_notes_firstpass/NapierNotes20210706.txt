@@ -1,0 +1,45 @@
+Napier: 7/06/2021
+
+- Goals: Error Classification Parasite Test
+ 
+- Experiment: Dylan, Hisham, Eric
+
+- Recording Start Time: 11:30 am
+- Recording Stop Time:  1:15 pm
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); (optimal lag [2, 2]) - 0.76 CC
+	KF1: KF0 w/ 0 lag
+		
+-Runs:
+	Run 1: Calibration
+	Run 2: Training TS34 - 500 trials
+	Run 3: KF0 - online around trial 20; lower performance than normal, ~250 trials online
+	Run 4: Error classify test run for debugging (online around trial 10); ~50 trials online
+	Run 5: Error classify test run for debugging (online around trial 10); ~80 trials online
+	Run 6: Error classify test run for debugging (online around trial 10); ~30 trials online
+	Run 7: Error classify test run for debugging (online around trial 10); ~30 trials online
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	
+	
+	
+	

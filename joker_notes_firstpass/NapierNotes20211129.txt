@@ -1,0 +1,66 @@
+Napier: 11/29/2021
+
+- Goals: variable lag+noise with RFKF
+ 
+- Experiment: Joey C, Sam
+
+- Recording Start Time: 8:30 am
+- Recording Stop Time:  10:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_CAR_noise
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,0,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80/100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true);
+		SBP KF correlation = 0.78905
+		SBP KF lag = 2 (but 0 lag for online)
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',3,3,false,[2 4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[],[]},true);
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Training TS34. 400 trials. BR~3.5-3.8 (kinda slow)
+	Run 3: KF0 - TS34. 250 trials. BR~2.0
+	
+	Run  4: RF0 - TS34.   0ms lag. 240 trials. BR~2.5. (pretty good)
+	Run  5: RF0 - TS34.  16ms lag. 100 trials.
+	Run  6: RF0 - TS34.  32ms lag. 100 trials. BR~2.1
+	Run  7: RF0 - TS34.  64ms lag. 100 trials. BR~1.8
+	Run  8: RF0 - TS34. 100ms lag. 150 trials. BR~1.6
+	Run  9: RF0 - TS34.  64ms lag. 100 trials.
+	Run 10: RF0 - TS34.  32ms lag. 100 trials.
+	Run 11: RF0 - TS34.  16ms lag. 100 trials.
+	Run 12: RF0 - TS34.   0ms lag. 100 trials.
+	
+	(noise std=0.01, decay=0.9975, noise every 32ms)
+	Run 13: RF0 - TS34.   0ms lag + noise. 240 trials.
+	Run 14: RF0 - TS34.  32ms lag + noise. 100 trials.
+	Run 15: RF0 - TS34.  64ms lag + noise. 100 trials.
+	Run 16: RF0 - TS34. 100ms lag + noise. 100 trials.
+	Run 17: RF0 - TS34.  64ms lag + noise.  30 trials. giving up. (ignore) 1min break before run18
+	Run 18: RF0 - TS34.  64ms lag + noise. 100 trials.
+	Run 19: RF0 - TS34.  32ms lag + noise. 100 trials.
+	Run 20: RF0 - TS34.   0ms lag + noise. 100 trials.
+	Should probably remove the first few trials of each run since sometimes stuck/getting used to decoder
+	
+
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	An example of slow training and then a pretty good KF & RFKF
+
+
+

@@ -1,0 +1,117 @@
+Napier: 4/22/2022
+
+- Goals: RFKF vs RKNN+ 0 lag- refresher
+ 
+- Experiment: Hisham, Dylan
+
+- Recording Start Time: 10:10 am
+- Recording Stop Time:  12:30 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 (off/on)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29/36
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: >> TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true);
+		SBP KF correlation = 0.83179
+		SBP KF lag = 1
+		
+	(load KF0 before training)
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',4,4,false,[2,4],50,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	
+NN0:
+Epoch 11, Iteration 3500, loss = 0.9017
+Checking accuracy on validation set
+Mean Correlation is 0.636265
+Mean SNR is 2.77214.
+Total number of peaks is 274.
+Average control peaks is 1.47539.
+Average signal peaks is 0.0713126.
+Ratio of control to true signal is 20.6891.
+Feature number 0.
+Median of feature is 0.0168757.
+Ratio of control to true signal is 20.3428.
+Correlation is 0.614475
+Feature number 1.
+Median of feature is 0.173016.
+Ratio of control to true signal is 21.0102.
+Correlation is 0.658055
+Finger 0 RR Calculated Gain, Offset: 0.042126, -0.000003
+Finger 1 RR Calculated Gain, Offset: 0.046419, -0.007635
+
+NN1:
+Epoch 11, Iteration 3500, loss = 0.9074
+Checking accuracy on validation set
+Mean Correlation is 0.636585
+Mean SNR is 2.81311.
+Total number of peaks is 239.
+Average control peaks is 1.58036.
+Average signal peaks is 0.0713126.
+Ratio of control to true signal is 22.161.
+Feature number 0.
+Median of feature is -0.0146189.
+Ratio of control to true signal is 22.3935.
+Correlation is 0.617546
+Feature number 1.
+Median of feature is 0.191139.
+Ratio of control to true signal is 21.9453.
+Correlation is 0.655625
+Finger 0 RR Calculated Gain, Offset: 0.038803, 0.001423
+Finger 1 RR Calculated Gain, Offset: 0.045160, -0.007973
+
+RN0 (Trained on NN1):
+Epoch 2, Iteration 500, loss = 0.6779
+Checking accuracy on validation set
+Mean Correlation is 0.633646
+Mean SNR is 2.61785.
+Total number of peaks is 973.
+Average control peaks is 3.06071.
+Average signal peaks is 1.39908.
+Ratio of control to true signal is 2.18765.
+Feature number 0.
+Median of feature is -0.133019.
+Ratio of control to true signal is 2.22585.
+Correlation is 0.65607
+Feature number 1.
+Median of feature is -0.257843.
+Ratio of control to true signal is 2.15143.
+Correlation is 0.611223
+Finger 0 RR Calculated Gain, Offset: 0.294782, -0.050676
+Finger 1 RR Calculated Gain, Offset: 0.224207, -0.147974
+
+-Runs:
+	Run 1: Calibration + 125 TS29 warmup + 5 minute break
+	Run 2: TS29 - Training 400, 750 HT
+	Run 3: ~slight break due to filelogger crash and vispc getting stuck.**~
+	Run 4: TS29 - Validation 100, 750 HT
+	~training break~
+	
+	Run 5: NN0: 250 Trials, 500 HT, ReFIT training. something not working. trying again.
+	Run 6: NN0: tried again. tried removing offset around ~25. still not very succesful. Maybe needs more time to acclimate. but going to do KF0 first.
+	Run 7: KF0: 250 Trials, 500 HT, ReFIT training
+	Run 8: NN1: 250 Trials, 500 HT. Working much better. New network, but also just transitioned much quicker from MC to CL.
+	~refit training~
+	
+	Run 9: RN0: TS36, 200 trials.
+	Run 10: RK0: TS36, 200 trials.
+	Run 11: RN0: TS36, 150 trials.
+	Run 12: RK0: TS36, 150 trials.
+	
+-Notes:
+	- removed channel 95 for today, has been having some noise problems.
+	deleting tmp files from the ends of runs (trials that weren't completed)
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,96];
+	**There was a period of a minute or two where napier was staring at a frozen hand over the task (correctly on targets) but wasnt doing anything. Not sure if he tried to hold it there or not.
+	
+	Seems like RK was better than RN today.

@@ -1,0 +1,103 @@
+Napier: 2/24/2023
+
+- Goals: KalmanNet
+ 
+- Experimenters: Luis, Matt
+
+- Recording Start Time: 9:20 am
+- Recording Stop Time:   am
+
+- xPC Model: Rig_main_Cortical_Parasite_v2
+- Recorded Array: Motor (Patient cable/cerebus)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPass + EMG 10ksps
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,0,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 5000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29, 35, 37
+	* Visualization Style: MRP
+	
+-Decoders:
+	- KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','2023-02-24',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true)
+		SBP KF correlation = 0.7127
+		SBP KF lag = 1
+		FORGOT TO TRAIN IT WITH GOOD CHANS FROM TODAY
+	- KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','2023-02-24',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true)
+		SBP KF correlation = 0.7591
+		SBP KF lag = 1
+	- KFN0: trained on run 2, good chans
+		[0.72, 0.82, 0.44, 0.62], lag=1
+	- KFN1: trained on run 2, 50 channels selected iteratively
+		[[0.70, 0.78, 0.38, 0.54], lag=0
+	- KFN2: trained on run 2, good chans from yesterday, but without channel 2 (a lot of artifacts)
+		[0.70, 0.81, 0.43, 0.62], lag=1
+	- KNet0: trained on run 3, good chans.
+		[0.88, 0.85, 0.74, 0.78]
+	- KNet1: same as KNet0
+		[0.86, 0.85, 0.73, 0.83]
+	- RFNt0: refit of KNet0 using run 13
+	- KNet2: same as KNet0 but trained on channels from yesterday, excluding chan 2.
+		[0.81, 0.87, 0.73, 0.78]
+	- RFNt1: refit of KNet1 using run 23
+		
+		
+	
+-Runs:	
+	Run 1: calibration
+	Run 2: 500 TS29 hand control. ~4.2 bitrate
+	Run 3: 500 TS37 hand control. ~3 bitrate
+	Run 4: 500 TS35 hand control. ~4.4 bitrate
+	-- KFN0
+	Run 5: TS29, beta=1. Both fingers got biased towards flexion. The index seems to have the least control, and definitely can't extend. Can't do any trials. Restarted a few times, no effect.
+	-- KF0: FORGOT TO TRAIN IT WITH GOOD CHANS FROM TODAY
+	Run 6: 100 TS29. Bitrate ~1
+	-- KF1
+	Run 7: TS29. Fingers completely biased towards flexion.	
+	-- KFN2
+	Run 8: TS29. Fingers completely biased towards flexion. Did one or two trials, but gets biased fast. Restarted a few times to no effect.
+	Run 9: TS29. Tried setting the starting velocity to 0. Doesn't seem to change anything.
+	-- KNet0
+	Run 10: TS29. Fingers are biased towards flexion. Not as much as in the previous run, but Napier can't do trials. The index is the most biased. Then, the situation is reversed: index can move, mrs biased towards extension. Crashed.
+	Run 11: TS29. Did a few trials, and then got biased again. Changed beta to 0.98 and now Napier can do some trials. The problem was that the velocity output was getting very biased and thus was not able to move at all.
+	Run 12: Crashed
+	Run 13: 260 TS29, beta=0.98. Bitrate between  ~1.6 and 1.9
+	-- KF0
+	Run 14: 210 TS29. Bitrate between 1.1 and 1.5
+	-- RFNt0
+	Run 15: TS29, beta=0.98. Did a few trials, and then got biased towards flexion. Crashed.
+	Run 16: TS29, beta=0.98. Restarted it a few times, and generally starts being able to do trials, but then fingers get biased, even when using beta=0.98. Crashed.
+	Run 17: TS29, beta=0.95. Didn't work, still biased.
+	-- KNet2
+	Run 18: 100 TS29, beta=0.98. Bitrate at ~1.5
+	Run 19: 60 TS29, beta=1.0. Can do some trials, but both fingers are generally biased towards flexion. After a while it gets over the bias, but the movement is not that great. Success rate at 40%.
+	-- KNet1
+	Run 20: TS29, beta=1.0. It was working great, but for some reason Napier stopped doing the targets. Crashed
+	Run 21: 50 TS29, beta=1.0. Has some very good trials, where it gets the perfect starting velocity, and stops at the appropriate timing. Has other trials where it just doesn't do anything: fingers stuck in the middle. Maybe it's Napier getting tired, I don't really know. 
+	Run 22: 130 TS29, beta=0.98. Bitrate ~1.7-1.9
+	Run 23: 160 TS29, beta=0.99. Bitrate ~1.5. Started better, but then it got worse.
+	-- RFNt1
+	Run 24: TS29, beta=0.99. It stops too much for some reason. It also gets more biased than the previous one.
+	
+Summary:
+	- It's interesting that the Kalman filter trained on 50 channels selected iteratively worked worse than the KF trained on the 33 good chans.
+	- Some channel today that was not yesterday is biasing the Kalman Filter. I'll train the KFN with the channels from yesterday and see if that prevents the biasing.
+	- ReFit didn't seem to work, but I need to make sure I'm doing it correctly.
+
+
+TODO:
+	- 
+
+Notes:
+	Channels with >1Hz firing rate
+	- good_chans_SBP = [3,4,7,8,9,11,12,15,32,33,35,38,40,58,65,67,68,69,70,71,72,73,74,75,76,78,79,81,82,84,90,91]
+	
+	
+	
+
+
+

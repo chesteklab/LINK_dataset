@@ -1,0 +1,52 @@
+Napier: 1/5/2021
+
+- Goals: EMG + Brain
+
+- Experiment: Sam, Hisham
+
+- Recording Start Time: 10:10 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable) + EMG (CPD via CPA)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous & Raw (EMG)
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders: 
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS34 for a while
+	
+-Notes:
+	EMG connectors -> Synapse Patient Cable -> Blackrock Splitter Box ch1-16 -> QSE cable -> CerePlex A -> HDMI cable -> CerePlex Direct
+	
+	Referencing scheme as configured in Central:
+	Ch1: Ch2
+	Ch2: Mono
+	Ch3: Ch4
+	Ch4: Mono
+	Ch5: Ch6
+	Ch6: Mono
+	Ch7: Ch8
+	Ch8: Mono
+	Ch9: Ch10
+	Ch10: Mono
+	Ch11: Ch12
+	Ch12: Mono
+	Ch13: Ch14
+	Ch14: Mono
+	Ch15: Ch16
+	Ch16: Mono
+	
+	EMG activity looks great today, but seems like there is a bit more contamination from other muscles today than there was last week. This could be due to some inconsistent channel labelling between the splitter box and the CPA, but I don't think so.

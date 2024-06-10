@@ -1,0 +1,41 @@
+Napier: 12/17/2021
+
+- Goals: Offline 2D Interleaved Springs/No Springs
+ 
+- Experiment: Mender, Eric
+
+- Recording Start Time: 9:15 am
+- Recording Stop Time:  10:55
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable), EMG
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,0,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRS
+	
+-Decoders:
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 29 - normal, 250 trials
+	Run 3: TS 29 - springs 2/4, 250 trials  
+	Run 4: TS 29 - normal, 350 trials 
+	Run 5: TS 29 - springs 2/4, 250 trials
+	Run 6: TS 29 - normal, 250 trials 
+	Run 7: TS 29 - springs 2/4, 250 trials
+	Run 8: TS 29 - normal, 250 trials
+	Run 9: TS 29 - springs 2/4, 300 trials
+	Run 10: TS 29 - normal, 250 trials 
+	Run 11: TS 29 - springs 2/4, 250 trials
+	Run 12: TS 29 - normal, 250 trials 
+	
+-Notes:

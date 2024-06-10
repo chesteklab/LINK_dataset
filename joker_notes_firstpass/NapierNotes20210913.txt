@@ -1,0 +1,48 @@
+Napier: 9/13/2021
+
+- Goals: Normal model tested with and without spring+wrist changes to stanchion
+
+- Experiment: Mender, Eric
+
+- Recording Start Time: 11:45 AM
+- Recording Stop Time: 1:15 PM
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Lateral (Patient Cable) + Medial (Cereplex)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80/90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); %corr = 0.692 (normal)
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',5,5,0,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[],[]},1);
+	
+-Runs:
+	Run 1: Calibration 
+	Run 2: TS 34 - test calibration/warmup 250 trials
+	Run 3: TS 34 - normal - 400 trials
+	Run 4: TS 34 - KF0 - Forgot to load model
+	Run 5: TS 34 - KF0 - 270 trials in about 10 minutes. BR ~1.45
+	Run 6: TS 34 - RF0 - Index started fully extended
+	Run 7: TS 34 - RF0 - Springs 2/4 and wrist flexed. earth ground was unconnected during this run
+	Run 8: TS 34 - RF0 - Normal stanchion. Earth ground connected again. 
+	Run 9: TS 34 - RF0 - springs 2/4 and wrist flexed. 
+	Run 10: TS34 - RF0 - normal stanchion
+	Run 11: TS 34 - RF0 - springs 2/4 and wrist flexed
+
+	
+	
+	
+-Notes:
+chans with tcfr > 1hz according to run 3
+good_chans_SBP = [4	7	9	33	35	36	37	38	52	57	58	59	63	65	67	68	69	71	72	73	74	75	76	78	79	80	81	82	83	84	85	86	90	91	92	96]; 

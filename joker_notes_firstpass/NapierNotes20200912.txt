@@ -1,0 +1,132 @@
+Napier: 9/12/2020
+
+- Goals: ReFIT a NN
+
+- Experiment: Hisham, Willsey
+
+- Recording Start Time: am
+- Recording Stop Time:  pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- REFERENCING OFF OF CHANNEL 14
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100 (50 for training)
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 29/36 (training/testing)
+	* Visualization Style: MRP
+	
+-Decoders: 
+good_chans_SBP = [1,3:7,9,13,15,17,23,33, 35,37:38,40,43,45:47,49:53,55:60,62,64,67:68,71:76,79:87,90:92,94]; 
+TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); % Normal
+
+load('Z:\Data\Joker\2020-09-12\decodeParamsKF0.mat')
+RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',7,7,0,[2,4],50,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true);
+
+
+Uni Redis:
+Epoch 7, Iteration 2500, loss = 0.8436
+Checking accuracy on validation set
+Mean Correlation is 0.445415
+Mean SNR is 3.2211.
+Total number of peaks is 82.
+Average control peaks is 1.63948.
+Average signal peaks is 0.0773391.
+Ratio of control to true signal is 21.1985.
+Feature number 0.
+Median of feature is 0.120548.
+Ratio of control to true signal is 23.2623.
+Correlation is 0.356786
+Feature number 1.
+Median of feature is 0.0248376.
+Ratio of control to true signal is 18.6361.
+Correlation is 0.534045
+
+Tri Redis:
+Epoch 11, Iteration 3500, loss = 0.8893
+Checking accuracy on validation set
+Mean Correlation is 0.499114
+Mean SNR is 3.12517.
+Total number of peaks is 157.
+Average control peaks is 1.79821.
+Average signal peaks is 0.0773391.
+Ratio of control to true signal is 23.251.
+Feature number 0.
+Median of feature is 0.251978.
+Ratio of control to true signal is 25.0319.
+Correlation is 0.402806
+Feature number 1.
+Median of feature is -0.147656.
+Ratio of control to true signal is 21.0399.
+Correlation is 0.595423
+
+ReFIT (tri): Z_Joker_2020-09-12_Run-006_ReFIT_Test_network_500
+Epoch 2, Iteration 500, loss = 0.9321
+Checking accuracy on validation set
+Mean Correlation is 0.579653
+Mean SNR is 2.66012.
+Total number of peaks is 1280.
+Average control peaks is 3.19436.
+Average signal peaks is 1.85243.
+Ratio of control to true signal is 1.72441.
+Feature number 0.
+Median of feature is 0.0630292.
+Ratio of control to true signal is 1.49578.
+Correlation is 0.547108
+Feature number 1.
+Median of feature is -0.215298.
+Ratio of control to true signal is 2.08382.
+Correlation is 0.612199
+
+ReFIT (Uni) Z_Joker_2020-09-12_Run-005_ReFIT_Test_network_500
+Epoch 2, Iteration 500, loss = 0.8760
+Checking accuracy on validation set
+Mean Correlation is 0.554693
+Mean SNR is 2.67989.
+Total number of peaks is 1259.
+Average control peaks is 3.01793.
+Average signal peaks is 1.45261.
+Ratio of control to true signal is 2.07759.
+Feature number 0.
+Median of feature is 0.0695604.
+Ratio of control to true signal is 1.76307.
+Correlation is 0.524732
+Feature number 1.
+Median of feature is 0.0419224.
+Ratio of control to true signal is 2.56946.
+Correlation is 0.584654
+
+
+-Runs: where there are missing runs means there was a crash
+	Run 1: Calibration
+	Run 2: TS 29 - Warmup run - 530 trials
+		
+	wait 15 min until 10:50
+	
+	Run 3: TS 29 - Training set - 400 trials
+	Run 4: TS 29 - Validation set - 100 trials
+	Run 5: TS 36 - NN, Uniform distribution of velocities, 200 trials
+	Run 6: TS 36 - NN, Triangular distribution of velocities, 250 trials
+	Run 7: TS 36 - KF, 250 trials
+	Run 8-9: crash and had the thing on threshold crossing instaed of SBP
+	Run 10: ReFIT NN, 250 trials (triang)
+	Run 11: ReFIT KF, 250 trials
+	Run 12: ReFIT NN, 200 trials (tri)
+	Run 13: ReFIT KF, 200 trials (quite around 190)
+	Run 14: Hand control
+	Run 15: ReFIT NN (uni)
+	Run 16: ReFIT NN (Tri)
+	Run 17: ReFIT NN (uni)
+	Run 18: ReFIT NN (Tri) - TS 34
+		
+
+-Notes:
+good_chans_SBP = [1,3:7,9,13,15,17,23,33, 35,37:38,40,43,45:47,49:53,55:60,62,64,67:68,71:76,79:87,90:92,94]; 

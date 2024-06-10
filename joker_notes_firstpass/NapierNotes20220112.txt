@@ -1,0 +1,55 @@
+Napier: 01/12/2022
+
+- Goals: Error Correction Parasite Test (2D)
+ 
+- Experiment: Dylan, Eric
+
+- Recording Start Time: 9:50 am
+- Recording Stop Time:  11:50 am
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [2, 2] - 0 lag picked) - 0.77 CC
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Warmup TS34, ~200 trials
+	Run 3: Training TS34 - 525 trials, fair performance (3.5 bps)
+	Run 4: KF0 (0 lag) - online by trial 20; slow performance for Napier, but usable (2.0 bps), ~280 trials; individuated movement especially hard today (e.g. splits); he got much better at controlling the KF as time went on; overall succes rate: 96%
+		T = 4 gives best FPR and TPR performance for all dirs; T = 3 good for flex, T = 5 good for ext; T = 4 chosen
+
+	Run 5: Error detection run 1 (correction OFF) - online by trial 10; ~180 trials, fair performance for Napier (1.57 bps);
+	Run 6: Debug run
+	Run 7: Error detection run 2 (correction ON, vel-lim 6 bins) - online by trial 10; MRP got stuck in a biased flex state, going to try negating
+	Run 8: Error detection run 3 (correction ON, negated) - online by trial 15; ~212 trials, fair performance for Napier (1.76 bps); made save period longer after last one wasn't long enough; negation seems to be working pretty well, isn't having the same bias issues as velocity limit
+	Run 9: Error detection run 4 (correction OFF) - online by trial 10; ~300 trials, great performance for Napier (2.02 bps); exceptionally good run compared to past ones, might have had a really good initialization or KF may have improved suddenly; very little bias issues until very end
+	Run 10: Error detection run 5 (correction ON, negated) - online by trial 10; ~151 trials, poor performance for Napier (1.44 bps); more noise than previous run, as it came back right at the end of last run (very inconvenient); bias issues return around trial 35, making it hard to progress, but he resumed control after trial 55;
+	Run 11: Error detection run 6 (correction ON, negated) - online by trial 10; ~270 trials, good performance for Napier (2.04 bps); much better initialization, but got biased again after trial 15; seems that when he gets into full flex, he gets "stuck"; got much better after trial 30 and he started running very well
+	Run 12: Error detection run 7 (correction OFF) - online by trial 10; ~150 trials, fair performance for Napier (1.42 bps); lots of bias and noize near the end
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	CAR: [1,1,1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,0,1,1]
+	
+	
+	
+	
+	
+	
+	

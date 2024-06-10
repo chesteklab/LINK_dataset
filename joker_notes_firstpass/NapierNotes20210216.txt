@@ -1,0 +1,32 @@
+Wayne: 2/16/2021
+
+- Goals: Random targets offline dataset
+
+- Experiment: Sam, Hisham
+
+- Recording start: 11:15am
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable) + EMG (Synapse PC via SplitterBox & CPD)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000 
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRS
+	
+-Decoders: 
+	
+-Runs:
+	Run 1: TS29 - forgot to start recording
+	Run 2: TS29 - seems index calibration is too far, reducing slightly.
+	Run 3: TS29 - calibration better. Starting to take breaks around trial 3400. Stop analyzing around 3380.
+	
+-Notes:
+	Recordings started after Run 1, before Run 2.

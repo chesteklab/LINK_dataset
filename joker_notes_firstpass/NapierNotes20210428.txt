@@ -1,0 +1,80 @@
+Napier: 4/28/2021
+
+- Goals: Functional NN
+
+- Experiment:  Hisham, Mender, Joey
+
+- Recording Start Time: 11:30 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 20000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRS
+
+-Decoders:
+
+	NN1:
+	Epoch 9, Iteration 3100, loss = 0.0773
+	Checking accuracy on validation set
+	Mean Correlation is 0.538126
+	Mean SNR is 3.03098.
+	Total number of peaks is 89.
+	Average control peaks is 0.628564.
+	Average signal peaks is 0.0624115.
+	Ratio of control to true signal is 10.0713.
+	Feature number 0.
+	Median of feature is 0.0265286.
+	Ratio of control to true signal is 10.3701.
+	Correlation is 0.500609
+	Feature number 1.
+	Median of feature is 0.0331222.
+	Ratio of control to true signal is 9.80376.
+	Correlation is 0.575643
+	
+	NN2:
+	Epoch 11, Iteration 3500, loss = 0.0632
+	Checking accuracy on validation set
+	Mean Correlation is 0.5599
+	Mean SNR is 3.07555.
+	Total number of peaks is 108.
+	Average control peaks is 0.507824.
+	Average signal peaks is 0.0624115.
+	Ratio of control to true signal is 8.1367.
+	Feature number 0.
+	Median of feature is 0.0499269.
+	Ratio of control to true signal is 8.82238.
+	Correlation is 0.51533
+	Feature number 1.
+	Median of feature is 0.0530209.
+	Ratio of control to true signal is 7.5228.
+	Correlation is 0.604469
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 29 Warm-Up (175 Trials) - followd by 5 min break
+	Run 3: Training - ~450 Trials, TS29
+	Run 4: Validation - 100 Trials, TS29
+	Run 5: NN1 - Tried for 100 Trials, TS29 - 500ms hold, first 15 were hand control - sort of worked, but not stable braking speeds
+	Run 6: NN1 - Trying again, same issue
+	Run 7: NN1 - 30 Trials - Trying again, starting get it, needed to figure out the decoder (divided gains by 2)
+	Run 8: NN2 - Trying, gain seems to high
+	Run 9: NN2 - Divided gains by 2, buggy start
+	Run 10: NN2 - Divided gains by 2, worked much better, not great tho, went for 50 trials.
+	Run 11: offline run
+	Run 12: NN2 - Divided gains by 10, worked great but super slow
+	Run 13: NN 2 - divided gains by 5 - worked great, relatively slow - 200 Trials
+	Run 14: NN2 - divided gains by 3
+	Run 15: NN2 - quadratic scaling
+	
+-Notes:
+	- really need to figure out this gain offset stuff

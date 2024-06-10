@@ -1,0 +1,41 @@
+Napier: 11/19/2021
+
+- Goals: Offline 2D Interleaved Springs/No Springs
+ 
+- Experiment: Hisham, Eric
+
+- Recording Start Time: 10:50 am
+- Recording Stop Time:  12:
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable), EMG
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,0,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRS
+	
+-Decoders:
+	
+-Runs:
+	Run 1: Calibration & Warm-up (210 trials TS29) followed by 5 min break. During break, reset threshold (p sure that doesn't affect SBP at all, just making sure)
+	Run 2: 250 Trials, TS29 750ms, NORMAL
+	Run 3: 250 Trials, TS29 750ms, SPRING - 4/4 was too strong for just idx. Swapping, restarting run.
+	Run 4: 150 Trials, TS29 750ms, SPRING - stop at ~150. tired from last run, needs break from springs
+	Run 5: 150 Trials, TS29 750ms, NORMAL - evening out interleaving.
+	Run 6: 250 Trials, TS29 750ms, SPRING
+	Run 7: 300 Trials, TS29 750ms, NORMAL
+	Run 8: 300 Trials, TS29 750ms, SPRING
+	Run 9: 300 Trials, TS29 750ms, NORMAL
+	Run 10: 300 Trials, TS29 750ms, SPRING
+	
+-Notes:
+	Springs used: 2/4 IDX, 4/4 MRP (after run 3)
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];

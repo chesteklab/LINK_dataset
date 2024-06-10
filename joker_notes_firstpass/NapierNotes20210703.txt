@@ -1,0 +1,66 @@
+Napier: 7/03/2021
+
+- Goals: Random targets, compare KF gains to RFNN
+
+- Experiment: Willsey, Hisham
+
+- Recording Start Time: ~9:30 AM
+- Recording Stop Time:   AM
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 75/100 (offline/online)
+	* Trial Timeout: 7500
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29/36
+	* Visualization Style: MRS
+	
+-Decoders:
+KF0
+TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+REFIT0,1:
+TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',10,10,false,[2,4],50,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+		-  z= z([1:33 35:69 71:length(z)]);
+
+Epoch 11, Iteration 3500, loss = 0.9066
+Checking accuracy on validation set
+Mean Correlation is 0.637903
+Mean SNR is 3.10086.
+Total number of peaks is 241.
+Average control peaks is 1.67338.
+Average signal peaks is 0.070154.
+Ratio of control to true signal is 23.8529.
+Feature number 0.
+Median of feature is 0.0151194.
+Ratio of control to true signal is 21.0794.
+Correlation is 0.606318
+Feature number 1.
+Median of feature is 0.31231.
+Ratio of control to true signal is 26.6612.
+Correlation is 0.669488
+Finger 0 RR Calculated Gain, Offset: 0.036893, -0.001446
+Finger 1 RR Calculated Gain, Offset: 0.051507, -0.017073
+
+-Runs:
+	Run 1: Calibration
+	Run 2: Warm-ups: 300 trials
+	Run 2: TS 29 Training: 400
+	Run 3: TS 29 Validation: 100
+	Runs 4-16: neither decoder made the hand move at all, we found that it was bad training data
+	Run 17: TS 29 Training: 400
+	Run 18: TS 29 Validation: 100
+	Run 19: NN on TS 29, 750 hold times
+	Run 20: KF on TS 29, 750 hold times
+	
+-Notes:
+	- 2kSps recording didn't start until 10:14 (partway through training run)
+	- good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96]; 
+
+	

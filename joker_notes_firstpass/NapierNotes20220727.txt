@@ -1,0 +1,99 @@
+Napier: 07/27/2022
+
+- Goals: RNNs (it worked!). ABA with RNN vs FNN.
+ 
+- Experimenters: Joey, Hisham
+
+- Recording Start Time: 8:45 am
+- Recording Stop Time:  11:00 am
+
+- xPC Model: Rig_main_Cortical_Parasite_DevJuly22
+- Recorded Array: Motor (Patient cable/cerebus)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:	
+	- all decoders trained with tri vel redistribution, RR scaler, RNNs with 5 time history
+	RNN0 - GRU without norm
+	RNN1 - GRU with full X norm 						(corrs roughly 0.7)
+	RNN2 - GRU trained with high bias noise and X norm
+	RNN3 - GRU variant (no relu)
+	RNN4 - GRU variant with full X norm
+	RNN5 - GRU with full X norm, PV decoder				(corrs 0.73/0.79/0.6/0.6
+
+	NN0 - willsey net, X norm, 3500 training 			(corr 0.67/0.7)
+	NN1 - willsey net, no norm, 3500 trainging 			(corr 0.63/0.7)
+	
+	KF0 : TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); 
+		SBP KF correlation = 0.77173
+		SBP KF lag = 0
+
+	
+-Runs:
+	Run 1: calibration
+	Run 2: warmup - 150 trials.
+	Run 3: TS29 training - 500 trials. BR~3.8  #HC1#.
+	-- 10min training break --
+	Run 4: RNN0 - immediately biased to extension
+	Run 5: RNN1 - 2 min ema norm. Worked trials 16-17. Trying locking the norm trial 35 - worked for a trial or two, then stuck. Worked really well trial 50-85 then crash.
+	Run 6: RNN1 - 2 min ema norm. 150. trials. BR~2.0. 20 trials hand, then online. Locked the norm immediately. Working really well until crash at the end.
+	Run 7: RNN1 - 2 min ema norm. Locked norm from start. 10 trials hand, then online. Working ok, but then stuck trial 30. Working on/off trial 35-64 but having trouble. crash
+	Run 8: RNN1 - 2 min ema norm. 10 trials hand, then online. Locked norm trial 25 (1min in). Working well trial 30-90. crash.
+	Turned parasite saving off.
+	Run 9: RNN1 - 2 min ema norm. Online from start. Norm locked 70sec in (trial 27). Mostly working before norm locked. Pretty slow, but very controlled/clean (gain could be turned up). Stuck trial 55. Stop trial 62. I locked the norm ~15 sec after he got stuck, and that might've messed things up/slowed it down a lot.
+	Run 10: ignore
+
+ABA:
+	Run 11: (A) RNN1 - 2 min ema norm. #RNN1# 10 trials hand then online. Norm locked at 60 sec (trial 20). Fingers stuck at the start, somewhat working 15-20. Moving much faster than run 9, seems like the norm is in a much better spot. Looks a little "slippery" and maybe slightly fast, but able to stop very well. Getting really good around trial 150. 400 trials. BR~2.0 for first 200, BR~2.2-2.5 for last 200.
+	Run 12: (B) NN0 - 2 min ema norm. #NN0# 10 trials hand then online. Norm locked at 60 sec (trial 43). Decoder working fine during the first minute. Looks slightly jittery when it's moving (not as smooth clean movements as the rnn). Moving somewhat slower then what I've seen before. 250 trials. BR~1.8
+	Run 13: (C) NN1 - no norm. #NN1# 10 trials hand then online. Barely working until trial 35 then mostly stuck. Stop trial 45 (220 sec).
+	Run 14: (A) RNN1 - 2 min ema norm. #RNN1# 10 trials hand then online. Norm locked at 60 sec (trial 20). Fingers stuck at the start, somewhat working 15-20. 200 trials. BR~2.4
+	Run 15-16: ignore. tried to run KF but getting errors.
+	
+	Run 17: RNN2 - 2 min ema norm. 10 trials hand then online. Norm locked at 60 sec (trial 18). Working once norm locked. Looks harder to control than RNN1 (more overshooting). 100 trials. (maybe BR~1.5 ?)
+	Run 18: RNN5 (PV decoding) - 2 min ema norm. 10 trials hand then online. I think norm was locked? retrying.
+	Run 19: RNN5 (PV decoding) - 2 min ema norm. 10 trials hand then online. Norm locked at 60 sec (trial 16ish).  Able to move a lot more before the norm locked. Moving, but getting stuck at splits. Stopped trial 30 (never got working). 
+	Run 20: RNN3 (gru variant) - no norm. 10 trials hand then online. fully maxed out immediately.
+	Run 21: RNN4 (gru variant) - 2 min ema norm. 10 trials hand then online. Norm locked at 60 sec (trial 20). Working ok, but lots of oscillation. 120 trials. BR~1.3
+	
+	Run 22: RNN1 - 2 min ema norm, with first 1 min gradual partial hand control. Norm locked at 60 sec. Working well Some trouble with fine adjustments. 200 trials. BR~2.0
+	Probably getting tired at this point, but motivation still high (~2.5 hours in rig).
+
+
+Summary:
+	Getting RNNs working:
+		- RNNs need the neural normalization to adapt slightly when switching to closed-loop control
+		- Things tend to fail/get stuck when the norm is constantly changing
+		-> Want short adaptation period at beginning, then lock in place to allow the monkey to figure it out (and stay stable)
+		-> Could work well to do 1 min of gradual hand control to full decoder, and lock the norm at 1 min.
+	
+	Bitrates (approximate):
+		- GRU no norm 		= 0
+		- GRU norm			= 2.4
+		- FNN no norm 		= <1
+		- FNN norm 			= 1.8
+		- GRU linear 		= 1.3
+		- GRU train noise 	= 1.5
+
+	
+-Notes:
+	Some juicer artifact
+	
+	good_chans_SBP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 23, 24, 33, 35, 37, 38, 39, 40, 43, 45, 46, 47, 49, 50,
+					51, 52, 53, 55, 56, 57, 58, 59, 60, 62, 64, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 79,
+					80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 95, 96]
+					
+	good_chans_SBP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 23, 24, 33, 35, 37, 38, 39, 40, 43, 45, 46, 47, 49, 50,51, 52, 53, 55, 56, 57, 58, 59, 60, 62, 64, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 95, 96]
+
+
+	

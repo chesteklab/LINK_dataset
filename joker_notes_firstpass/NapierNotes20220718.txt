@@ -1,0 +1,71 @@
+Napier: 07/18/2022
+
+- Goals: Error Correction Parasite Test (2D) - New Detector Training Correction Test 9 (Debugging Correction)
+ 
+- Experiment: Dylan, Mender, Luis
+
+- Recording Start Time: 9:35 am
+- Recording Stop Time:  11:55 am
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [1, 1] - 0 lag picked) - 0.791 CC
+
+	
+-Runs:
+	Run 1: Calibration and warm-up (~200 trials)
+	Run 2: Training TS34 - 500 trials, good performance (4.63 bps), 99% SR;
+	Run 3: KF0 (0 lag) 500 ms hold time - online by trial 10; fair performance for Napier (2.05 bps), ~410 trials, 98% SR;
+		try_data: T = 4: 23 - 60% TPR for 5% FPR
+	
+	Run 4: Test run
+	Run 5: Test run
+	
+	-- Detector a bit old by now --
+	Run 6: Error detection run 1 (correction OFF) - online by trial 10; ~420 trials, fair performance for Napier (2.09 bps), 100% SR; Finger 1: 47.64% TPR, 34.12% FPR; Finger 2: 18.53% TPR, 15.12% FPR
+	
+	-- Trained new detector --
+	try_data: T = 4: 38 - 52% TPR for 5% FPR
+	
+	Run 7: Error detection run 2 (correction OFF) - online by trial 10; ~460 trials, good performance for Napier (2.22 bps), 100% SR; Finger 1: 21.78% TPR, 19.55% FPR; Finger 2: 20.38% TPR, 12.8% FPR
+	
+	-- Changed velocity read in error detector --
+	
+	Run 8: Test run
+	
+	Run 9: Error detection run 3(correction OFF) - online by trial 10; ~420 trials, good performance for Napier (1.96 bps), 100% SR; Finger 1: 25.44% TPR, 27.05% FPR; Finger 2: 29.555 TPR, 19.25% FPR
+	
+	-- Trained new detector and taking 1 previous bin of neural data (to fix possible delayed vel) --
+	try_data: T = 4: 25 - 38% TPR for 5-7% FPR
+	
+	Run 10: Test run; vel delay did not seem to help, so turning off
+	
+	Run 11: Error detection run 4 (correction OFF) - online by trial 10; ~250 trials, poor performance for Napier (0.98 bps), 71% SR; Finger 1: 75.64% TPR, 61.885 FPR; Finger 2: 16.73% TPR, 16.25% FPR; ran out of juice around trial 200 so performance is way off
+	
+	
+-Notes:
+	good_chans_SBP = [1:3, 5:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78,80:88,91:92,96]; (not used in err detector training)
+	
+	CAR (NOT USED TODAY): [1,1,1,0,1,1,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1,1,0,1,0,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,0,0,1,1,0,0,0,1]
+	
+	
+	
+	
+	
+	
+	
+	

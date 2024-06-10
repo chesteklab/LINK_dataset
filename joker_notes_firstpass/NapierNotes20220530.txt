@@ -1,0 +1,109 @@
+Napier: 05/30/2022
+
+- Goals: RNN with /normalization, refit RNN
+ 
+- Experimenters: Joey, Paras
+
+- Recording Start Time: 9:10 am
+- Recording Stop Time:  11:00 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:	
+	- all decoders trained with tri vel redistribution, RR scaler, RNNs with 5 time history
+	NN0 - willsey net, 3500 iters
+	NN1 - willsey net, 3500 iters, 10 sec neural norm
+	NN2 - willsey net, 3500 iters, 60 sec neural norm
+	RNN0 - GRU 
+	RNN1 - GRU with 10 sec neural norm
+	RNN2 - GRU with 60 sec neural norm
+	
+	NN3 - refit NN1 on run 7(NN1)
+	RNN3 - refit GRU on run 11(RNN1)
+	
+	NN4 - PV willsey net, 3500 iters (correlations around 0.5-0.6)
+	RNN4 - PV GRU with 10 sec neural norm (correlations around 0.65-0.75)
+	
+	--- TS34 retraining (Run 22):
+	NN5 - willsey net, 3500 iters
+	NN6 - willsey net, 3500 iters, 10 sec neural norm
+	RNN5 - GRU with 10 sec neural norm
+
+	
+	
+-Runs:
+	Run 1: calibration
+	Run 2: warmup. 100 trials.
+	Run 3: TS29 training - 500 trials. BR~3.8  #HC#
+	--- 10 min training break ---
+	
+	---- For the following online tests, runs were started in brain control without any hand trials. ----
+	Run 4-5: debug
+	Run 6: NN0. 				120 trials. BR~1.9. #NN0# Working ok, but some overshooting/oscillation. Figured it out around trial 15.
+	Run 7: NN1 - 10 sec norm. 	110 trials. BR~1.9. #NN1# A LOT cleaner with no oscillation. But sometimes getting stuck twoard split for a couple trials. (MRP biased toward extend)
+	Run 8: NN2 - 60 sec norm. 	120 trials. BR~1.75. #NN2# Very clean but having some trouble on splits. Figured out around trial 15. 
+		Is fast for large movements and stops well, but somewhat hard to fine-tune.
+	Run 9: NN0. 				 70 trials. BR~1.7. #NN0# A lot more oscillation than NN1/2 but overall a more control/faster (like on splits)
+	
+	Run 10: RNN0. Bias issues immediately
+	Run 11: RNN1 - 10 sec norm. 110 trials. BR~1.4. #RNN1# Looks super clean and smoother than FNN, but often stuck on small fine tuning & splits. Getting stuck at flex sometimes.
+		Very good at large movements. Fingers move together a little
+	Run 12: RNN2 - 60 sec norm. 60 trials. BR~0.9. #RNN2# Similar to RNN1, but MRP biased toward extension and making things hard.
+	Run 13: RNN2 - 60 sec norm with 0.001 MRP bias. MRP still not working well.
+	
+	Run 14: NN3 - RF, 10 sec norm. something wrong with refit. both finger slowly went to extend
+	Run 15: RNN3 - RF, 10 sec norm. Both fingers strongly correlated. Very controlled, but slow. Not really usable.
+	
+	Run 16: NN4 - PV network. Beta=0.99. 60 trials. BR~1.7. Working well, but position seems to add high(ish) frequency noise.
+	Run 17: NN4 - PV network. Beta=0.9. Not really usable since idx position is bad, kinda biased toward extend.
+	Run 18: NN4 - PV network. Beta=1.0. Having some trouble, getting stuck in splits. \
+	Run 19: NN1 - 25 trials. checking to see if normalization fixes bias issues - it does! Decoding working pretty well, but stuck temporarily.
+	*** At this point >1 hour past the original training, so brain activity could have shifted a bit.
+	
+	Run 20 - RNN4 - PV network. Beta=0.99. Working ok, but MRP biased toward extend, so only somewhat usable 
+	Run 21 - RNN4 - PV network. Beta=0.5. Super noisy and hard to control as expected, but no bias issues
+	
+	Run 22: - TS34 training - 500 trials. BR~4.0  #HC#
+	--- 5 min training break ---
+	(decoders below tested on TS29)
+	Run 23: NN5 - 50trials. working trial 33 for a bit. Idx getting stuck at flex. 
+	Run 24: NN6 - 10 sec norm. 20 trials. idx stuck momentarily at flex, but slightly better than run 23. **He may be getting tired**
+	Run 25: RNN5 - 10 sec norm. 80 trials. BR~1.5. Working pretty well, very smooth, not getting stuck. But fingers somewhat correlated. Good through trial 30, then maybe getting tired.
+		Working really well but somewhat slow.
+
+
+Summary:
+ - neural normalization makes the trajectories a lot cleaner (and fixes some bias issues on the FNN)
+	- seems like shorter normalization might work better
+	- still sometimes getting stuck (momentarily)
+	
+ - when the RNN works, it looks super clean and smooth
+ - RNN still somewhat getting stuck
+ 
+ 
+ TODO:
+ - debug pybmi refit code
+
+ 
+
+	
+	
+-Notes:
+	good_chans_SBP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 23, 24, 33, 35, 37, 38, 39, 40, 43, 45, 46, 47, 49, 50,
+					51, 52, 53, 55, 56, 57, 58, 59, 60, 62, 64, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 79,
+					80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 95, 96]
+
+	Some juicer artifact

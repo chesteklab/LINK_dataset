@@ -1,0 +1,45 @@
+Napier: 4/22/2021
+
+- Goals: Online wrist and springs together
+
+- Experiment: Mender, Eric
+
+- Recording Start Time: 11:00 am
+- Recording Stop Time:  
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 35
+	* Visualization Style: MRS
+	
+-Decoders:
+KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); 
+KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); 
+
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 34 - normal 300 trials
+	Run 3: TS 34 - wrist flexed with springs 2/4 - 300 trials
+	Run 4: TS 34 - normal while training models - went a little long ~400 trials
+	Run 5: TS 34 - KF0 - TCFR - bit rates around 1.3-1.4 
+	Run 6: TS 34 - KF1 - TCFR - Good bit rates again 
+	Run 7: TS 34 - KF0 - TCFR - probably a little worse
+	Run 8: TS 34 - KF0 - SBP - very slow not working that well
+	Run 9: TS 34 - KF1 - SBP - very biased towards extension - not useable.... added a bias of .0001 
+	Run 10: TS 34 - KF0 - SBP - slow but useable
+	Run 11: TS 34 - normal hand contorl
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	Used 0 bin lag for both models

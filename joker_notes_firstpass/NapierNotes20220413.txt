@@ -1,0 +1,123 @@
+Napier: 4/13/2022
+
+- Goals: RFKF vs RKNN optimal gain - refresher
+ 
+- Experiment: Hisham, Mender
+
+- Recording Start Time: 9:50 am
+- Recording Stop Time:  12:30 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 (off/on)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29/36
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},-1,true); #-1 is optimal lag
+		SBP KF correlation = 0.84692
+		SBP KF lag = 1
+
+	
+	RK0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',5,5,false,[2,4],50,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	(remember to load the KF before training)
+	
+	RK1: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',4,4,false,[2,4],50,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	NN0:
+	Epoch 11, Iteration 3500, loss = 0.8837
+	Checking accuracy on validation set
+	Mean Correlation is 0.6415
+	Mean SNR is 3.16478.
+	Total number of peaks is 191.
+	Average control peaks is 1.65648.
+	Average signal peaks is 0.0767212.
+	Ratio of control to true signal is 21.591.
+	Feature number 0.
+	Median of feature is 0.290481.
+	Ratio of control to true signal is 22.2802.
+	Correlation is 0.573071
+	Feature number 1.
+	Median of feature is 0.189177.
+	Ratio of control to true signal is 20.791.
+	Correlation is 0.70993
+	Finger 0 RR Calculated Gain, Offset: 0.044107, -0.011036
+	Finger 1 RR Calculated Gain, Offset: 0.047617, -0.007787
+	
+	RN0:
+	Epoch 3, Iteration 500, loss = 0.7058
+	Checking accuracy on validation set
+	Mean Correlation is 0.200156
+	Mean SNR is 2.49737.
+	Total number of peaks is 872.
+	Average control peaks is 2.10125.
+	Average signal peaks is 1.54696.
+	Ratio of control to true signal is 1.35831.
+	Feature number 0.
+	Median of feature is -0.130385.
+	Ratio of control to true signal is 0.974024.
+	Correlation is 0.150196
+	Feature number 1.
+	Median of feature is -0.321919.
+	Ratio of control to true signal is 1.85294.
+	Correlation is 0.250116
+	Finger 0 RR Calculated Gain, Offset: 0.041713, -0.313674
+	Finger 1 RR Calculated Gain, Offset: 0.119466, -0.104139
+	
+	RN1:
+	Epoch 3, Iteration 500, loss = 0.5400
+	Checking accuracy on validation set
+	Mean Correlation is 0.668724
+	Mean SNR is 2.63564.
+	Total number of peaks is 613.
+	Average control peaks is 3.55124.
+	Average signal peaks is 1.7673.
+	Ratio of control to true signal is 2.00941.
+	Feature number 0.
+	Median of feature is -0.00701893.
+	Ratio of control to true signal is 1.86504.
+	Correlation is 0.650591
+	Feature number 1.
+	Median of feature is 0.040649.
+	Ratio of control to true signal is 2.183.
+	Correlation is 0.686858
+	Finger 0 RR Calculated Gain, Offset: 0.300452, -0.243816
+	Finger 1 RR Calculated Gain, Offset: 0.259422, -0.220318
+
+-Runs:
+	Run 1: Calibration (took a while) + Warm-up: ~200 trials, first 100 were 1D + followed by 5 min break.
+	Run 2: TS29 - Training 400
+	Run 3: TS29 - Validation 100
+	~ TRAINING BREAK ~
+	
+	Run 4: TS29 - KF0 250 trials - ReFIT training. originally had trouble. Tried turning decoder off and back on between 55-65. Seemed to work
+	Run 5: TS29 - NN0 250 trials - ReFIT training.
+	~ REFIT TRAINING ~
+	
+	Run 6: TS29 - RK0 250 Trials - Gain 120%, smooth 1.25. Not working. Trying normal (no gain adjustments)
+	Run 7: TS29 - RK0 250 Trials - 100 Trials. Worked much better
+	Run 8: TS29 - RN0 250 Trials - 100 Trials. Incorrectly trained
+	~Retraining RN/RK correctly~
+	
+	Run 9-11: tried rk and rn, neither worked
+	Run 12: tried nn0, seems like he gave up
+	Run 13: tried kf0, also doesnt work. doing hand control.
+	
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	first RK is a little jumpy. might be due to the rough 50 first trials. (turns out training was done wrong)
+	
+	refit retraining/mistakes took too much time, probably lost motivation or neural data shifted/changed.
+	
+	*retroactive note: things probably broke later on because it got switched to TCFR somehow.
+	

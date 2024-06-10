@@ -1,0 +1,59 @@
+Napier: 08/25/2022
+
+- Goals: Does the NN still work
+ 
+- Experimenters: Hisham, Luis (start), Joey (end)
+
+- Recording Start Time: 11:00 am
+- Recording Stop Time:  12:30 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient cable/cerebus)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous + broadband
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:	
+
+	NN0: (forgot to copy info) - Training around .71/.61 for I/MRP. Used Train_Network_v3, 3500 iters
+	NN1: Scheduler On
+		iter 2500: val corr = [0.6953969947545544, 0.6117681974650505]
+		Test Correlation:[0.6953969947545544, 0.6117681974650505]
+		MSE:1.3260587453842163
+		Epoch    24: reducing learning rate of group 0 to 2.5000e-05.
+		*** model done improving based on scheduler ***
+		Finger 0 RR Calculated Gain, Offset: 0.024249, 0.003188
+		Finger 1 RR Calculated Gain, Offset: 0.025909, 0.006082
+		decoder saved to: Z:/Data/Monkeys/Joker\2022-08-25\decodeParamsNN1.pkl
+
+-Runs:
+	Run 1: calibration + 120-150 warm-up followerd by 5 minute break
+	Run 2: 400 Training - TS29
+	Run 3: 100 Validation - TS29 
+	~Training Break~
+	
+	Run 4: 200 NN0 TS29 - working ok, but pretty noisy/jittery. BPS dipping below 1 at times. May b due to extended break for debugging.
+	Run 5: 200 NN1 TS29 - seems maybe better than NN0. BPS at ~90 is 1.4, but NN0 wasn't far off from that earlier in the run.
+	Run 6: NN0 - Seemed ok, run crashed.
+	Run 7: 250 NN1 TS29 - not bad, ~1.5-1.6ish
+	Run 8: 250 NN0 TS29 - around 130ish got stuck, joey switched between hc and nn a few times, started going around 170.
+
+-Notes:
+	Training nn0 took extra time, bug related to train_model returning the model instance so too many values to unpack
+	
+	App origin/main and current parasite have diverged. Think Joey and I should walk through it.
+	
+	
+	Removing 84, noisy
+	good_chans_SBP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 23, 24, 33, 35, 37, 38, 39, 40, 43, 45, 46, 47, 49, 50,
+                51, 52, 53, 55, 56, 57, 58, 59, 60, 62, 64, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 81, 82, 83, 86, 87, 88, 90, 91, 92, 95, 96]
+				

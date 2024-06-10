@@ -1,0 +1,96 @@
+Napier: 9/15/2021
+
+- Goals: Nonlinear velocity scaling with NN
+
+- Experiment: Joey, Sam
+
+- Recording Start Time: 8:45 AM
+- Recording Stop Time: 10:00 AM
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable) + Medial (Cereplex)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90/100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+
+-Decoders: 
+
+NN0:
+Epoch 9, Iteration 3100, loss = 0.9394
+Checking accuracy on validation set
+Mean Correlation is 0.531974
+Mean SNR is 2.83648.
+Total number of peaks is 259.
+Average control peaks is 1.43331.
+Average signal peaks is 0.0523244.
+Ratio of control to true signal is 27.3927.
+Feature number 0.
+Median of feature is 0.116387.
+Ratio of control to true signal is 22.3426.
+Correlation is 0.532249
+Feature number 1.
+Median of feature is -0.25118.
+Ratio of control to true signal is 34.5044.
+Correlation is 0.531699
+Finger 0 RR Calculated Gain, Offset: 0.026039, 0.000655
+Finger 1 RR Calculated Gain, Offset: 0.024893, 0.006005
+
+NN1:
+Epoch 12, Iteration 3800, loss = 0.9312
+Checking accuracy on validation set
+Mean Correlation is 0.546865
+Mean SNR is 2.78621.
+Total number of peaks is 189.
+Average control peaks is 1.80485.
+Average signal peaks is 0.0573606.
+Ratio of control to true signal is 31.465.
+Feature number 0.
+Median of feature is 0.230552.
+Ratio of control to true signal is 32.6629.
+Correlation is 0.560652
+Feature number 1.
+Median of feature is -0.194599.
+Ratio of control to true signal is 30.2321.
+Correlation is 0.533079
+Finger 0 RR Calculated Gain, Offset: 0.024708, -0.004282
+Finger 1 RR Calculated Gain, Offset: 0.024287, 0.002204
+
+
+		
+-Runs:
+	(parasite model wasn't updated for FL mac address, so calibration and warmup weren't logged)
+	Run 1: TS34 - 400 trials. BR=4.0
+	Run 2: TS34 - 100 trials. 
+	
+	Run 3: NN0 TS34 - works ok, idx is too fast (this run was peaks gain/offset, next run switching to RR gain/offset)
+	Run 4: RF0 TS34 - RR gains are more controlled. but MRP needed an offset (getting stuck at extension). Decoder not great, fingers pretty correlated.
+	
+	Run 5: TS34 - 400 trials. BR=4.0
+	Run 6: TS34 - 100 trials. 
+	
+	Run 7: NN1 TS34 - 100 trials. better decoder now, little jittery. BR=1.8
+	(few minute delay)
+	Run 8: NN1 TS34 - power=1.4, k=0.04. less jittery, better stopping. overall slower brain control. BR=1.5
+	Run 9: NN1 TS34 - power=2.0 was too high
+	Run 10: NN1 TS34 - power=1.6, k=0.02. snappy with good stopping. a little too notchy. BR=1.8
+	Run 11: NN1 TS34 - power=1.0, k=0.04. (normal). much more jittery, more oscillation. BR=1.6
+	Run 12: NN1 TS34 - power=1.4, k=0.02. 650 trials. looks good. BR=1.8 increasing to 2.2
+	Run 13: NN1 TS34 - power=1.0, k=0.04. (normal). more controlled that the first couple times. BR=2.0
+
+	
+	
+-Notes:
+	somewhat low correlations today
+	
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	

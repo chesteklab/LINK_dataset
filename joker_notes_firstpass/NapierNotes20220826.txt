@@ -1,0 +1,78 @@
+Napier: 08/26/2022
+
+- Goals: Error Correction Parasite Test (2D) - New Detector Training Correction Test 17 (Testing training code fixes, and new data saving fixes)
+ 
+- Experiment: Dylan, Hisham 
+
+- Recording Start Time: 9:50 am
+- Recording Stop Time: 12:00 pm  am
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [1, 1] - 0 lag picked) - 0.773 CC
+
+	
+-Runs:
+
+	-- CAR ON --
+	Run 1: Calibration and warm-up (~200 trials)
+	Run 2: CAR Test run
+	Run 3: Training TS34 - 500 trials, good performance (4.69 bps), 100% SR;
+	
+	Run 4: KF0 (0 lag) 500 ms hold time - online by trial 10; good performance for Napier (2.44 bps), ~510 trials, 100% SR;
+		try_data_bug: T = 4: 12 - 39% TPR for 5% FPR
+		try_data_fix: T = 4: 13 - 43% TPR for 5% FPR
+	
+	-- Using try_data_bug --
+	-- Fixed target tracking during beginning before decode --
+	Run 5: Error detection run 1 (correction OFF) - online by trial 10; ~150 trials, good performance for Napier (2.36 bps), 100% SR; Finger 1: 18.15% TPR, 6.19% FPR; Finger 2: 14.98% TPR, 5.43% FPR
+
+	Run 6: Attempt, CPU overload trial 59
+
+	-- New live tracking of flex and extend --
+	Run 7: Error detection run 2 (correction OFF) - online by trial 10; ~170 trials, good performance for Napier (2.60 bps), 100% SR; Finger 1 Ext: 3.64% TPR, 0.91% FPR; Finger 1 Flex: 45.28% TPR, 19.67% FPR; Finger 2 Ext: 16.51% TPR, 5.86% FPR; Finger 2 Flex: 12.2% TPR, 4.79% FPR
+	
+	Run 8: Attempt, CPU overload trial 99
+	
+	-- Longer run with threshold adjust --
+	Run 9: Error detection run 3 (correction OFF) - online by trial 10; ~280 trials, fair performance for Napier (2.16 bps), 99% SR; Finger 1 Ext: 15.96% TPR, 5.82% FPR; Finger 1 Flex: 15.95% TPR, 7.41% FPR; Finger 2 Ext: 20.67% TPR, 5.98% FPR; Finger 2 Flex: 11.89% TPR, 4.19% FPR
+	
+	-- Longer run without threshold adjust --
+	Run 10: Error detection run 4 (correction OFF) - online by trial 10; ~320 trials, good performance for Napier (2.45 bps), 100% SR; Finger 1 Ext: 5.18% TPR, 1.38% FPR; Finger 1 Flex: 51.2% TPR, 26.91% FPR; Finger 2 Ext: 34.65% TPR, 9.41% FPR; Finger 2 Flex: 19.49% TPR, 5.92% FPR
+	
+	-- Using try_data_fix, after fixing target training bug --
+	Run 11: Error detection run 5 (correction OFF) - online by trial 10; ~320 trials, good performance for Napier (2.1 bps), 100% SR; Finger 1 Ext: 0.92% TPR, 0.43% FPR; Finger 1 Flex: 47.92% TPR, 28.22% FPR; Finger 2 Ext: 34.98% TPR, 11.88% FPR; Finger 2 Flex: 17.38% TPR, 7.34% FPR
+	
+	Run 12: Attempt, CPU overload trial 289
+	
+	-- Correction with new try_data_fix and threshold adjustment --
+	Run 13: Error detection run 6 (correction ON, T-2T) - online by trial 10; ~290 trials, fair performance for Napier (2.18 bps), 100% SR; Finger 1 Ext: 1.27% TPR, 0.35% FPR; Finger 1 Flex: 14.92% TPR, 10.99% FPR; Finger 2 Ext: 18.87% TPR, 4.08% FPR; Finger 2 Flex: 12.14% TPR, 5.28% FPR; bit of bias, few different correcitosn throughout
+	
+-Notes:
+	good_chans_SBP = [1:3,5:9,11:13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78,81:83,85:87,90:92,94:96];
+
+	CAR: [1,1,1,0,1,1,1,1,1,1,1,0,1,0,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,0,0,1,1,1,0,1,1,1,0,0,1,1,1,0,1,1,1]
+	
+	Using longer bend sensor in MRP, resolution is smaller than usual
+	
+	
+	
+	
+	
+	
+	
+	

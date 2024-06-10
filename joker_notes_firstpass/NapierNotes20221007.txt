@@ -1,0 +1,68 @@
+Napier: 09/29/2022
+
+- Goals: Dusting off Dual State (ONLINE)
+ 
+- Experimenters: Hisham, Mender
+
+- Recording Start Time: 10:10 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient cable/cerebus)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100/100
+	* Trial Timeout: 5000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:
+
+DS0:
+TrainOnline_Cortical_DualStateDecoder('Joker','','Run-002',0,[2,4],32,[],good_chans_SBP)
+
+DS1:
+TrainOnline_Cortical_DualStateDecoder('Joker','','Run-002',0,[2,4],32,[],good_chans_SBP)
+
+KF0:
+TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true);
+
+-Runs:
+	Run 1: calibration + warmup + followed by 5 min break
+	Run 2: 400 TS29 training
+	Run 3: BIN SIZE
+	Run 4: DS0 TS29 - It's working in just the move state, but the threshold is still broken.
+	Run5-6: Debuggin
+	Run 7: DS0 TS29 200 Trials It works! Kinda slow but functional. Move probs could be adjusted (maybe train on 70/30 but threshold for 50/50?). Br ~1.7 at 170
+	Run 8: DS1. seems to bias entirely towards flexion. stuck there. Screen blanked for a while, changed the targPM from .3 to .5. Still gets stuck in flexion
+	Run 9: DS0 TS29 - 300 trials.
+	Run 10: KF0 TS29 - 300 trials
+	Run 11: TS29 HC
+-Notes:
+	Same problem was happening, but math should be working. Figured it out! Turns out -self.class_lambda needed to be -1 * self.class_lambda
+	Once worked, felt like it could go faster. Interested in different splits. Or potentially excluding middle velocities from training.
+	Going to start by doing on 30/70 move/posture split. Maybe this will make move faster. 
+	(it did not), instead got stuck in flexion. Maybe 30/70, but then followed by 50/50 threshold adaptation?
+	could be the flexion gets higher velocities?
+	
+	Started with chans from 9/30, removed 93
+	good_chans_SBP = [1, 2, 3, 4, 5, 7, 8, 9, 11, 13, 14, 15, 17, 19, 20, 22, 23, 24, 26, 27, 28, 29, 31, 33, 35, 36, 37, 38, 39, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 81, 82, 83, 84, 85, 86, 87, 90, 91, 94, 96]
+	
+
+
+
+
+
+
+
+
+
+
+
+

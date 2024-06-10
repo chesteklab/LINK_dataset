@@ -1,0 +1,86 @@
+Napier: 3/17/2021
+
+- Goals: Mote Intervals - (30 pps, 10ms bins, refit)
+
+- Experiment:  Joey C, Sam
+
+- Recording Start Time: 9:00 am
+- Recording Stop Time:  11:00 am
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_motePackets10
+- Recorded Array: Motor (Patient Cable) + EMG (CPD via CPA)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100/100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+
+-Decoders: 
+	(final 3 numbers are threshNum,avgMode,intLagMs)
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',2,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,0);
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',2,false,[2,4],10,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,0);
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi_MoteIntervals('Joker','',3,3,0,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true, 1,2,0);
+	RF1: TrainOnline_Cortical_KalmanFilterReFIT_Multi_MoteIntervals('Joker','',5,5,0,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true, 1,2,0);
+		** manually combined run 5/6 within the refit training function to train on both
+	RF2: TrainOnline_Cortical_KalmanFilterReFIT_Multi_MoteIntervals('Joker','',5,5,0,[2,4],10,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true, 1,2,0);
+		** manually combined run 5/6 within the refit training function to train on both
+		
+	KF5: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',15,false,[2,4],10,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,0);
+	KF6: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',15,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,0);
+	RF3: TrainOnline_Cortical_KalmanFilterReFIT_Multi_MoteIntervals('Joker','',18,18,0,[2,4],10,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true, 1,2,0);
+		** also included failed runs in the refit
+-Runs:
+	Run 1: threshold setting. 150 trials
+	
+30pps, 32/10ms bins	
+	xpcMoteThresholds = calcOnlineMoteThresholds(30,'Joker');
+	Run 2: TS-34 training. 400 trials.
+	Run 3: KF0 30pps 32ms bins - 100 SBP BR=1.9. 100 mint BR=1.8. 100 sbp BR=1.95. 100 Mint BR=1.6. More mint oscillations at the end
+	Run 4: KF1 totally maxed out. reloading KF1 to be sure
+	Run 5: KF0 30pps 10ms bins - 100 SBP BR=1.9. 100 mint BR=1.2. 10sbp -> crash. Super responsive mint having hard time stopping. probably getting tired using it
+	Run 6: (continued) 100 SBP BR=2(?). 85 mint BR=1.0. crash.
+	Run 7: ignore
+
+Refit:	
+	Run 8: Refit0 30pps 32ms bins - 100 SBP BR=2.1. 200 mint BR=2.0-2.2. 100 sbp BR=2.3. Getting better at mint with more trials. (Might be a good video example)
+	Run 9: Refit1 - bin size was wrong in the training code - decoder super sluggish but controlled
+	Run 10: Refit2 30pps 32ms bins - 100 SBP BR=1.8. crash
+	Run 11: (continued) crash 
+	Run 12: (continued) 30 Mint - pretty bad, needed a bias to work
+	
+Short hold times: (comparison of the non-hold part)
+	Run 13: KF0, 100 hold time - decoder not very good (about 90min after training)
+	Run 14: RF0, 100 hold time - 100 SBP BR=2.0. 200 mint BR=1.9. 100+ sbp BR=2.0
+	
+20pps, 10ms bins:
+	xpcMoteThresholds = calcOnlineMoteThresholds(20,'Joker');
+	Run 15: TS-34 training. 400 trials.
+	Run 16: KF5 - 50 sbp - not working well, going toward extension
+	Run 17: msms crash
+	Run 18: KF5 100 mint (500sec) BR=0.95- very responsive, hard to stop. 2 sbp.
+	Run 19: RF5 - mint not working, going toward extension
+	
+	
+
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+
+	
+	The slight delay/noise introduced with intervals means for times without much feedback control (moving quickly to target) Mint can do just as well,
+	but when lots of feedback is required (holding on the target), then it's significantly worse
+	
+	From 3/3:
+	Maybe with "better" decoders the optimal offline decoder is close to the optimal online decoder since there's not much online feedback required.
+	Whereas, with "worse" decoders there's a larger difference between optimal offline/online since there's a lot of closed-loop feedback. 
+	Argument for why refit is needed to get Mint to it's more optimal state, close to SBP performance
+

@@ -1,0 +1,87 @@
+Napier: 3/11/2022
+
+- Goals: GRU, LSTM, FNN online
+ 
+- Experiment: Joey, Dylan
+
+- Recording Start Time: 9:30 am
+- Recording Stop Time:  12 am
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: ALL
+	
+-Decoders:
+	NN0: GRU
+		input_size = 96
+		conv_size = 20
+		hidden_size = 350
+		num_states = 2
+		num_layers = 2
+		dropout_p = 0.3
+		model_type = 'RNNDecoders.GRUModel'
+		scaler_type = 'regression' 
+		binsize = 32
+		
+		Test Correlation:[0.6091368549833666, 0.6805134754484831]
+		MSE:0.00042254882282577455
+		
+	NN1: LSTM
+		input_size = 96
+		conv_size = 20
+		hidden_size = 250
+		num_states = 2
+		num_layers = 1
+		dropout_p = 0.0
+		model_type = 'RNNDecoders.LSTMModel'
+		scaler_type = 'regression' 
+		binsize = 32
+		Test Correlation:[0.6151127800273267, 0.6776861171421791]
+		MSE:0.0004222737334202975
+
+	NN2: GRU (TS34)
+	
+	NN3: FNN (TS34)
+	
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',10,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true);
+
+-Runs:
+	Run 1: Calibration
+	Run 2: 100 warmup, 2min break
+	Run 3: TS29 - 500 (400 training + 100 validation). BR~3.1-3.5
+	~15 min Training Break~
+	
+	Run 4-5: debugging
+	Run 6: NN0 - GRU - super fast and jittery, only somewhat controllable
+	Run 7-9: debugging
+	
+	Run 10: TS34 - 500 (400 training + 100 validation). BR~4
+	
+	Run 11-15: debugging - the bias was way off for GRU and FNN. Added an auto-bias (20sec moving average) to the decoded velocity
+	Even with bias fixed, both network way too fast and not very controllable
+	
+	Run 16: KF0 - works fine?! Default gain and bias are good
+	
+	Run 17: NN3 (FNN) - working a bit better than before (at 0.5 gain), IDX is still pretty jittery and hard to control
+	Run 18: NN2 (GRU) - biasing still off even with the moving average. Trial 35 set to 0.5 gain - working somewhat, still hard to control
+	
+	
+-Notes:
+
+	Need to figure out why the NNs both had a lot of trouble but the KF was fine
+
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	
+	

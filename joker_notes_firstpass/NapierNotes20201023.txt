@@ -1,0 +1,42 @@
+Napier: 10/20/2020
+
+- Goals: Position vs velocity online control
+
+- Experiment: Sam, Dylan
+
+- Recording Start Time: 10:25 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',3,3,false,[2,4],32,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[],[]},1);
+	
+-Runs:
+	Run 1: Warmup
+	Run 2: Training TS34.
+	Run 3: KF0 SBP: Vint = 0. 500 HT at 13. Really slow start, but can do it decently well later. Having trouble with MRS flexion again. TCR at 283.
+	Run 4: RF0 SBP: Vint = 0. Really quick decoder. Much better than KF0. Very slow start though
+	Run 5: RF0 SBP: Vint = 1. Good decoder, but not as good as run 4. Getting a little speedier later on though.
+	Run 6: RF0 SBP: Vint = 2. Looks ok as well.
+	Run 7: RF0 SBP: Vint off
+	Run 8: RF0 SBP: Vint = 0. Out of juice around 720.
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90,92,95,96];	% 91 had a weird artifact along with spikes, but the artifact was very frequent so we can't use that channel
+	
+	KF process: Train KF decoder like normal. In DecodeConfig box, have steady state unchecked, velocity output checked, zero position uncertainty checked, and velocity integration type set to 0. Start the run with closed loop off and Decode off. When his fingers are inside the rest targets, flip the Decode on switch. Then turn on the Closed loop switch when the predictions are not obviously maxed. Even if they are railed, it seems Napier has figured out how to move them back towards center, might take a few trials.

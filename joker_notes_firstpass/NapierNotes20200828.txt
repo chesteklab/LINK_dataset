@@ -1,0 +1,45 @@
+Napier: 8/28/2020
+
+- Goals: Testing 2D RF Code Fix on TS34
+
+- Experiment: Sam, Mender
+
+- Recording Start Time: 10:05 am
+- Recording Stop Time:  1:00pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5, referenced to Ch14) + Raw + 2kSps 300-1000HzBPas continuous (referenced to Ch14)
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 34
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); 
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',3,3,0,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 0, {[], []}, true);
+	RF1: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',3,3,0,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true);
+	RF2: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',3,3,0,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 2, {[], []}, true);
+	
+-Runs:
+	Run 1: Warm up while we were degowning
+	Run 2: TS34.
+	Run 3: KF0 SBP: 1.6 bit rate to end, which is awesome. TCR index is getting stuck at full flexion.
+	Run 4: RF0 SBP: Looks really good, averaged maybe a 1.8.
+	Run 5: RF1 SBP: Also looks really good.
+	Run 6: RF2 SBP: Looks good as well.
+	Run 7: RF0 SBP. Still looking strong.
+	Run 8: RF1 SBP. Still looking strong. Index finger seems to be getting a bit flexion biased.
+	Run 9: RF2 SBP. Still going strong. Out of juice around 370.
+
+-Notes:
+good_chans_SBP = [1:7,9,11,13,15,17,23,33,35,37:38,40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,94,96];
+
+Spike and LFP data referenced to Channel 14, no additional grounds connected. 

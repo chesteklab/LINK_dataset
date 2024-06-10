@@ -1,0 +1,37 @@
+Napier: 12/2/2020
+
+- Goals: 2D Online Short Dataset Training
+
+- Experiment: Sam, Dylan
+
+- Recording start: 8:27am
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',1,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',2,2,false,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	RF1: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',2,3,false,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	
+-Runs:
+	Run 1: Training TS34
+	Run 2: KF0 SBP Vint=2: Very high velocities. TCR at 60. Good TCR after 66. Reset decoder 70/71, index gets stuck at flexion.
+	Run 3: RF0 SBP Vint=2: Looks good again, Gain limitations turned off, so this could go to shit if the decoder says to. Giving TCR at try at 273, no luck, instant full flex.
+	Run 4: RF1 SBP Vint=2: Nothing great to start, but could get better with use.
+	
+-Notes:	
+	good_chans_SBP = [1,3:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,96];

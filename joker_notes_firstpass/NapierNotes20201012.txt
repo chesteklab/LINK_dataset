@@ -1,0 +1,50 @@
+Napier: 10/12/2020
+
+- Goals: Zero Decoder Lag Tests
+
+- Experiment: Sam, Dylan, Costello
+
+- Recording Start Time: 11:30 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 train/500 test
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',5,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	KF2: Same as KF1 but with 0 bin lag
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',6,6,0,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true);
+	RF1: Same as RF0 but with the bin lag as set in KF1.
+	RF2: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',6,6,0,[2,4],32,xpcBinLag,xpcA,xpcW,1:96,1:96, 1, {[], []}, true);
+	
+-Runs:
+	Run 1: MRS still locked from Wayne training.
+	Run 2: TS34 warm up.
+	Run 3: TS34 training.
+	Run 4: KF0 SBP: Index not doing so well. Very extension biased. Maybe not long enough warmup?
+	Run 5: Training TS34 again.
+	Run 6: KF2 SBP: Not having an easy time with index when separating from MRS, but he's getting the hang of it later. Good control now that index is working with him. TCR index is locked at 1 FYI. Index locked at extension with SBP trial 160 or so. Reset decoder in trial 165. Happens when target is double flexion. Resetting again in 192. Could pull it back despite being unsuccessful around 306. TCR at 326. Reset decoder in 327.
+	Run 7: RF0 SBP: Slower but ok. Had to reset in trial 9 because index got stuck at full extension. After resetting, he was able to get it out again. Was doing well but now MRS seems quite extension biased, to the point where he cannot always control it. Out of juice.
+	Run 8: RF1: SBP index is locked at 0, TCr works ok but not too well.
+	Run 9: RF0 again but not working.
+	Run 10: RF2 SBP can get a few targets but has a tough time bringing either finger out of extension. TCR at 30. Can hit a few trials but not very good control.
+	Run 11: KF2 SBP. Stuck in flexion most of the time, when he gets it out it pops to extension and stays there.
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	I think the RF problems today stemmed from index being very flexion biased in KF, so RF made it extension biased. Not enough index neurons today. It is Monday, so could be a Monday thing.

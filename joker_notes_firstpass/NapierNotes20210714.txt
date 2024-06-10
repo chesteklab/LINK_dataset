@@ -1,0 +1,62 @@
+Napier: 7/14/2021
+
+- Goals: 2D Fingers with Nerve Block Replication
+ 
+- Experiment: Sam, Joey C, Eric, Srini, Parag
+
+- Recording Start Time: 8:25 am
+- Recording Stop Time:  1:15 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable) + Sensory (CPD)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	KF1: KF0 w/ 0 lag
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',3,3,false,[2,4],32,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	RF1: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',3,4,false,[2,4],32,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	RF2: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',3,6,false,[2,4],32,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+		
+-Runs:
+	Run 1: Calibration
+	Run 2: Training TS34 (DVR video 1)
+	Run 3: KF1 SBP Vint=0 (DVR video 2): Looks really good for a KF. 2.9bps???
+	Run 4: RF0 SBP Vint=0 (DVR video 3): Still really good, 2.7bps???
+	Run 5: RF1 SBP Vint=0 (DVR video 4): 
+	
+	BLOCK DELIVERED - 2% Lidocaine with 100,000:1 epi around 9:30am
+	DVR video 5 started early run 6 and continues to end
+	
+	Run 6: RF1 SBP Vint=0: Hand control to start, can still move a lot. Cannot extend MRS in brain control.
+	Run 7: Hand control while RF2 is training.
+	Run 8: RF2 SBP Vint=0: Better brain control, MRS is working great now. Around 260s-270s losing ability to extend MRS again. Starting to lose motivation in hand control around 370s. Hitting noise problems around 540
+	Run 9: RF1 SBP Vint=0: Not really working at all, could be a noise problem. Noise across every channel. Not worth looking at.
+	Run 10: RF2 SBP Vint=0: Brain control working.
+	Run 11: RF1 SBP Vint=0: Not working at all, noise problems again. But doesn't seem like he's trying.
+	Run 12: RF2 SBP Vint=0: Working fine
+	Run 13: KF1 SBP Vint=0: Working well again.
+	
+	STOPPED NEURAL RECORDING HERE
+	
+	Run 14: Hand control to watch his functionality in the rig
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	
+	
+	
+	

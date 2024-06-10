@@ -1,0 +1,49 @@
+Napier: 9/22/2020
+
+- Goals: Spring decoders online
+
+- Experiment: Mender, Hisham
+
+- Recording Start Time: 10:00 am
+- Recording Stop Time:  1:00pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5, referenced to Ch14) + Raw + 2kSps 300-1000HzBPas continuous (referenced to Ch14)
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 34
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',4,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',5,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+
+	
+-Runs:
+	Run 1: Did not mean to create.
+	Run 2: Calibration
+	Run 3: TS35 - warmup
+	Run 4: TS34 - normal training - 400 trials
+	Run 5: TS34 - spring training - 400 trials
+	Run 6: TS34 - KF0 - just a long enough break to go to the otherside and train kalman filters (8 minutes). Loaded in the wrong decoder..... 
+	Run 7: TS34 - KF0 - now 15 minutes after last training set.
+	Run 8: TS34 - KF1 - Looks way faster to start
+	Run 9: TS34 - KF0 
+	Run 10: TS34 - KF0 - added springs to the stanchion
+	Run 11: TS34 - KF1 - still with springs in the stanchion
+	Run 12: TS34 - KF0 - springs in stanchion. I think he's getting tired. Taking a few breaks. Difficulty with flexion
+	Run 13: TS34 - KF1 - springs in stanchion.
+	Run 14: TS34 - hand control 400 trials
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+
+	Spike and LFP data referenced to Channel 14, no additional grounds connected. 

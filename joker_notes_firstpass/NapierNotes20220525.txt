@@ -1,0 +1,53 @@
+Napier: 05/25/2022
+
+- Goals: Error Correction Parasite Test (2D)
+ 
+- Experiment: Joey, Hisham
+
+- Recording Start Time: 9:30 am
+- Recording Stop Time:  11:30 am
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); 	
+		(optimal lag 2 - 0 lag picked) - 0.719 CC
+	
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',7,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); 	
+		(optimal lag 2 - 0 lag picked) - 0.70 CC
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: 100 trials warm-up
+	Run 3: Training TS34 - 500 trials
+	Run 4: KF0 (0 lag) - 325 trials total. online by trial 10; index biased for 10 trials - figured it out at trial 25. BR~1.5-1.8
+		T = 2 chosen; (train percentage set to 0.6)  TPR1ext=0.04, TPR1flex=0.014, TPR2ext=0.07, TPR2flex=0.07
+
+	Run 5: Error detection run 1 (correction OFF) - both fingers strong bias to flex, can't get to work
+	Run 6: same as 8, both fingers strong bias to flex. Going to retrain the KF
+	
+	Run 7: Training TS34 - 500 trials. 4.67 bps
+	Run 8: KF1 (0 lag) - 140 trials. online by trial 10; Lots of orbiting, not very good. BR~1.4 until stuck at flex around trial 135 and couldn't get it to work again.
+
+	
+-Notes:
+	Overall bad decoder day
+
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,96];
+	
+	CAR: [1,1,1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,0,1,1]
+		
+	

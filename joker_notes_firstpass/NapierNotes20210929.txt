@@ -1,0 +1,51 @@
+Napier: 9/29/2021
+
+- Goals: Offline Dataset - alternating big/small targets (random targets, dual array)
+ 
+- Experiment: Joey, Sam
+
+- Recording Start Time: 9:00 am
+- Recording Stop Time:  10:00 am
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable) + Sensory (Cpd)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRS
+	
+-Decoders:
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Warmup TS34, 150 trials
+	(few minute break)
+	
+	Run 3: TS29, hold 750, target 100%, 200 trials. having trouble hitting the far idx extension targets so adjusted calibration partway through - maybe don't use this run?
+	Run 4: TS29, hold 750, target 100%, 300 trials. BR~3.2. Still slightly slow on idx extension but ok.
+	Run 5: TS29, hold 750, target 50%,  300 trials. BR~3.4
+	Run 6: TS29, hold 750, target 100%, 300 trials. BR~4.0
+	Run 7: TS29, hold 750, target 50%,  300 trials. BR~3.6
+	
+	
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+		
+	When we were getting him in the rig he was kept opening his mouth, maybe like a tooth hurt.
+	
+	In the manipulandum, currently using the new index and the old mrp (the new mrp was sticking)
+	
+	
+	
+	
+	

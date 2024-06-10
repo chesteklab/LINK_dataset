@@ -1,0 +1,81 @@
+Napier: 05/23/2022
+
+- Goals: RNN with new training regularization
+ 
+- Experimenters: Joey, Hisham
+
+- Recording Start Time: 9:40 am
+- Recording Stop Time:  12:00 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 1002
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:	
+	- all decoders trained with tri vel redistribution, RNNs with 5 time history
+	NN0 - willsey net, 3500 iters, RR scaler
+	RNN0 - GRU
+	RNN1 - GRU with normalized neural
+	### NOPE  GRU with normalized neural and training noise (errors during training)
+	RNN2 - GRU with position/velocity decoding
+	RNN3 - GRU trained on 1D
+	
+	
+-Runs:
+	Run 1: calibration
+	Run 2: warmup
+	Run 3: TS29 training - 500 trials. BR~4.4  #HC#
+	--- 10 min training break ---
+	
+	---- For the following online tests, runs were started in brain control without any hand trials. ----
+	Run 4: NN0 - wrong bin size
+	Run 5: NN0 - 100 trials. BR~2.3. Figured it out around trial 15. Good decoder with minimal overshoot
+	Run 6: RNN0 - 130 trials. Working! Pretty smooth but somewhat slow, more orbiting. Might be slightly biased toward extend both fingers (looks fine offline)
+	worked for ~10 trials, then drifted and got stuck at extend around trial 13, worked, out at 39/42/71/94 momentarily before recovering. Stuck at 130.
+	Run 7-16: debugging neural normalization
+	Run 17: RNN0 but start with hand control - when swtich to brain totally stuck at extend
+	Run 18: RNN0 start with brain. Worked for a few seconds then biased to extend.
+	Run 19: RNN0 start with brain, autobiasing. 60 trials. autobiasing is working, but decoder is pretty slow, somewhat hard to control. Trial 61 getting stuck flex
+	
+	Run 20-22: debugging
+	Run 23: RNN2 trying position decoding - barely works, but fingers seem strongly correlated
+	Run 24: RNN2 only velocity decoding, bias +0.005. Was stuck at extend, but then drifted to full flex, looks like unable to control
+	 *** normalize_x was turned on for RNN2 training - could explain why didn't work online ***
+	 
+	Run 25: 1D warmup (couldn't reach full flex target)
+	Run 26: 1D (TS29) 500 trials. 
+	Run 27: debug
+	Run 28: RNN3 1D - immediately fully biased to extend.
+	Offline decoding RNN3 looks fine.
+	Run 29: RNN3 1D - manually adjusted gains - no luck
+	Run 30: RNN3 1D autobias. He figured it out for a little but basically won't move (super slow if not stuck)
+	Run 31-32: RNN3 1D manually adjusting bias. Finally got a working bias (+0.041), but he couldn't move fingers (basically stuck). You could tell he was still trying hard
+	Run 33: NN0 (2D model) 1D. Working fine, bias is fine
+	
+Summary from today:
+- RNN tends to work better when you start without any hand control (maybe it starts in a better defined state)
+- Autobiasing somewhat helps, but the decoder doesn't work nearly as well as NN
+- in 1D we still have bias problems - when bias fixed, still had problems where barely moved
+- didn't get to test: 
+	noise training, 
+	neural normalization, 
+	position+velocity decoding
+	
+	
+-Notes:
+	good_chans_SBP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 23, 24, 33, 35, 37, 38, 39, 40, 43, 45, 46, 47, 49, 50,
+					51, 52, 53, 55, 56, 57, 58, 59, 60, 62, 64, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 79,
+					80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 95, 96]
+
+	Some juicer artifact

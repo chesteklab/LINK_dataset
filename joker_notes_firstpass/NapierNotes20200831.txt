@@ -1,0 +1,119 @@
+Napier: 8/31/2020
+
+- Goals: ReFIT a NN
+
+- Experiment: Matt M, Hisham
+
+- Recording Start Time: 9:10 am
+- Recording Stop Time:  pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 29,36
+	* Visualization Style: MRP
+	
+-Decoders: 
+TrainOnline_Cortical_KalmanFilter_Multi('Joker','',19,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); % Normal
+
+NN (First iteration where correlation plateaus)
+Epoch 4, Iteration 1500, loss = 0.9049
+Checking accuracy on validation set
+Mean Correlation is 0.585892
+Mean SNR is 3.2725.
+Total number of peaks is 157.
+Average control peaks is 1.49.
+Average signal peaks is 0.0678657.
+Ratio of control to true signal is 21.9551.
+Feature number 0.
+Median of feature is -0.21196.
+Ratio of control to true signal is 23.2375. - 0.043
+Correlation is 0.572987
+Feature number 1.
+Median of feature is 0.133519.
+Ratio of control to true signal is 20.5339. - 0.0487
+Correlation is 0.598798
+
+Epoch 11, Iteration 3500, loss = 0.8866
+Checking accuracy on validation set
+Mean Correlation is 0.581872
+Mean SNR is 2.69065.
+Total number of peaks is 277.
+Average control peaks is 1.55547.
+Average signal peaks is 0.0678657.
+Ratio of control to true signal is 22.9198.
+Feature number 0.
+Median of feature is -0.126942.
+Ratio of control to true signal is 22.7664. - 0.0439
+Correlation is 0.579587
+Feature number 1.
+Median of feature is 0.047283.
+Ratio of control to true signal is 23.0898. - 0.0433
+Correlation is 0.584157
+
+NN Training round 2 (with reference)
+Epoch 11, Iteration 3500, loss = 0.8949
+Checking accuracy on validation set
+Mean Correlation is 0.578208
+Mean SNR is 2.82734.
+Total number of peaks is 268.
+Average control peaks is 1.6236.
+Average signal peaks is 0.0634832.
+Ratio of control to true signal is 25.5752.
+Feature number 0.
+Median of feature is 0.167994.
+Ratio of control to true signal is 26.0372. 0.0384
+Correlation is 0.540349
+Feature number 1.
+Median of feature is -0.0869331.
+Ratio of control to true signal is 25.1177. 0.0398
+Correlation is 0.616067
+
+Training round 3
+Epoch 11, Iteration 3500, loss = 0.8862
+Checking accuracy on validation set
+Mean Correlation is 0.595473
+Mean SNR is 3.10037.
+Total number of peaks is 98.
+Average control peaks is 1.86803.
+Average signal peaks is 0.0766704.
+Ratio of control to true signal is 24.3644.
+Feature number 0.
+Median of feature is 0.0540066.
+Ratio of control to true signal is 23.9292. - 0.0418
+Correlation is 0.584719
+Feature number 1.
+Median of feature is -0.221604.
+Ratio of control to true signal is 24.845. - 0.0402
+Correlation is 0.606227
+
+-Runs:
+	Run 1: Calibration - model crashed, decode was turned online
+	Run 2: Calibration
+	Run 3: TS 29 - Warmup run - 250 trials
+	Run 4: TS 29 - Warmup - 100 trials
+	Run 5: TS 29 - Training set - 400 trials
+	Run 6: TS 29 - Validation set - 100 trials
+	Run 7: TS 36 - NN (iteration 1500) - start online run 35. Control is very shakey
+	Run 8: TS 36 - NN 2 (iteration 3500) - fingers started fully extended. Still very shakey but can flex MRP now. Still missing many targets (71% success rate on xpc)
+	Run 9: TS 29 - Training set - using channel 14 as reference. 400 trials
+	Run 10: TS 29 - Validation set - 100 trials
+	Run 11: TS 36 - NN 3 (second training set, iteration 3500) - very shakey still, can't extend well this time. 
+	Run 12: Went back to try and clean the array. Forgot to turn recording back on. Forgot to turn recording back on. 
+	Run 13: Something crashed
+	Run 14: TS 36 - hold time 500 - to train on quickly
+	Run 15: TS 36 - hold time 500 - validation set
+	Run 16: TS 36 - NN4 (trained on run 14)
+	
+
+-Notes:
+good_chans_SBP = [1,3:9,13,15,17,23,33,35,37:38,40,43,45:47,49:53,55:60,62,64,65,67:68,71:76,78:87,90:92,94,96];

@@ -1,0 +1,50 @@
+Napier: 11/2/2023
+
+- Goals: Offline 2DOF Finger EMG
+ 
+- Experimenters: Matt, Jake
+- Recording Start Time: 12:15pm
+- Recording Stop Time:   1:20 pm
+
+- xPC Model: Rig_main_Cortical_Parasite_v2
+- Recorded Array: Motor (Patient cable/cerebus) / EMG (CPD)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPass + EMG 10kHz Bipolar referenced
+- Drink: Apple Juice
+
+- Params:
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29/34
+	* Visualization Style: MRS
+	* Manipulandum: old
+	
+-Decoders:
+	- 
+
+-Runs:	
+	Run 1: Calibration
+	Run 2: TS29 - finger sep 0.8, 650 trials
+	Run 3: TS34 - until out of juice, 1700 trials
+	
+	
+	
+	
+Summary:
+
+
+
+TODO:
+
+
+Notes:	
+	Bad channels: [77]
+	We had only a few good channels today, measured as those that fire more than once on average
+
+	
+
+
+

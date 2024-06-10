@@ -1,0 +1,50 @@
+Napier: 9/23/2020
+
+- Goals: Spring decoders online
+
+- Experiment: Mender, Joey C
+
+- Recording Start Time: 10:00 am
+- Recording Stop Time:  1:00pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5, referenced to Ch14) + Raw + 2kSps 300-1000HzBPas continuous (referenced to Ch14)
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 34
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',4,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS34 - 350 trial warmup (with springs 2/4)
+	Run 3: TS34 - 400 trials training set - 15 minute break first. Went back while still doing the task in order to take springs out.
+	Run 4: TS34 - no springs - 400 trials
+	Run 5: TS34 - KF1 - (normal decoder) - 225 trials -  -bit rates in the 1.4 range
+	Run 6: TS34 - KF0 - (spring decoder) - fingers immediately went to full extension
+	Run 7: TS34 - KF1 - 
+	Run 8: TS34 - Hand control with springs - 360 trials
+	Run 9: TS34 - KF1 - (normal decoder) - springs in stanchion
+	Run 10: TS34 - KF0 - (spring decoder) - springs in stanchion still. Hand stuck in extension.
+	Run 11: TS34 - KF0 - Gave him a break and then tried again.
+	Run 12: TS34 - KF1 - 230 trials
+	Run 13: TS34 - KF0 - Stuck at extension again.
+	Run 14: TS34 - still springs in stanchion - 900 trials
+	
+-Notes:
+	Started with springs in the stanchion then took them out for run 4
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+
+	Spike and LFP data referenced to Channel 14, no additional grounds connected. 

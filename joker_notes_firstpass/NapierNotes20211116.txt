@@ -1,0 +1,59 @@
+Napier: 11/16/2021
+
+- Goals: Error Correction Parasite Test (2D)
+ 
+- Experiment: Dylan, Mender
+
+- Recording Start Time: 9:30 am
+- Recording Stop Time:  11:40 am
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [1, 1] - 0 lag picked) - 0.703 CC
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Warmup TS34, ~170 trials
+	Run 3: Training TS34 - 500 trials, fair performance (3.58 bps)
+	Run 4: KF0 (0 lag) - online by trial 10; good performance for Napier (1.83 bps), ~260 trials;
+		T = 3 gives best FPR performance, although T = 4 gives slightly beter TPR with slightly worse FPR; T = 3 chosen
+
+	Run 5: Debug test run for saving y_est
+	Run 6: Debug run 2
+	Run 7: Debug run 3, saving working now
+	Run 8: bad run due to KF bias, couldn't get started into a good rythmn
+	Run 9: Error detection run 1 (correction OFF) - online by trial 10; ~475 trials, fair performance for Napier (1.64 bps);
+	Run 10: Bad run
+	Run 11: Bad run
+	Run 12: Error detection run 2 (correction ON, zeroed 1 bin) - online by trial 5; ~240 trials, good performance for Napier (1.79 bps);
+	Run 13: Error detection run 3 (correction OFF) - online by trial 5; ~240 trials, good performance for Napier (1.70 bps);
+	Run 14: Error detection run 4 (correction ON, zeroed 1 bin) - online by trial 5; ~260 trials, great performance for Napier (1.96 bps);
+	Run 15: Error detection run 5 (correction OFF) - online by trial 5; ~155 trials, poor performance for Napier (1.18 bps); around trial 124, KF became biased toward flexion due to noise spike (1.66 bps before bias)
+	Run 16: Error detection run 6 (correction ON, zeroed 1 bin) - online by trial 15; was biased toward flexion throughout, was trying to fix with starts and stops but no permanent fix
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	CAR: [1,1,1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,0,1,1]
+	
+	
+	
+	
+	
+	
+	

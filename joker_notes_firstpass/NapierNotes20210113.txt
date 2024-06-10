@@ -1,0 +1,56 @@
+Napier: 1/13/2021
+
+- Goals: Testing Mote Simulator/Interval Decoding  +  Some offline spring tests
+
+- Experiment:  Joey C, Mender
+
+- Recording Start Time: 10:00 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_motePackets5v2
+- Recorded Array: Motor (Patient Cable) + EMG (CPD via CPA)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 500/500 online
+	* Target Scaling(OL/CL): 100/120
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	♦
+-Decoders: 
+	(final 3 numbers are threshNum,avgMode,intLagMs)
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',3,false,[2,4],30,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,0);
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',3,false,[2,4],30,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,10);
+	KF2: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',3,false,[2,4],30,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,20);
+
+-Runs:
+	Run 1: calibration
+	Run 2: threhold setting: [720 800 1100] (720 is ~30pps)
+	Run 3: TS-34 training - 400 trials
+	Run 4: crash when run decode
+	Run 5: working with screen off
+	Run 6: KF0 - SBP trials 15 (until crash)
+	Run 7: KF0 - intervals working! (until crash)
+	Run 8: KF0 - intervals - set bias = -0.00005 (until crash) ***TET=0.00040 - probably should increase spike threshold so not as many packets
+	Run 8: KF0 - SBP 
+	Run 9: early crash
+	Run 10: KF1 - intervals, bias = -0.00003, targets 120%. Working reasonably well. Having hard time with index far targets. Index sometimes stuck at extension. Hard time stopping, slightly more than SBP. ~120 trials intervals. SBP around 145 - definitely faster.
+	Run 11: early crash
+	Run 12: KF2 - intervals, bias= -0.00003; Definitely thinking differently than SBP since the SBP decode is very different when he's using intervals.
+	Run 13: KF2 - intervals, bias=-0.00004; gain = 0.9; Seems to work better with the gain down a bit
+	
+	Overall - intervals finally working! But definitely slower than SBP - needs more tuning, probably need individual channel thresholds.
+	
+	-------- Switching to spring tests (using same model, just without any mote stuff running)
+	Run 14: TS-35, 750 hold, 100 scaling. ~680 trials.
+	Run 15: Same as 14 but with springs. 
+	Run 16: without springs
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	EMG connector was plugged in incorrectly this day (arrow on left when should have been on the right). 

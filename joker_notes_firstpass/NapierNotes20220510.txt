@@ -1,0 +1,48 @@
+Napier: 05/10/2022
+
+- Goals: Spring NN on Normal
+ 
+- Experimenters: Hisham, Joey
+
+- Recording Start Time: 9:30 am
+- Recording Stop Time:  11:20 am
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:	
+	NN0: trained on pybmi (runs 4,5)
+	NN1: trained on pybmi (runs 8,9)
+	
+-Runs:
+	Run 1-3: calibration + TS34 warmup 120 + 5 min break
+	Run 4: TS29 - 400 Training, spring
+	Run 5: TS29 - 100 Validation, spring
+
+	Run 6: Debug
+	Run 7: Trying Spring NN on Normal. Wasn't working very well
+	Run 8: TS29 - 400 Training, normal
+	Run 9: TS29 - 100 Training, normal
+	Run 10: TS29 - NN1 - not working very well (suspect scaler method or issues with binsize) - enough things are different from usual that not expecting it to work
+	
+	
+-Notes:
+	good_chans_SBP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 23, 24, 33, 35, 37, 38, 39, 40, 43, 45, 46, 47, 49, 50,
+					51, 52, 53, 55, 56, 57, 58, 59, 60, 62, 64, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 79,
+					80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 95, 96]
+
+	still getting used to pybmi setup, changing binsizes adding history etc.
+	experiment had some problems, mostly testing small things after Run 7.
+	Lots of changes today

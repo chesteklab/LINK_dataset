@@ -1,0 +1,108 @@
+Napier: 8/22/2020
+
+- Goals: NN run
+
+- Experiment: Matt M, Matt W
+
+- Recording Start Time: 10:10 am
+- Recording Stop Time:  pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 29,36
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',4,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); % Normal
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',8,8,0,[2,4],50,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true);
+
+
+Not redistributed:
+Epoch 17, Iteration 3500, loss = 0.9679
+Checking accuracy on validation set
+Mean Correlation is 0.685486
+Mean SNR is 2.13312.
+Total number of peaks is 624.
+Average control peaks is 2.84519.
+Average signal peaks is 0.0608565.
+Ratio of control to true signal is 46.7524.
+Feature number 0.
+Median of feature is -0.144392.
+Ratio of control to true signal is 39.4846.
+Correlation is 0.694543
+Feature number 1.
+Median of feature is -0.25277.
+Ratio of control to true signal is 55.1495.
+Correlation is 0.67643
+
+
+VR
+Epoch 11, Iteration 3500, loss = 0.9091
+Checking accuracy on validation set
+Mean Correlation is 0.581223
+Mean SNR is 2.60781.
+Total number of peaks is 375.
+Average control peaks is 1.48023.
+Average signal peaks is 0.0608565.
+Ratio of control to true signal is 24.3233.
+Feature number 0.
+Median of feature is 0.118522.
+Ratio of control to true signal is 24.0148.
+Correlation is 0.585513
+Feature number 1.
+Median of feature is -0.00749816.
+Ratio of control to true signal is 24.6797.
+Correlation is 0.576933
+
+Not redistributed, first time hit a good correlation. 
+Epoch 7, Iteration 1600, loss = 0.9673
+Checking accuracy on validation set
+Mean Correlation is 0.673149
+Mean SNR is 2.7524.
+Total number of peaks is 366.
+Average control peaks is 2.72138.
+Average signal peaks is 0.0608565.
+Ratio of control to true signal is 44.7179.
+Feature number 0.
+Median of feature is -0.366212.
+Ratio of control to true signal is 48.2331.
+Correlation is 0.676155
+Feature number 1.
+Median of feature is -0.278858.
+Ratio of control to true signal is 40.6565.
+Correlation is 0.670144
+
+
+
+
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 29 - Warmup run - 250 trials - calibration looks fine. Wilsey was still in there for the first 25 trials. 
+	Run 3: TS 29 - Warmup run 2 - 120 trials
+	Run 4: TS 29 - Training set - 400 trials. 
+	Run 5: TS 29 - Validation set - 130 trials. 
+	Run 6: TS 36 - KF0 - wasn't doing the task
+	Run 7: Something crashed, probably a delayed packet from parasite or something
+	Run 8: TS 36 - KF0 - 250 trials SBP. Can't move index finger with TCFR. 
+	Run 9: TS 36 - RF0 - Start online trial 19. Total trials 290.
+	Run 10: TS 36 - NN - Start online right away. Can reach targets quickly but doesn't want to do the task. Tried giving him 10 hand control trials and then restarting the neural network. Can't seem to extend very well. 
+	Run 11: TS 36 - NN2 (Velocity resampled) - started online, didn't do anything, gave him some hand control, then he was able to do some trials. Not giving a great effort especially during extension trials. Around trial we gave him hand control again and then switched back. He can clearly do the task well online, just not very motivated. Got up to around trial 280 before stopping him. 
+	Run 12: TS 36 - NN1 again - he did the targets very well to start then stopped again. Stopped after 25 trials, not going to do it. 
+	Run 13: TS 36 - RF0 - slow but he's hitting targets again. 100 trials and then he stopped.
+	Run 14: TS 29 - hand control to see how activity changes over time and noise and stuff. 
+	Run 15: TS 36 - NN3 - non redistributed, iteration 1600 that was the first correlation of 0.67 before it stalled. First few trials are messed up because decode was off. Online really started around trial 20. Intermittent effort. Stopped around trial 120.
+	
+	
+
+-Notes:
+good_chans_SBP = [1,3:9,11,13,15,17,23,33,35,37:38,40,43,45:47,49:53,55:60,62,64,65,67:68,71:76,78:87,90:92,94,96];

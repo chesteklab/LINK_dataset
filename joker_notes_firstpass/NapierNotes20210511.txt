@@ -1,0 +1,45 @@
+Napier: 5/11/2021
+
+- Goals: Error Classification Parasite Test
+
+- Experiment: Dylan, Joey, Eric
+
+- Recording Start Time: 10:30 am
+- Recording Stop Time:  12:30 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2, 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); (optimal lag [1, 1])
+	KF1: KF0 w/ 0 lag
+		
+-Runs:
+	Run 1: Calibration
+	Run 2: Training TS34
+	Run 3: KF0 - online around trial 9; good online performance, around 250 trials
+	Run 4: Testing file save data with old error-classify training data
+	Run 5: Error classify - online around trial 9; run failed at trial 15
+	Run 6: Error classify - online around trial 9; run failed at trial 10
+	Run 7: Error classify - online around trial 9; run works this time.
+	Run 8: Error classify - Full test, online around trial 9; changed T to 4 to match Miri's data; This is the run the data is saved for.
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	Got data to save to file, but needs to be synced with z-struct for better accuracy
+	
+	
+	

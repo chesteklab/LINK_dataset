@@ -1,0 +1,67 @@
+Napier: 8/11/2021
+
+- Goals: Compare LR vs P/O Gains/Offsets
+ 
+- Experiment: Mender, Hisham, Eric
+
+- Recording Start Time: 9:22 am
+- Recording Stop Time:   pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90/100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+Epoch 11, Iteration 3500, loss = 0.9033
+Checking accuracy on validation set
+Mean Correlation is 0.611272
+Mean SNR is 2.53577.
+Total number of peaks is 340.
+Average control peaks is 1.49746.
+Average signal peaks is 0.0687716.
+Ratio of control to true signal is 21.7744.
+Feature number 0.
+Median of feature is -0.0827621.
+Ratio of control to true signal is 19.4503.
+Correlation is 0.602678
+Feature number 1.
+Median of feature is 0.139856.
+Ratio of control to true signal is 25.0026.
+Correlation is 0.619865
+Finger 0 RR Calculated Gain, Offset: 0.042980, 0.003529
+Finger 1 RR Calculated Gain, Offset: 0.035090, -0.002066
+
+-Runs:
+	Run 1: Calibration
+	Run 2: Dud, didn't press play on animation
+	Run 3: 130 Warm-Up, 5 Min break.
+	Run 4-5: Weird Stuff needed fixing
+	Run 6: TS29 - 400 Training
+	Run 7: TS29 - 100 Validation
+	Break for NN Training
+	
+	Run 8: 100 Trials, LR Gain/Offset - Interrupted by Fire drill
+	Run 9: 100 Trials - Peak G/O - 750 HT
+	Run 10: 100 Trials - LR G/O - 750 HT
+	Run 11: 100 Trials - Peak G/O - 500 HT
+	Run 12: 100 Trials - LR G/O - 500 HT
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	
+	
+	
+	

@@ -1,0 +1,35 @@
+Napier: 04/01/2022
+
+- Goals: Offline runs for ?
+ 
+- Experiment: Dylan, Pez
+
+- Recording Start Time: 10:50 am
+- Recording Stop Time: 11:50 am
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,0,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 120
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); % Corr 0.627
+	
+-Runs:
+	Run 1: Calibration & Warm-up (~200 trials)
+	Run 2: Offline TS34 - 1900 trials (1990 total, last few he was running out of juice so performance went down a bit)
+
+-Notes: 
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	

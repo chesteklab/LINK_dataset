@@ -1,0 +1,94 @@
+Napier: 07/25/2022
+
+- Goals: Error Correction Parasite Test (2D) - New Detector Training Correction Test 11 (Debugging Different Classifiers)
+ 
+- Experiment: Dylan, Mender, Luis 
+
+- Recording Start Time: 9:55 am
+- Recording Stop Time:  11:55 am
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [1, 1] - 0 lag picked) - 0.789 CC
+
+	
+-Runs:
+	Run 1: Calibration and warm-up (~200 trials)
+	Run 2: Training TS34 - 510 trials, good performance (4.16bps), 99% SR;
+	Run 3: KF0 (0 lag) 500 ms hold time - online by trial 10; great performance for Napier (2.44 bps), ~500 trials, 99% SR;
+		try_data: T = 4: 35 - 45% TPR for 5-9% FPR
+	
+	
+	Run 4: Test run
+	
+	
+	-- With new directions fixed, but accidentally chose optimal lag instead of zero lag --
+	Run 5: Error detection run 1 (correction OFF) - online by trial 10; ~525 trials, good performance for Napier (2.52 bps), 100% SR; Finger 1: 40.7% TPR, 42.83% FPR; Finger 2: 71.81% TPR, 70.35% FPR
+	
+	-- After this run turning down saving bin length since getting hard to debug quickly --
+	-- Sqitching to zero lag, and classifiers direction (flex vs ext) should be switched from last week --
+	
+	Run 6: Error detection run 2 (correction OFF) - online by trial 10; ~180 trials, good performance for Napier (2.45 bps), 100% SR; Finger 1: 32.02% TPR, 36.99% FPR; Finger 2: 80.87% TPR, 80.35% FPR
+	
+
+	-- Adding some printing for debugging live --
+
+	Run 7: Error detection run 3(correction OFF) - online by trial 10; ~180 trials, good performance for Napier (2.47 bps), 100% SR; Finger 1: 43.67% TPR, 42% FPR; Finger 2: 71.78% TPR, 68.85% FPR
+	
+	-- Finger 2 has switched, Finger 1 has original directions --
+	
+	Run 8: Error detection run 4 (correction OFF) - online by trial 10; ~170 trials, good performance for Napier (2.24 bps), 100% SR; Finger 1: 14.04% TPR, 10.88% FPR; Finger 2: 65.82% TPR, 62.14% FPR;
+	
+	-- Both fingers with original directions --
+	
+	Run 9: Error detection run 5 (correction OFF) - online by trial 10; ~170 trials, good performance for Napier (2.45 bps), 100% SR; Finger 1: 12.92% TPR, 10.44% FPR; Finger 2: 27.79% TPR, 23.49% FPR;
+	
+	Run 10: Test run
+	
+	-- Manually setting the thresholds to 0.95 for all classifiers --
+	
+	Run 11: Error detection run 6 (correction OFF) - online by trial 10; ~170 trials, good performance for Napier (2.37 bps), 100% SR; Finger 1: 12.23% TPR, 10.14% FPR; Finger 2: 29.28% TPR, 22.55% FPR;
+	
+	-- Manually setting the thresholds to 1.5 for all classifiers --
+	
+	Run 12: Error detection run 7 (correction OFF) - online by trial 10; ~180 trials, good performance for Napier (2.67 bps), 100% SR; Finger 1: 5.33% TPR, 3.03% FPR; Finger 2: 10.51% TPR, 11.37% FPR;
+	
+	Run 13: KF0 (0 lag) 500 ms hold time - online by trial 10; good performance for Napier (2.58 bps), ~215 trials, 100% SR;
+	
+	-- New detector from Run 13, T = 1 --
+		try_data: T = 1: 9 - 17% TPR for <5% FPR
+	
+	Run 14: Error detection run 8 (correction OFF) - online by trial 10; ~165 trials, good performance for Napier (2.37 bps), 100% SR; Finger 1: 11.32% TPR, 10.5% FPR; Finger 2: 6.56% TPR, 7.39% FPR;
+
+	Run 15: Test run
+
+	-- Trying an automatic thrsholding adjustment --
+
+	Run 16: Error detection run 9 (correction OFF) - online by trial 10; ~130 trials, fair performance for Napier (2.08 bps), 100% SR; Finger 1: 3.76% TPR, 4.75% FPR; Finger 2: 3.07% TPR, 5.31% FPR;
+	
+-Notes:
+	good_chans_SBP = [1:3, 5:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78,80:88,91:92,96]; (not used in err detector training)
+	
+	CAR (NOT USED TODAY): [1,1,1,0,1,1,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1,1,0,1,0,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,1,1,1,1,1,1,1,0,0,1,1,0,0,0,1]
+	
+	
+	
+	
+	
+	
+	
+	

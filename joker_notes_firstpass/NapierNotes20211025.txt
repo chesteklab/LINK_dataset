@@ -1,0 +1,48 @@
+Napier: 10/25/2021
+
+- Goals: Normal model tested with and without wrist changes to stanchion
+
+- Experiment: Mender, Joey C
+
+- Recording Start Time: 9:30 AM
+- Recording Stop Time: 11:00 AM
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Lateral (Patient Cable) + Medial (Cereplex)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); %corr = 0.735 (normal)
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',4,4,0,[2,4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[],[]},1);
+	
+-Runs:
+	Run 1: Calibration 
+	Run 2: TS 34 - test calibration/warmup 250 trials
+	Run 3: TS 34 - normal - 400 trials
+	Run 4: TS 34 - KF0 - 280 trials - BR 2.2
+
+	Run 5: TS 34 - RF0 - 250 trials - BR 2.4
+	Run 6: TS 34 - RF0 - wrist flexed - 250 trials - BR 2.3
+	Run 7: TS 34 - RF0 - 250 trials - BR 2.4
+	Run 8: TS 34 - RF0 - wrist flexed - started online late because he didn't do hand control at first. 250 trials - BR 2.1
+	Run 9: TS 34 - RF0 - 250 trials
+	Run 10: TS 34 - RF0 - wrist flexed - BR 2.3
+	Run 11: TS 34 - RF0 - 250 trials - BR 2.3
+	
+	
+	
+-Notes:
+chans with tcfr > 1hz according to run 3
+good_chans_SBP = [3 4 5 6 7 25 33 35 38 40 53 57 58 65 67 68 69 71 72 73 74 75 76 79 82 83 84 90 91]; 

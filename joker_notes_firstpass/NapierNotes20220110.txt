@@ -1,0 +1,56 @@
+Napier: 01/10/2022
+
+- Goals: Error Correction Parasite Test (2D)
+ 
+- Experiment: Dylan, Sam
+
+- Recording Start Time: 9:20 am
+- Recording Stop Time:  10:50 am
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [3, 3] - 0 lag picked) - 0.7667 CC
+	
+-Runs:
+	Run 1: Calibration, Warmup TS34, ~200 trials
+	Run 2: Training TS34 - 500 trials, fair performance (3.70 bps)
+	Run 3: Debug run for KF
+	Run 4: Blank run
+	Run 5: KF0 (0 lag) - online by trial 10; slow performance for Napier (high bias during sporadic periods) (1.39 bps), ~260 trials;
+		Error detection training was unusable, with no perforamnce (NaN) for all T except 1
+
+	Run 6: Offline run while debugging
+	
+	Run 7: KF0 (0 lag) - online by trial 10; slow performance for Napier (high bias during sporadic periods) (1.03 bps), ~110 trials;
+		Error detection training was unusable, with no perforamnce (NaN) for all T except 1
+	
+	Run 8: Offline run to finish day (250 trials)
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	CAR: [1,1,1,1,1,1,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1,0,0,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,1,0,1,0,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,0,1,1]
+	
+	Bad/slow KF day: some bias issues, but small enough that he is able to take control and fix them and finish trials, but really slow overall
+	
+	
+	
+	
+	
+	
+	

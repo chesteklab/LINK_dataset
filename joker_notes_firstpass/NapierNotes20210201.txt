@@ -1,0 +1,41 @@
+Napier: 2/01/2021
+
+- Goals: Measure EMG with different springs
+
+- Experiment: Mender, Joey C
+
+- Recording Start Time: 10:45 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 35/29
+	* Visualization Style: MRS
+	
+-Decoders: 
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS35 - Normal, Matt was in the rig for the first ~30 trials.
+	Run 3: TS35 - Spring 4 on MRS, no spring on index. Difficult for him at first.
+	Run 4: He got hand out of stanchion
+	Run 5: Recalibrated
+	Run 6: TS 35 - Spring 2 on index - either not strong enough or not motivated enough. The stanchion seems to be sticking. Couldn't figure out how to get it to stop.
+	Run 7: TS 35 - Normal. Having a lot of trouble doing index flexion. EMG channel 5 came back during this run and channel 9 went away. Won't do index flexion MRP extension
+
+	
+-Notes:
+	Had referencing issues in the neural data to start. Cleaning the patient cable/pedestal and plugging in the EMG cleaned up most common noise. ***Exception is that neural channel 1 is looking disconnected.*** 
+	On the EMG side, most channels look normal except FCU (9) has a signal today and FDPi(proximal - 5) does not have a signal. 
+	
+	Channel 5 came back part way through

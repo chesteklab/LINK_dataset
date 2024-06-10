@@ -1,0 +1,123 @@
+Napier: 7/19/2021
+
+- Goals: RFKF vs RKNN optimal gain
+ 
+- Experiment: Joey, Dylan
+
+- Recording Start Time: 11:00 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 (off/on)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 7500
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29/36
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},-1,true); # Note: lag param is new (-1 sets optimal)
+		SBP KF correlation = 0.78605
+		SBP KF lag = 1
+	KF1: same as KF0, but with optimal lag=0
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',6,6,false,[2,4],50,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	(KF1 was not loaded so RF0 params are junk)
+	
+	RF1: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',6,6,false,[2,4],50,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	
+	
+	NN0:
+	Epoch 11, Iteration 3500, loss = 0.9059
+	Checking accuracy on validation set
+	Mean Correlation is 0.65227
+	Mean SNR is 2.27048.
+	Total number of peaks is 455.
+	Average control peaks is 1.22945.
+	Average signal peaks is 0.0705869.
+	Ratio of control to true signal is 17.4175.
+	Feature number 0.
+	Median of feature is -0.0217897.
+	Ratio of control to true signal is 16.2208.
+	Correlation is 0.620049
+	Feature number 1.
+	Median of feature is -0.0254032.
+	Ratio of control to true signal is 18.8058.
+	Correlation is 0.684491
+	Finger 0 RR Calculated Gain, Offset: 0.046823, 0.004985
+	Finger 1 RR Calculated Gain, Offset: 0.043227, -0.000299
+	
+	RN0:
+	Epoch 2, Iteration 500, loss = 0.7354
+	Checking accuracy on validation set
+	Mean Correlation is 0.541575
+	Mean SNR is 2.56813.
+	Total number of peaks is 1523.
+	Average control peaks is 3.35497.
+	Average signal peaks is 1.17077.
+	Ratio of control to true signal is 2.86561.
+	Feature number 0.
+	Median of feature is -0.234443.
+	Ratio of control to true signal is 2.97998.
+	Correlation is 0.488297
+	Feature number 1.
+	Median of feature is 0.0352541.
+	Ratio of control to true signal is 2.7382.
+	Correlation is 0.594853
+	Finger 0 RR Calculated Gain, Offset: 0.174953, 0.152749
+	Finger 1 RR Calculated Gain, Offset: 0.192109, -0.048961
+	
+	RN1:
+	Epoch 4, Iteration 1200, loss = 0.5920
+	Checking accuracy on validation set
+	Mean Correlation is 0.592575
+	Mean SNR is 2.39084.
+	Total number of peaks is 2203.
+	Average control peaks is 3.04321.
+	Average signal peaks is 1.17077.
+	Ratio of control to true signal is 2.59932.
+	Feature number 0.
+	Median of feature is -0.0382782.
+	Ratio of control to true signal is 2.40963.
+	Correlation is 0.562024
+	Feature number 1.
+	Median of feature is 0.0543004.
+	Ratio of control to true signal is 2.81063.
+	Correlation is 0.623125
+	Finger 0 RR Calculated Gain, Offset: 0.216536, 0.128094
+	Finger 1 RR Calculated Gain, Offset: 0.198486, -0.065822
+
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Warm-up: 100 Trials, TS29, followed by 5 min break
+	Run 3: TS29 - Training 400. BR~3.8-4.2
+	Run 4: TS29 - Validation 100, followed by break for decoder training
+	
+	Run 5: TS29 - NN0 250 trials - refit training. BR~1.2. Pretty fast but index having some trouble, tends to go full extension. Pretty good at stopping
+	Run 6: TS29 - KF1 250 trials - refit training. BR~1.7. More general control than NN, but slower and more oscillation. Index is fine
+	Break for decoder training.
+
+	Run 7: TS36 - RN0 - not working - both fingers at max 
+	Run 8: TS36 - RN1 - not working for a couple minutes then suddenly started working. Not great but it works
+	Run 9: TS36 - RN1 90 Trials - Gain 100%, BR~2.0. The first ~15 trials were maxed out. Somewhat jittery. Index tends to get maxxed out. Not working for some trials.
+
+	Run 10-11: 
+	Run 12: TS36 - RF1 100 Trials - BR~1.8. somewhat slow, some orbiting
+	Run 13: TS36 - RF1 100 Trials - Gain 120%,smooth 1.25. BR~2.0
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	- Problems with the network today
+	
+	
+	

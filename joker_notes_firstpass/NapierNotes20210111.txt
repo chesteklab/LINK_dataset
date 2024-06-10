@@ -1,0 +1,34 @@
+Napier: 1/11/2021
+
+- Goals: Measure FES with two different wrist postures
+
+- Experiment: Mender, Joey C
+
+- Recording Start Time: 10:30 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders: 
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS34 - Normal wrist, ~750 trials
+	Run 3: TS34 - Flexed wrist, ~800 trials - matt was in rig for the first couple and last couple trials to start/stop the run
+	Run 4: TS34 - Normal wrist - ~850 trials - matt was in the rig to start and stop again
+	
+-Notes:
+Plugged in EMG connector so that arrow is towards pin 2 - incorrect orientation so EMG isn't really valid

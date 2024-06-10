@@ -1,0 +1,57 @@
+Napier: 09/02/2022
+
+- Goals: Regular KF vs Steady State KF online
+ 
+- Experimenters: Luis, Hisham
+
+- Recording Start Time:  9:30am
+- Recording Stop Time:  11:20am
+
+- xPC Model: Rig_main_Cortical_Sbp_Spikes_CAR_Luis
+- Recorded Array: Motor (Patient cable/cerebus)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous + EMG
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:	
+	KF0
+		TrainOnline_Cortical_KalmanFilter_Multi('Joker','',5,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true);
+			SBP KF correlation = 0.76384
+			SBP KF lag = 1
+
+-Runs:
+	Run 1: testing
+	Run 2: testing
+	Run 3: calibration
+	Run 4: 200 trials warm-up
+	Run 5: 400 offline
+	Run 6: 261 Steady state KF. Forgot to change it to 500ms hold time until about trial 15. 
+	Run 7: 264 Regular KF. The delta Kt is not changing, the output may not be set up correctly. 
+	Run 8: 254 Steady-state KF. 
+	Run 9: 84 Steady state KF. Then, CPU overload crashed xPC.
+	Run 10: 261 Regular KF.
+-Notes:	
+
+	good_chans_SBP = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 14, 15, 17, 19, 20, 22, 23, 24, 27, 28, 29, 31, 33, 35, 36, 37, 38, 39, 40, 42, 43, 45, 46, 47, 48, 49, 50, 51, 52, 53, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 82, 83, 85, 86, 87, 88, 90, 91, 93, 94, 95, 96]
+	
+
+
+
+
+
+
+
+
+
+
+
+

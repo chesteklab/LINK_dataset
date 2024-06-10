@@ -1,0 +1,90 @@
+Napier: 7/26/2021
+
+- Goals: RFKF vs RKNN optimal gain
+ 
+- Experiment: Hisham, Joey, Mender
+
+- Recording Start Time: 9:25 am
+- Recording Stop Time:  
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 (off/on)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 7500
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29/36
+	* Visualization Style: MRS
+	
+-Decoders:
+
+NN0:
+Epoch 11, Iteration 3500, loss = 0.8941
+Checking accuracy on validation set
+Mean Correlation is 0.637674
+Mean SNR is 2.26132.
+Total number of peaks is 461.
+Average control peaks is 1.22532.
+Average signal peaks is 0.070423.
+Ratio of control to true signal is 17.3994.
+Feature number 0.
+Median of feature is 0.0279964.
+Ratio of control to true signal is 17.9858.
+Correlation is 0.643931
+Feature number 1.
+Median of feature is 0.100893.
+Ratio of control to true signal is 16.8705.
+Correlation is 0.631418
+Finger 0 RR Calculated Gain, Offset: 0.039441, 0.001100
+Finger 1 RR Calculated Gain, Offset: 0.046538, -0.000722
+
+KF0:
+TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},-1,true);
+- KF1 is exactly the same, with bin lag adjusted to 0 after training.
+
+RN0:
+Epoch 1, Iteration 500, loss = 0.7042
+Checking accuracy on validation set
+Mean Correlation is 0.510581
+Mean SNR is 2.5265.
+Total number of peaks is 2026.
+Average control peaks is 3.58004.
+Average signal peaks is 1.03724.
+Ratio of control to true signal is 3.4515.
+Feature number 0.
+Median of feature is -0.0379839.
+Ratio of control to true signal is 3.40647.
+Correlation is 0.497887
+Feature number 1.
+Median of feature is -0.303544.
+Ratio of control to true signal is 3.50979.
+Correlation is 0.523274
+Finger 0 RR Calculated Gain, Offset: 0.140012, -0.092326
+Finger 1 RR Calculated Gain, Offset: 0.185780, 0.011460
+
+RF0:
+TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',6,6,false,[2,4],50,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+- Discard Trial 126
+-Runs:
+	Run 1: Calibration
+	Run 2: Warm-up: 125 Trials, TS29, followed by 5 min break
+	Run 3: TS29 - Training 400
+	Run 4: TS29 - Validation 400, followed by training break
+	Run 5: TS29 - NN0, 20 Trials, Hold Time 750 - Discard, meant to change to TS36,HT500
+	Run 6: TS36 - NN0, 250 Trials, HT 500ms *Noted later that offset on finger 1 had been set incorrectly.
+	Run 7: TS36 - KF1, 250 Trials, HT 500ms
+	Run 8: TS36 - NN0, 250 Trials, HT 500ms - Stopped at 265 to make up for some failed trials. Followed by break for reFIT training.
+	Run 9: TS36 - RN0, 250 Trials, HT 500ms
+	Run 10: TS36 - RF0, 250 Trials, HT 500ms Didn't work. Calling it for today, getting later and need to re-do today (perhaps saturday).
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	
+	

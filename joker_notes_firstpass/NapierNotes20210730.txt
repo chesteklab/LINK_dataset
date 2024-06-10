@@ -1,0 +1,41 @@
+Napier: 7/30/2021
+
+- Goals: Offline with different wrist angles
+ 
+- Experiment: Mender, Dylan
+
+- Recording Start Time: 12:00 pm
+- Recording Stop Time:  
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Lateral (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 (off/on)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 90
+	* Trial Timeout: 7500
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+
+
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 34 - Wrong vis style then warmup for 150 trials. 
+	Run 3: TS 34 - normal hand control - 500 trials 
+	Run 4: TS 34 - wrist flexed (25) - 500
+	Run 5: TS 34 - wrist extended (25) - 600 trials
+	Run 6: TS 34 - wrist flexed (25) - 400
+	Run 7: TS 34 - wrist extended (25)
+	Run 8: TS 34 - normal hand
+
+	
+-Notes:
+	6dB of 120 Hz on the motor array
+	First time using more wrist angles

@@ -1,0 +1,68 @@
+4Napier: 10/26/2022
+
+- Goals: Error Correction Parasite Test (2D) - Error Detection Week Day 14
+ 
+- Experiment: Dylan, Luis
+- Recording Start Time: 9:45 am
+- Recording Stop Time:  pm 
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 60
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [1, 1] - 0 lag picked) - 0.804 CC
+	
+
+-Runs:
+
+	-- CAR OFF --
+	Run 1: Calibration and warm-up (~500 trials); no TCFR after this point since threshold set high to prevent crashing
+	-- CAR ON --
+	Run 2: Training TS34 - 500 trials, good performance (4.66 bps), 99% SR;
+	
+	Run 3: KF0 (0 lag) 500 ms hold time - online by trial 10; fair performance for Napier (2.07 bps), 600 trials, 99% SR;
+		try_data: T = 4: 35.86% Finger 1 EXT, 52.07% Finger 1 FLEX, 22.00% Finger 2 EXT, 20.28% Finger 2 FLEX TPR for 4-5% FPR
+
+	
+	Run 4: xPc crashed at trial 71
+	
+	-- try_data, vel and pos delay 1, detection --
+	Run 5: Error detection run 1 (correction OFF) - online by trial 10; ~320 trials, fair performance for Napier (1.98 bps), 93% SR; Finger 1 Ext: 22.06% TPR, 2.68% FPR; Finger 1 Flex: 35.25% TPR, 16.52% FPR; Finger 2 Ext: 33.33% TPR, 5.90% FPR; Finger 2 Flex: 11.81% TPR, 4.64% FPR; a bit of bias around trial 280
+
+	-- try_data, vel and pos delay 1, correction --
+	Run 6: Error detection run 2 (correction ON, T-2T) - online by trial 10; ~315 trials, fair performance for Napier (2.07 bps), 97% SR; Finger 1 Ext: 22.28% TPR, 4.57% FPR; Finger 1 Flex: 26.22% TPR, 10.67% FPR; Finger 2 Ext: 25.67% TPR, 5.83% FPR; Finger 2 Flex: 8.62% TPR, 3.89% FPR; short bias around trial 160 and trial 280
+
+	-- try_data, vel and pos delay 1, detection --
+	Run 7: Error detection run 3 (correction OFF) - online by trial 10; ~255 trials, poor performance for Napier (1.55 bps), 95% SR; Finger 1 Ext: 24.53% TPR, 6.73% FPR; Finger 1 Flex: 36.79% TPR, 16.87% FPR; Finger 2 Ext: 33.18% TPR, 5.78% FPR; Finger 2 Flex: 14.33% TPR, 6.35% FPR; bias got way better around trial 80
+
+	-- try_data, vel and pos delay 1, correction --
+	Run 8: Error detection run 4 (correction ON, T-2T) - online by trial 10; ~230 trials, poor performance for Napier (1.71 bps), 91% SR; Finger 1 Ext: 16.02% TPR, 5.25% FPR; Finger 1 Flex: 27.53% TPR, 19.67% FPR; Finger 2 Ext: 29.18% TPR, 8.76% FPR; Finger 2 Flex: 8.04% TPR, 5.45% FPR; major finger 1 flexion bias getting stronger throughout
+
+	Run 9: Offline TS34 to finish day, 525 trials
+	
+-Notes:
+	good_chans_SBP = [1,3:5,7:9,11,13,15,17,23:25,33:60,62,64,65,67:76,78,82:87,90:93,95,96];
+
+	CAR: [1,0,1,1,1,0,1,1,1,0,1,0,1,0,1,0,1,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,0,1,1,0,1,1,1,1,1,1,1,1,1,1,0,1,0,0,0,1,1,1,1,1,1,0,0,1,1,1,1,0,1,1]
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

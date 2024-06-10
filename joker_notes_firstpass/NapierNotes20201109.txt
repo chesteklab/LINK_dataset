@@ -1,0 +1,43 @@
+Napier: 11/9/2020
+
+- Goals: Online performance with ReFIT trained on normal training data and then tested on different contexts
+
+- Experiment: Mender, Joey C
+
+- Recording Start Time: 11:15 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',4,4,false,[2,4],32,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[1:20, 55:59, 66:76], []},true);
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 34 - 300
+	Run 3: TS 34 - Training set - 400 trials
+	Run 4: TS34 - KF0 -
+	Run 5: TS34 - RF0
+	Run 6: TS34 - RF0 - with springs
+	Run 7: TS34 - RF0 - normal
+	Run 8: TS34 - RF0 - with springs
+	Run 9: TS34 - RF0 - normal
+	Run 10: TS34 - RF0 - wrist flexed
+	Run 11: TS34 - RF0 - normal
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];

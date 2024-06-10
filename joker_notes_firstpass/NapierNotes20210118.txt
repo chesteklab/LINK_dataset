@@ -1,0 +1,56 @@
+Napier: 1/18/2021
+
+- Goals: Mote Simulator/Interval Decoding  +  Some offline spring tests
+
+- Experiment:  Joey C, Mender
+
+- Recording Start Time: 10:00 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_motePackets9
+- Recorded Array: Motor (Patient Cable) + EMG (CPD via CPA)
+- Data recorded Motes: Spikes (250Hz highpass, RMS -20.0) + Raw + 2kSps 300-1000HzBPas continuous
+  Data recorded Springs: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100/120
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	♦
+-Decoders: 
+	(final 3 numbers are threshNum,avgMode,intLagMs)
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',3,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,25);
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',3,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,0);
+	KF2: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',8,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,25);
+	KF3: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',8,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,2,0);
+
+-Runs:
+	Run 1: calibration
+	Run 2: threshold setting: xpcMoteThresholds = calcOnlineMoteThresholds(20,'Joker');
+	Run 3: training - 400 trials (BR = 4.4)
+	Run 4: KF0 - intervals working without a bias (hold time still 750 here)
+	Run 5: KF0 - (hold time 500) MInt - letting him get used to the decoder. hard time stopping at center. (BR = 0.99)
+	Run 6: KF0 - SBP - ~90 trials before decode got stuck at 0 (resetting didn't help, MInt stuck too)
+	Run 7: KF0 - decoder still stuck
+	Run 8: more training. 400 trials. BR = 3.9
+	Run 9:  KF2 - working better. ~100 MInt(BR 1.2). ~80 SBP (BR 1.3). crash
+	Run 10: KF2 - ~20 SBP. ~100 MInt (BR 1.2). ~100 SBP (BR 1.4). ~100 MInt (BR 1.4!). Seemed to be getting the hang of MInt at the end
+	--------
+	Started new brain/emg recording for springs (turned spike threshold back to normal)
+	Run 11: no springs. 370 trials.
+	****Noticed stanchion had shifted slightly and wrist was slightly bent.
+	Run 12: spring on MRP only. 660 trials.
+	Run 13: no springs. 600 trials
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	EMG recorded today isn't valid, the connector was incorrectly plugged in (arrow on the left when the missing pin was on the right at this point).
+
+
+

@@ -1,0 +1,85 @@
+Napier: 8/08/2020
+
+- Goals: Neural Network test run
+
+- Experiment: Matt M, Matt W
+
+- Recording Start Time: 9:15 am
+- Recording Stop Time:  pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 29,36
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2,4],50,0,goodChans,goodChans,1,{'act_thresh',1},true); % Normal
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',7,7,0,[2,4],50,xpcBinLag,xpcA,xpcW,goodChans,goodChans, 1, {[], []}, true);
+
+	
+Epoch 18, Iteration 3500, loss = 0.9314
+Checking accuracy on validation set
+Mean Correlation is 0.698388
+Mean SNR is 2.33652.
+Total number of peaks is 399.
+Average control peaks is 3.57049.
+Average signal peaks is 0.0773584.
+Ratio of control to true signal is 46.1551.
+Feature number 0.
+Median of feature is -0.248996.
+Ratio of control to true signal is 46.6898.
+Correlation is 0.671194
+Feature number 1.
+Median of feature is -0.287359.
+Ratio of control to true signal is 45.6058.
+Correlation is 0.725582
+
+with velocity resampled to triangular dist.
+Epoch 18, Iteration 3500, loss = 0.9440
+Checking accuracy on validation set
+Mean Correlation is 0.694772
+Mean SNR is 2.16146.
+Total number of peaks is 466.
+Average control peaks is 3.23802.
+Average signal peaks is 0.0773584.
+Ratio of control to true signal is 41.8574.
+Feature number 0.
+Median of feature is -0.229026.
+Ratio of control to true signal is 40.2437.
+Correlation is 0.667547
+Feature number 1.
+Median of feature is -0.210247.
+Ratio of control to true signal is 43.5151.
+Correlation is 0.721997
+
+
+
+
+-Runs:
+	Run 1: Calibration
+	Run 2: TS 29 - Warmup run - 250 trials
+	Run 3: TS 29 - Warmup run - 100 trials - after this run we stopped the recording session, cleaned the connector, and started a new recording.
+	Run 4: TS 29 - training set - 400 trials
+	Run 5: TS 29 - validation set - 150 trials
+	Run 6: TS 36 - KF0
+	Run 7: TS 36 - NN one
+	Run 8: TS 36 - ReFit
+	Run 9: TS 36 - NN one
+	Run 10: TS 36 - NN with velocity redistribution- this may not have been redistributed
+	Run 11: TS 36 - NN one again - not motivated anymore
+
+
+-Notes:
+ 		
+goodChans = [1,3:7,9,11,15:19,33,35,37:41,49:51,53,58:62,65,67:68,71:76,78:88,90:92]; %These have some spiking
+

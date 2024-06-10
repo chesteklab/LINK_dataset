@@ -1,0 +1,51 @@
+Napier: 6/28/2021
+
+- Goals: 2D Online with Nerve Block
+
+- Experiment:  Mender, Eric, Srini, Parag
+
+- Recording Start Time: 8:45 am
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable) + Sensory (CPE)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100/100
+	* Juice Time: 80/90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true);
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',3,3,false,[2,4],32,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',7,7,false,[2,4],32,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[], []},true);
+
+-Runs:
+	Run 1: calibration
+	Run 2: Training TS34 
+	Run 3: KF0 SBP (DVR video 1) - looks like a good first decoder. 
+	Run 4: TS 34 - a few hand control trials while model trains to have dvr of hand control. 260 SBP trials, 20 TCFR trials starting around 260
+	Run 5: RF0 - TS 34 - Still on DVR video 1 - decoder is working well. Bit rate > 2, velocities a little low but can stop well. Peaked around 2.4 bps
+	
+	Blocks delivered between 9:45 and 10:10am. Injection end at 10:07, unable to grab craisins by 10:14. 
+	NERVE BLOCK - 4.5-5ml total between the three nerves. 
+	
+	Run 6: RF0 - TS 34 - started with a few hand control trials - was able to slightly extend fingers to center. Started online - can get some targets but very slow and shakey. Block seems to be working very well. Working more or less so went back to the other side, starting new run. 
+	Run 7: RF0 - TS 34 - started with hand control - twitched MRS a little, but could not get targets. Turned on decode and it's working still - bit rates around 1 bps still. 
+	
+	Training ReFIT on run 7 to see if we can get good performance while hand is blocked
+	Run 8: RF1 - TS 34 - still can't do hand control at start. Brain control seems much faster. Started adding more hand control near the end. Did not successfully acquire any hand control targets other than center.
+
+
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96]; 
+	Was not recording during calibration. 
+	Preblock recording started with run 2
+	Postblock recording started with run 6

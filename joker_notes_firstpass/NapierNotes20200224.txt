@@ -1,0 +1,72 @@
+Napier: 2/24/2020
+
+- Goals: Neural Network stuff
+
+- Experiment: Willsey, Ensel
+
+- Recording Start Time: 8:30am
+- Recording Stop Time:  
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous, 97-102 Raw
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 34
+	* Visualization Style: MRP
+	
+-Decoders: 
+	First set of good_chans from today
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','2020-02-24', 4, false, [2, 4], 50, 0, good_chans, good_chans, 1, {'act_thresh',1}, true);
+	
+	good_chans from sturday
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','2020-02-24', 4, false, [2, 4], 50, 0, good_chans, good_chans, 1, {'act_thresh',1}, true);
+	
+	these are good_chans for SBP from today
+	KF3: TrainOnline_Cortical_KalmanFilter_Multi('Joker','2020-02-24', 4, false, [2, 4], 50, 0, good_chans, good_chans, 1, {'act_thresh',1}, true);
+
+	wont use but its trained and there
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','2020-02-24',7,8,0,[2,4],50,xpcBinLag,xpcA,xpcW,good_chans,good_chans, 1, {[], []}, true);
+	
+	RF1: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','2020-02-24',7,11,0,[2,4],50,xpcBinLag,xpcA,xpcW,good_chans,good_chans, 1, {[], []}, true);
+	
+	NN in NNDecode.py used was: FC4Lp05_CNN1L16N_BN
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Vis model was crashed so restarted but forgot to press play on hand 
+	Run 3: Everything works waited for him to adapt to todays calibration to get clean run
+	Run 4: TS34 - Hand control, 400+ trials 
+	Run 5: KF0 using good_chans from today, bad
+	Run 6: KF1 using good_chans from saturday 2/22/2020, bad
+	Run 7: KF0 with TCFR got to 150 trials, was bad, couple trials at end are SBP
+	Run 8: KF0 with SBP, avg bit rate is 1.48, couple trials at end are TCFR
+	Run 9: NN run. Gain looks quite low in beginning. letting trials run while watching movie dont look at trials before trial 32. New gain didnt fix anything
+	worthless run
+	Run 10: NN run again with asymmestric gain, 10 on index nothing on MRP, still did not work.
+	Run 11: KF3 using SBP with new good_chans from today. Really good around trial 200 peaked bit rate at 1.8, avg is 1.65
+	Run 12-14: running NN with SBP, trying different weights and gains
+	Run 15: gain 1.5, avg bit rate for first 100 trials was super high around 2.2 or so. settled in around 2.0. There was an offset so we had to use LPF. Waited about 10 seconds before starting the run to allow LPF to settle, but not sure if I need to do that. avg bit rate 1.89
+	Run 16: KF3 just going to run 100 trials for A B A to make sure he not jsut getting good. bit rate 1.4
+	Run 17: RF1 started a little slow but bit rate is now at 1.71
+	Run 18: debugging
+	Run 19: NN SBP, again above 1.9 for bit rate
+	Run 20: HC, bit rate 2.0
+	
+	
+-Notes:	
+	Today channels for TCFR
+	good_chans = [1, 3, 4, 5, 6, 7, 8, 11, 15, 23, 33, 35, 37, 38, 40, 51, 53, 57, 58, 59, 62, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 79, 81, 82, 83, 84, 86, 90, 91];
+	
+	today channels for SBP but these were used for after run 10
+	good_chans = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 13, 15, 17, 23, 33, 35, 37, 38, 40, 43, 45, 46, 47, 49, 50, 51, 52, 53, 55, 56, 57, 58, 59, 60, 62, 64, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 90, 91, 92, 94, 96];
+	
+	Saturday channels:
+	good_chans = [1, 3, 4, 5, 6, 7, 8, 10, 11, 15, 23, 33, 35, 37, 38, 40, 42, 51, 53, 56, 57, 58, 62, 65, 67, 68, 69, 71, 72, 73, 74, 75, 76, 77, 78, 79, 81, 82, 83, 84, 85, 86, 90, 91, 92];

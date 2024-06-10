@@ -1,0 +1,43 @@
+Napier: 1/6/2021
+
+- Goals: Testing Mote Simulator/Interval Decoding
+
+- Experiment:  Joey, Sam
+
+- Recording Start Time: 9:30 am
+- Recording Stop Time:  1:00 pm
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_motePackets8, switched back to v6 around run 4
+- Recorded Array: Motor (Patient Cable) + EMG (CPD via CPA)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500 online
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	♦
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',1,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,1);
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',1,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 1,1);
+	KF2: TrainOnline_Cortical_KalmanFilter_Multi_MoteIntervals('Joker','',12,false,[2,4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true, 3,1);
+	
+-Runs:
+	(calibration and first run was in the 'Test' folder. Switched to Joker)
+	Run 1: training TS-34 (400 trials). Having a little trouble reaching index extension
+	Run 2: KF0 - out of range
+	Run 3-11: testing, trying to get decoder working
+	Run 12: 100 trials training
+	Run 13: KF2 - not even SBP decoder is working (totally maxed out)
+	Run 14: KF2 on the normal xpc model - KF2 works! which means the mote data collection/training works, but not real time decoder
+	...
+	Run 17: switched to 5v2_2 - looks like working, getting actual decode values for both sbp/intervals. 
+	
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];

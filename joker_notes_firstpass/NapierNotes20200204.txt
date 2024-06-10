@@ -1,0 +1,40 @@
+Napier: 2/04/2020
+
+- Goals: Lots of 2D data with springs
+
+- Experiment: Matt M, Scott, and Eric
+
+- Recording Start Time: 9:45am
+- Recording Stop Time:  
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 34
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2,4],32,0,goodChans,goodChans,1,{'act_thresh',1},true);
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2,4],32,0,goodChans,goodChans,1,{'act_thresh',1},true);
+	KF2: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',5,false,[2,4],32,0,goodChans,goodChans,1,{'act_thresh',1},true);
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS34 with springs on both fingers. About 500 trials.
+	Run 3: TS34 with spring on MRP. Doesn't want to do many of the index extension trials - made it slightly easier at trial 445. About 500 trials.
+	Run 4: TS34 without springs. Stopped around trial 330 because juice tube came away.
+	Run 5: TS34 again. 
+	Run 6: KF0 - Stopped trying to do the task around trial 40. Switched to manual control at 55. He started trying again at 75 and then stopped. Might not be getting juice. 
+
+-Notes:
+	- Our juice tube solution isn't working very well. The tube was an inch from his mouth when I went back to take springs out. 
+	goodChans = [1:8,11,15,17,23,33,35,38,40,43,45:47,50:53,56:58,62,65,67:69,71:76,78:81,83:88,90:92,96];

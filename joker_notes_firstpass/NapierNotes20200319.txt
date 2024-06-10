@@ -1,0 +1,66 @@
+Napier: 3/19/2020
+
+- Goals: Neural Network stuff
+
+- Experiment: Willsey, Kennedy, Ensel (remote)
+
+- Recording Start Time: 8:20 am
+- Recording Stop Time: 11:00 pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous, 97-102 Raw
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+	* Target Pos Style: 29, 36
+	* Visualization Style: MRP
+	
+-Decoders: 
+	KF0: 
+	good_chans_SBP = [1:9,11,13,15,17,23,33,35,37:38,40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,94,96];
+	TrainOnline_Cortical_KalmanFilter_Multi('Joker','', 4, false, [2, 4], 50, 0, 1:96, good_chans_SBP, 1, {'act_thresh',1}, true);
+	load('Z:\Data\Joker\2020-03-19\decodeParamsKF0.mat')
+	
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',6,6,0,[2,4],50,xpcBinLag,xpcA,xpcW,1:96,good_chans_SBP, 1, {[], []}, true);
+	
+	NN in NNDecoders.py 
+	gain = [0.046, 0.044]
+	offset = [-0.074, 0.133]
+
+	Gain and offset implemented in this fashion:
+	data_send[feat[0],fingers[0]] += 0.046*(myGain*(stateVars[0,0]) + 0.074)
+        data_send[feat[0],fingers[1]] += 0.044*(myGain*(stateVars[0,1]) - 0.133)
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: TS29 for 300 trials
+	Run 3: TS29 for 100 trials
+	Break: 30 min break until 9:07am
+	Run 4: TS29 for 400 trials
+	Run 5: TS29 for 100 trials
+	Run 6: TS36 for 214 trials SBP; 10 TC at the end
+	Run 7: ReFIT
+	Run 8: NN worked from trial 60 to about 160 and quit
+	5 min break
+	Run 9: NN 250 trials; 
+	5 min break (until 10:20)
+	Run 10: ReFIT
+	5 min break
+	Run 11: didn't run on hand control
+	5 min break
+	Run 12:Won't run on hand control
+	5 min break
+	Run 13: ran some one hand control, switched to NN, would run a few and then quit, run a few then quit
+	
+
+	These channels are used for SBP
+	good_chans_SBP = [1:9,11,13,15,17,23,33,35,37:38,40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,94,96];
+	

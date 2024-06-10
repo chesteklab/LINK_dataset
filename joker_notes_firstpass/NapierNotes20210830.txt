@@ -1,0 +1,57 @@
+Napier: 8/30/2021
+
+- Goals: Normal vs spring+wrist trial trained model online
+
+- Experiment: Mender, Joey C, Eric
+
+- Recording Start Time: 10:45 AM
+- Recording Stop Time: 12:30 PM
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR
+- Recorded Array: Lateral (Patient Cable) + Medial (Cereplex)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80/90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+
+-Decoders: 
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); %corr = 0.70 (normal)
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',4,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); %corr = 0.67 (spring)
+	KF2: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',3,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); %Normal, different good chans, corr = 0.70 
+	KF3: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',4,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); %Different good chanscorr = 0.63 (spring)
+	
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',9,[],0,[2,4],32,[0,0],xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[],[]},true); % ReFIT on the ~
+
+-Runs:
+	Run 1: Calibration 
+	Run 2: TS 34 - test calibration/warmup 250 trials
+	Run 3: TS 34 - normal - 400 trials
+	Run 4: TS 34 - with springs 2/4 and wrist flexed - 400 trials
+	Run 5: TS 34 - normal while training models - 400 trials
+	Run 6: TS 34 - KF0 (normal) - 200 trials. Pretty slow, BR~=1.4
+	Run 7: TS 34 - KF1 (wrist/spring) - stuck at extension to start - unuseable
+	Run 8: TS 34 - KF2 (normal retrained) - bit rate closer to 2 - 200 trials
+	Run 9: TS 34 - KF3 (wrist/spring retrained) - MRS biased towards extension still - made it through 50 trials and then couldn't use it anymore. Got him to do a few trials before ending it at 140. 
+	Run 10: TS 34 - KF2 (normal) - BR c~=1.8 or 1.9
+	Run 11: TS 34 - KF3 (wrist/spring) - biased all the way to extension, no successful trials. Some effort, occasionally see the fingers bend down towards the target.
+	Run 12: TS 34 - RF0 - Refit on the like 60 trials that worked from run 9, it's a useable decoder again.
+	Run 13: TS 34 - KF2 (normal)
+	Run 14: TS 34 - KF3 (wrist/spring) - one last try - still bad, no successes. 
+	
+	
+	
+-Notes:
+good chans from 8/19 (used for KF0 and KF1)
+good_chans_SBP = [4	7 12	32	33	34	35	36	38	40	44	52	53	57	59	61	63	65	67	68	69	71	72	73	74	75	76	77	78	79	81	82	83	84	85	88	90	93	95	96];
+Chans today with > 1 TCFR using run 3 (used for KF2 and KF3) 
+good_chans_SBP = [4	7	33	35	38	51	57	58	65	67	68	69	71	72	73	74	75	76	77	78	81	82	83	84	86	90	91];
+Chans today with > 1 TCFR using run 4/off-context 
+good_chans_SBP = [4	7	33	35	38	51	57	58	65	67	68	69	71	72	73	74	75	81	82	84	85	86	90	91];

@@ -1,0 +1,40 @@
+Napier: 06/06/2022
+
+- Goals: Matt learning how to use the current pyBMI setup
+ 
+- Experimenters: Matt M, Hisham
+
+- Recording Start Time: 9:30 am
+- Recording Stop Time:  11:30 am
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29
+	* Visualization Style: MRP
+	
+-Decoders:	
+	- all decoders trained with tri vel redistribution, RR scaler, RNNs with 5 time history
+
+	NN0 - willsey net, 3500 iters, 10 sec neural norm (regression gains)
+	RNN0 - GRU with 10 sec neural norm
+
+	
+-Runs:
+	Run 1: calibration + warmup
+	Run 2: TS29 training - 500 trials. BR~4.2  #HC1#
+	--- 10 min training break ---
+	Run 3: xpcBinSize didn't match
+	Run 4: xpc crashed
+	Run 5: NN0 - MRS biased to extension. 
+	Run 6: RN0 - Worked a little but then recording got noisy and fingers got stuck. He figured out how to do trials after a bit. I let him do ~500. He did them in spurts where he would figure it out, then fingers would get stuck, and then he'd figure it out again. 
+	

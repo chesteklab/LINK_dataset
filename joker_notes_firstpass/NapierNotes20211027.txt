@@ -1,0 +1,67 @@
+Napier: 10/27/2021
+
+- Goals: Variable noise - hand + brain control (random walk)
+
+- Experiment: Joey, Sam
+
+- Recording Start Time: 9:00 am
+- Recording Stop Time:  
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR_noise
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],32,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); 
+		SBP KF correlation = 0.70524
+		SBP KF lag = 2, 0 lag picked
+
+	RF0: TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',3,3,false,[2 4],32,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP,1,{[],[]},true);
+
+
+- Noise info:
+	- at every 1ms, an error of size +-errormag is added to handoffset with probability Perror
+	- noise decays every 1ms with *= 0.995
+	- decay = 0.995
+
+-Runs:
+	Run 1: Calibration
+	Run 2: TS34 - hand control - 400 trials. BR=3.5 (kinda low)
+	Run 3: KF0 - 200 trials. BR=1.7
+	Run 4: RF0 - 70 trials. BR<1.3. Seems worse than the original. some trouble stopping
+	Run 5: KF0 - 100 trials. BR<0.8.  Much worse than the first time. Did neural activity shift?. Just gonna look at hand control today.
+
+	Run 6: hand control - Perror = 0.00, ErrorMag = 0.00. 200 trials.
+	Run 7: hand control - Perror = 0.03, ErrorMag = 0.01. 100 trials. Noise is more of high freq jitter, not really like the decoder
+	Run 8: hand control - Perror = 0.015, ErrorMag = 0.01. 100 trials.
+	Run 9: hand control - Perror = 0.00, ErrorMag = 0.00. 100 trials. Back to normal HC
+	Run 10: hand control - Perror = 0.0075, ErrorMag = 0.01. 100 trials. Noise barely noticeable
+	
+
+
+	Thoughts:
+	- this kind of noise doesn't look like KF decoder noise
+	- might way to add some kind of velocity drift noise
+	
+	
+	
+-Notes:
+	
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	
+	
+	
+
+	

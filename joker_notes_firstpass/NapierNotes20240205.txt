@@ -1,0 +1,48 @@
+Napier: 2/5/2024
+
+- Goals: Offline Neural + EMG
+ 
+- Experimenters: Dylan, Luis
+
+- Recording Start Time: 12:05 pm
+- Recording Stop Time:  1
+
+- xPC Model: Rig_main_Cortical_Parasite_v2
+- Recorded Array: Motor + EMG
+- Data recorded: 10ksps on CPD, 2ksps on Cerebus
+- Drink: Apple Juice
+
+- Params:
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 120
+	* Trial Timeout: 5000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29/34/35
+	* Visualization Style: MRS
+	* Manipulandum: old
+	
+-Decoders:
+
+
+-Runs:	
+	Run 1: 1000 trials TS29. Bitrate ~4.6.
+	Run 2: 1000 trials TS34. Bitrate ~5. A few weird trials between 850 and 900 because the video was up.
+	Run 3: 170 trials TS35. He may be out of juice, he stopped out of nowhere. Giving him a short break
+	Run 4: 5 trials, just testing if he was out of juice. He was.
+	
+	
+Summary:
+	- 
+TODO:
+
+
+Notes:	
+	
+
+
+	
+
+
+

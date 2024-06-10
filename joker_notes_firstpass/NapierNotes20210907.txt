@@ -1,0 +1,61 @@
+Napier: 9/7/2021
+
+- Goals: Error Classification Parasite Test
+ 
+- Experiment: Dylan, Mender
+
+- Recording Start Time: 11:50 am
+- Recording Stop Time:  1:45 pm
+
+- xPC Model: Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750/500
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80/90
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 34
+	* Visualization Style: MRS
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',2,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (optimal lag [1, 1] - 0 lag picked) - 0.74 CC
+	
+	
+-Runs:
+	Run 1: Calibration
+	Run 2: Training TS34 - 500 trials
+	Run 3: KF0 - online by trial 10; good performance (1.9+ bps), 250 trials
+		try_data: T = 4, yields worse FPR than T = 3, but overall better TPR
+	Run 4: Error classifier test run 1 (correction OFF); online by trial 10, ~70 trials; 1.8 bps
+	Run 5: Bad run, decoder crashed and behavior got stuck?
+	Run 6: Pulled his hand out of manipulandum, went back to fix
+	Run 7: Debugging run to get error fixed, mostyly offline trials with some online correction at the end
+	Run 8: Error classifier test run 2 (correction ON); online by trial 10, ~60 trials; 1.5 bps
+	Run 9: Error classifier test run 3 (correction OFF); online by trial 10, ~60 trials; 1.5788 bps
+	Run 10: Error classifier test run 4 (correction ON); online by trial 10, ~60 trials; 1.3474 bps
+		new try_data: T = 2, same training data (to get lower FPR)
+	Run 11: Error classifier test run 5 (correction OFF); online by trial 10, ~60 trials; 1.7751 bps
+	Run 12: Error classifier test run 6 (correction ON); online by trial 10, ~60 trials; 1.3063 bps
+	Run 13: Error classifier test run 7 (correction OFF); online by trial 10, ~60 trials; 1.7999 bps
+	Run 14: Error classifier test run 8 (correction ON); online by trial 10, ~60 trials; 1.4098 bps; fixed potential bug in correction before this run; still jerky, but correction is noticeably better overall
+	Run 15: Error classifier test run 9 (correction OFF); online by trial 10, ~60 trials; 1.5963 bps
+	Run 16: Error classifier test run 10 (correction ON); online by trial 10, ~60 trials; 1.6327 bps;
+	Run 17: Error classifier test run 11 (correction ON, zeroed velocity); online by trial 10, ~60 trials; 1.7828 bps;
+	Run 18: Error classifier test run 12 (correction OFF); online by trial 10, ~60 trials; 1.8812 bps
+	Run 19: Error classifier test run 13 (correction ON, zeroed velocity); online by trial 10, ~60 trials; 1.5453 bps;
+	Run 20: Error classifier test run 14 (correction OFF); online by trial 10, ~60 trials; 1.2825 bps
+	
+-Notes:
+	good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+	
+	Correction works (may not improve bitrate yet), but needs some kind of smoothing factor or something that limits how often errors can be corrected (i.e. wait N bins before correcting again), as movements are jerky with the current method.
+	
+	
+	
+	
+	

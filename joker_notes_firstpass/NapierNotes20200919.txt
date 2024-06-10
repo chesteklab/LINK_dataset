@@ -1,0 +1,149 @@
+Napier: 9/19/2020
+
+- Goals: ReFIT a NN; center out training
+
+- Experiment: Hisham, Willsey
+
+- Recording Start Time: am
+- Recording Stop Time:  pm
+
+- xPC Model: Rig_main_Cortical_Parasite
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + Raw + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- REFERENCING OFF OF CHANNEL 14
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750 (training); 500 (testing)
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 100 (50 for training)
+	* Trial Timeout: 7500
+	* Auto Juice: 0
+	* Target Pos Style: 29/36 (training/testing)
+	* Visualization Style: MRP
+	
+-Decoders: 
+good_chans_SBP = [1:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78:88,90:92,95,96];
+TrainOnline_Cortical_KalmanFilter_Multi('Joker','',4,false,[2,4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},true); % Normal
+
+load('Z:\Data\Joker\2020-09-19\decodeParamsKF0.mat')
+TrainOnline_Cortical_KalmanFilterReFIT_Multi('Joker','',7,7,0,[2,4],50,xpcBinLag,xpcA,xpcW,good_chans_SBP,good_chans_SBP, 1, {[], []}, true);
+
+
+Mask: Z_Joker_2020-09-19_Run-004_NoVR_MASK
+
+No Redis: Z_Joker_2020-09-19_Run-004_NoVR_Test_network_3500
+Epoch 18, Iteration 3500, loss = 0.9650
+Checking accuracy on validation set
+Mean Correlation is 0.644789
+Mean SNR is 2.16105.
+Total number of peaks is 540.
+Average control peaks is 2.82875.
+Average signal peaks is 0.0655093.
+Ratio of control to true signal is 43.1809.
+Feature number 0.
+Median of feature is 0.012013.
+Ratio of control to true signal is 40.1843.
+Correlation is 0.62131
+Feature number 1.
+Median of feature is -0.259791.
+Ratio of control to true signal is 45.805.
+Correlation is 0.668269
+
+Tri Redis: Z_Joker_2020-09-19_Run-004_TriVR_Test_network_3500
+Epoch 11, Iteration 3500, loss = 0.9147
+Checking accuracy on validation set
+Mean Correlation is 0.476564
+Mean SNR is 3.09486.
+Total number of peaks is 78.
+Average control peaks is 1.86571.
+Average signal peaks is 0.0655093.
+Ratio of control to true signal is 28.48.
+Feature number 0.
+Median of feature is 0.160208.
+Ratio of control to true signal is 33.037.
+Correlation is 0.46729
+Feature number 1.
+Median of feature is -0.143075.
+Ratio of control to true signal is 24.4896.
+Correlation is 0.485837
+
+ReFIT (tri): Z_Joker_2020-09-19_Run-008_ReFIT_Test_network_500
+Epoch 2, Iteration 500, loss = 0.4809
+Checking accuracy on validation set
+Mean Correlation is 0.662143
+Mean SNR is 2.7609.
+Total number of peaks is 876.
+Average control peaks is 3.13159.
+Average signal peaks is 1.65319.
+Ratio of control to true signal is 1.89428.
+Feature number 0.
+Median of feature is 0.135622.
+Ratio of control to true signal is 1.63547.
+Correlation is 0.659766
+Feature number 1.
+Median of feature is -0.21686.
+Ratio of control to true signal is 2.27612.
+Correlation is 0.664519
+
+ReFIT (None): Z_Joker_2020-09-19_Run-009_ReFIT_Test_network_500
+Epoch 3, Iteration 500, loss = 1.2529
+Checking accuracy on validation set
+Mean Correlation is 0.669944
+Mean SNR is 2.37182.
+Total number of peaks is 1231.
+Average control peaks is 3.46668.
+Average signal peaks is 3.11432.
+Ratio of control to true signal is 1.11314.
+Feature number 0.
+Median of feature is 0.0190204.
+Ratio of control to true signal is 1.02052.
+Correlation is 0.653835
+Feature number 1.
+Median of feature is -0.320328.
+Ratio of control to true signal is 1.20913.
+Correlation is 0.686053
+
+
+
+-Runs: where there are missing runs means there was a crash
+	Run 1: Calibration
+	Run 2: TS 34 - Warmup run - uncertain numbe of trials, and I was doing some of them. Eventually he starting running after repositioning the chair
+	Run 3: TS 34 - 120 warmup trials
+		
+	wait 15 min until 10:23
+	
+	Run 4: Training set - 400 trials
+	Run 5: Validation set - 100 trials
+	
+	Run 6 - didn't turn on parasite
+	Run 7: TS 36 - KF, 250 trials
+	Run 8: TS 36 - NN, Triangular distribution of velocities, 250 trials
+	Run 9: TS 36 - NN, No distribution of velocities, 250 trials
+	
+	Run 10: RF, 250 trials
+	Run 11: Tri NN ReFIT, 250 trials
+	Run 12: RF, 250 trials, no motivation after trial 170 or so
+	Run 13: Tri NN ReFIT, 250 trials
+	
+	Run 14: NoVR NN ReFIT, 250 trials
+	Run 15: TriVR NN ReFIT, 250 trials
+	Run 16: No VR NN ReFIT, Index finger was stuck in extension, not sure whether it was a parasite crash or a NN problem, restarted it on the next run and was gone; never got beyond a few trials
+	Run 17: No VR NN ReFIT
+	
+	Run 18: Hit the wrong buttons to start ReFIT
+	
+	Run 19: ReFIT KF - has little motivation for refit and quit after a few trials
+	
+	Run 20: Hand Control
+	Run 21: No VR NN ReFIT; center out (34); index finger was stuck in extension around 220  trials
+	Run 22: Tri NN ReFIT; center out (34); ran 459 trials
+		
+Notes:
+
+z = ZStructTranslator(runpath, overwrite);
+z = z(2:end);   % the first trial is always weird
+z = z(setdiff(1:length(z), badTrials)); % only use the trials we've labeled as good
+z = z(end-20:end);

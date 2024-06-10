@@ -1,0 +1,57 @@
+Napier: 09/14/2022
+
+- Goals: Offline EMG+Neural
+ 
+- Experiment: Luis, Dylan
+
+- Recording Start Time: 9:40 am
+- Recording Stop Time:  pm 
+
+- xPC Model: Rig_main_Cortical_SBP_Spikes_CAR_Luis / Rig_main_Cortical_Parasite_Test
+- Recorded Array: Motor (Patient Cable)
+- Data recorded: Spikes (250Hz highpass, RMS -4.5) + 2kSps 300-1000HzBPas continuous
+- Drink: Apple Juice
+
+- Params: 
+	* Movement Mask: [0,1,0,1,0]
+	* Target Hold Time (OL/CL): 750
+	* Target Scaling(OL/CL): 100
+	* Juice Time: 80
+	* Trial Timeout: 10000
+	* Auto Juice: 0
+   	* Target Pos Style (OL/CL): 29/35/34
+	* Visualization Style: MRP
+	
+-Decoders:
+	KF0: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',7,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true); (
+		SBP KF correlation = 0.69776
+		SBP KF lag = 2
+	
+	KF1: TrainOnline_Cortical_KalmanFilter_Multi('Joker','',10,false,[2 4],50,0,good_chans_SBP,good_chans_SBP,1,{'act_thresh',1},0,true);
+
+-Runs:
+
+	Run 1: Calibration
+	Run 2: Calibration
+	Run 3: TS29 ~270 Warm-up trials
+	Run 4: TS35, had to stop it early because Napier got his hand out of the manipulandum
+	Run 5: TS29 ~129 warm-up trials
+	Run 6: 1000 TS35, good performance (5.6 bitrate)
+	Run 7: 1000 TS34, good performance (5-6 bitrate)
+	Run 8: Few trials with KF0 and TS34. The decoder got biased very quickly
+	Run 9: TS34 Offline with Parasite model, but failed because the calibration was wrong
+	Run 10: 500 TS34 Offline with Parasite model
+	Run 11: ~1100 TS34 KF1 ~2.4 bitrate
+	
+-Notes:
+	good_chans_SBP = [1:3,5:9,11,13,15,17,23,24,33,35,37:40,43,45:47,49:53,55:60,62,64,65,67:69,71:76,78,81:87,90:92,96];
+
+
+	
+	
+	
+	
+	
+	
+	
+	
