@@ -120,7 +120,7 @@ Date,Runs,Notes
 3/10/2021,"2,3",
 3/12/2021,"3,4",
 3/13/2021,"11,12",
-3/16/2021,"8,9","use 3,4 for emg connected - shouldn’t be hugely diff"
+3/16/2021,"8,9","use 3,4 for emg connected - shouldnâ€™t be hugely diff"
 3/17/2021,"2,15",
 3/19/2021,5,
 3/22/2021,"3,5",biscuit/food chewing artifact maybe
@@ -178,7 +178,7 @@ Date,Runs,Notes
 6/26/2021,"2,3",
 6/28/2021,"2,4",4 should be only hand control?
 6/29/2021,"6,7",
-6/30/2021,"3,4",decoder didn’t work
+6/30/2021,"3,4",decoder didnâ€™t work
 7/1/2021,"1,8",
 7/2/2021,1,
 7/3/2021,"2,3",
@@ -238,7 +238,7 @@ Date,Runs,Notes
 10/6/2021,"5,6,7",
 10/7/2021,"2,8,9",9 has CAR on
 10/8/2021,"3,2",
-10/13/2021,3,probably don’t use this day - don’t think there will be enough trials anywats
+10/13/2021,3,probably donâ€™t use this day - donâ€™t think there will be enough trials anywats
 10/15/2021,"2,7,8","2 - 34, 7,8 - 29"
 10/19/2021,2,
 10/22/2021,"5,3",3 crashed at the end
@@ -297,7 +297,7 @@ Date,Runs,Notes
 4/5/2022,3,
 4/6/2022,"2,3",
 4/7/2022,"2,3,10,11","spike panel seems weird, bad signals today?"
-4/8/2022,"3,15","29 and 34, base decoders didn’t seem to work well today"
+4/8/2022,"3,15","29 and 34, base decoders didnâ€™t seem to work well today"
 4/11/2022,"4,10",
 4/13/2022,"2,3",
 4/14/2022,"2,3",skip first 30 trials of 2
@@ -362,7 +362,7 @@ Date,Runs,Notes
 9/1/2022,2,
 9/2/2022,5,
 9/6/2022,"3,4",long offline day
-9/7/2022,3,maybe don’t use CAR on
+9/7/2022,3,maybe donâ€™t use CAR on
 9/9/2022,2,also CAR on
 9/12/2022,2,CAR on
 9/13/2022,3,CAR on
@@ -399,7 +399,7 @@ Date,Runs,Notes
 1/13/2023,2,
 1/16/2023,3,
 1/17/2023,2,
-1/18/2023,1,DON’T USE - WRONG TARGET STYLE
+1/18/2023,1,DONâ€™T USE - WRONG TARGET STYLE
 1/23/2023,2,
 1/24/2023,"2,3",
 1/27/2023,3,
