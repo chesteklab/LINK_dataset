@@ -123,7 +123,8 @@ class neural_plot(widgets.VBox):
 
         # start from first day or resume based on save file
         if resume:
-            self.fileidx = pickle.load(config.savestatepath)
+            with open(config.savestatepath, 'rb') as f:
+                self.fileidx = pickle.load(f)
             with self.text_output:
                 print(f'Resuming from {self.filenames[self.fileidx]}')
         else:
