@@ -11,13 +11,12 @@ import sys
 sys.path.append(config.pybmipath)
 from pybmi.utils import ZTools
 
-
 def prep_data_for_plotting(resume=True):
     datesruns = load_sheet()
     bad_days = []
     days = np.arange(len(datesruns))
     if resume:
-        resumeidx = np.argwhere(datesruns['Date'].to_numpy() == '2024-01-16')[0,0]
+        resumeidx = np.argwhere(datesruns['Date'].to_numpy() == '2022-10-28')[0,0]
     else:
         resumeidx = 0
     idxs = np.arange(resumeidx, len(datesruns))
@@ -33,13 +32,12 @@ def prep_data_for_plotting(resume=True):
             continue
         data_CO, data_RD = load_day(date)
 
-
         if data_CO == None and data_RD == None:
             #save to bad days txt file
             bad_days.append(f'{date}')
         else:
             filename = f'{date}_plotpreprocess.pkl'
-            with open(os.path.join(config.cwd,'plot_preprocessing',filename),'wb') as f:
+            with open(os.path.join(config.cwd,'plot_preprocessing_new',filename),'wb') as f:
                 pickle.dump((data_CO, data_RD), f)
 
         with open(os.path.join(config.cwd, 'plot_preprocessing','bad_days.txt'), 'a') as f:
@@ -127,10 +125,13 @@ def load_run(date, run):
 
     return z, target_style
 
+num_runs_by_trial = []
+
 def choose_data(data):
     # check how many runs are in a day
     num_runs = len(data)
     trials_per_run = np.asarray([len(z) for z in data])
+    num_runs_by_trial = trials_per_run
     trials_per_run_sorted = np.flip(np.sort(trials_per_run))
     tpr_indices = np.flip(np.argsort(trials_per_run))
     
@@ -164,8 +165,27 @@ def choose_data(data):
                 enough_trials = True
     return new_data
 
+def concat_runs(processed_runs):
+    concatenated_data = {}
+    for key in processed_runs[0].keys():
+        if key == 'target_style':
+            concatenated_data[key] = processed_runs[0][key]
+        else:
+            concatenated_data[key] = []
+            for run in processed_runs:
+                concatenated_data[key].extend(run[key])
+            concatenated_data[key] = np.array(concatenated_data[key])
+    return concatenated_data
+
 def plot_preprocessing(data, runs):
     processed = []
+    
+    # I'm doing the trial number trial index things here, not in the concat_runs function
+    # keeping track of the last index and count here, will need to add to the index of later runs 
+    trial_index_prev = []
+    trial_count_prev = []
+    count = 0
+
     for z, run in zip(data, runs):
         processed_run = {}
         style_mode = z['TargetPosStyle'].mode()[0]
@@ -184,21 +204,30 @@ def plot_preprocessing(data, runs):
         
         FingerAngles = feats["FingerAnglesTIMRL"][:, (1, 3, 6, 8)]  #selecting only position and velocity
         TrialNumber, TrialIndex, TrialCount = np.unique(feats["TrialNumber"], return_index = True, return_counts = True)
+        
+        trial_index_prev.append(TrialIndex[-1])
+        trial_count_prev.append(TrialCount[-1])
+
         sbp = np.abs(feats['NeuralFeature'])
         sbp = (sbp - np.mean(sbp, axis=0)) / np.std(sbp, axis=0)
 
-        # putting things together
+        # putting things together. I'm doing the adjust index thing here
         processed_run['target_style'] = target_style
-        processed_run['trial_number'] = TrialNumber
-        processed_run['trial_index'] = TrialIndex
+        processed_run['trial_number'] = [x + 1000*(count) for x in TrialNumber]
+        if run == runs[0]:
+            processed_run['trial_index'] = TrialIndex
+        else:
+            processed_run['trial_index'] = [x + sum(trial_index_prev[:count]) + trial_count_prev[count-1] for x in TrialIndex]
         processed_run['trial_count'] = TrialCount
         processed_run['run_id'] = np.zeros_like(TrialCount, dtype=int) + run
-        processed_run['target_positions'] = feats["TargetPos"][TrialIndex]
+        processed_run['target_positions'] = feats["TargetPos"][TrialIndex][:, [1, 3]]
         processed_run['time'] = feats['ExperimentTime']
         processed_run['finger_kinematics'] = FingerAngles
         processed_run['sbp'] = sbp
         processed_run['tcfr'] = feats['Channel']
         processed.append(processed_run)
+
+        count += 1 
 
     data = concat_runs(processed)
     return data
