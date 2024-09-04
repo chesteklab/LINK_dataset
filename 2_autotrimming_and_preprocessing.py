@@ -1,17 +1,14 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 import os 
 import numpy as np
 import pickle
 import config
 import pdb
-from ipywidgets import Text, IntSlider, VBox, HBox, Button, RadioButtons, Textarea, Output
-from IPython.display import display, clear_output
 import sys
 sys.path.append(config.pybmipath)
 from pybmi.utils import ZTools
 
-def prep_data_for_plotting(resume=True):
+def prep_data(resume=True):
     datesruns = load_sheet()
     bad_days = []
     days = np.arange(len(datesruns))
@@ -177,7 +174,7 @@ def concat_runs(processed_runs):
             concatenated_data[key] = np.array(concatenated_data[key])
     return concatenated_data
 
-def plot_preprocessing(data, runs):
+def preprocessing(data, runs):
     processed = []
     
     # I'm doing the trial number trial index things here, not in the concat_runs function
@@ -232,3 +229,5 @@ def plot_preprocessing(data, runs):
     data = concat_runs(processed)
     return data
 
+if __name__=="__main__":
+    prep_data()

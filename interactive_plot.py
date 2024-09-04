@@ -3,7 +3,6 @@ import ipywidgets as widgets
 import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import display, clear_output, update_display
-import data_utils
 import pickle
 import config
 import os
