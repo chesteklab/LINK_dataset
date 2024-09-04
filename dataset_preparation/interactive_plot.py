@@ -13,7 +13,7 @@ class neural_plot(widgets.VBox):
 
     def __init__(self, resume=True):
         super().__init__()
-        self.datapath = os.path.join(config.cwd, 'plot_preprocessing') #10 minutes i can never get back, brought to you by windows.
+        self.datapath = config.preprocessingpath
         self.filenames = [f for f in os.listdir(self.datapath) if not f.startswith('.')] #in case there are any hidden files
         self.filenames.remove('bad_days.txt')
         self.filenames.sort() #for some reason the files weren't in chronological order if left unsorted, maybe a macOS problem?

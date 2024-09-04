@@ -9,11 +9,15 @@ dfpath = os.path.join(firstpassdir, 'firstpass_datesruns.pkl')
 
 datapath = 'Z:\Data\Monkeys'
 
-datareviewpath = "Z:\Student Folders\Hisham_Temmar\\big_dataset\\3_Data_Review_Results"
-resultspath = os.path.join(datareviewpath, 'preprocessing_results.csv')
+preprocessingpath = os.path.join("Z:\Student Folders\Hisham_Temmar\\big_dataset\\2_autotrimming_and_preprocessing","preprocessing")
+
+datareviewpath = "Z:\Student Folders\Hisham_Temmar\\big_dataset\\3_data_review_results"
+resultspath = os.path.join(datareviewpath, 'review_results.csv')
 savestatepath = os.path.join(datareviewpath, 'savestate.pkl')
 
 pybmipath = 'C:\Repos\pybmi'
+
+
 
 #data review config and params
 data_params = {

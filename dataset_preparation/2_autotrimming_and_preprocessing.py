@@ -34,10 +34,10 @@ def prep_data(resume=True):
             bad_days.append(f'{date}')
         else:
             filename = f'{date}_plotpreprocess.pkl'
-            with open(os.path.join(config.cwd,'plot_preprocessing_new',filename),'wb') as f:
+            with open(os.path.join(config.preprocessingpath,filename),'wb') as f:
                 pickle.dump((data_CO, data_RD), f)
 
-        with open(os.path.join(config.cwd, 'plot_preprocessing','bad_days.txt'), 'a') as f:
+        with open(os.path.join(config.preprocessingpath,'bad_days.txt'), 'a') as f:
             for day in bad_days:
                 f.write(f"{day}\n")
 
@@ -85,10 +85,10 @@ def load_day(date):
     #once we know we have enough trials, do preprocessing
     if data_CO != None:
         print("PREPROCESSING CO")
-        data_CO = plot_preprocessing(data_CO, runs_CO)
+        data_CO = preprocessing(data_CO, runs_CO)
     if data_RD != None:
         print("PREPROCESSING RD")
-        data_RD = plot_preprocessing(data_RD, runs_RD)
+        data_RD = preprocessing(data_RD, runs_RD)
     
     return data_CO, data_RD
 
@@ -230,4 +230,4 @@ def preprocessing(data, runs):
     return data
 
 if __name__=="__main__":
-    prep_data()
+    prep_data(resume=False)
