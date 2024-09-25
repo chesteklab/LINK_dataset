@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from datetime import datetime
 
-filepath = 'C:\Repos\\nhp_time_dataset_processing\preprocessing_results.csv'
+
+
 df = pd.read_csv(filepath)
 
 dates = df['Date'].to_numpy()

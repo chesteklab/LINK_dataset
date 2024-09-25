@@ -6,14 +6,14 @@ import config
 import pdb
 import sys
 sys.path.append(config.pybmipath)
-from pybmi.utils import ZTools
+from pybmi.utils import ZTools # type: ignore
 
 def prep_data(resume=True):
     datesruns = load_sheet()
     bad_days = []
     days = np.arange(len(datesruns))
     if resume:
-        resumeidx = np.argwhere(datesruns['Date'].to_numpy() == '2022-10-28')[0,0]
+        resumeidx = np.argwhere(datesruns['Date'].to_numpy() == '2020-10-21')[0,0]
     else:
         resumeidx = 0
     idxs = np.arange(resumeidx, len(datesruns))
@@ -33,7 +33,7 @@ def prep_data(resume=True):
             #save to bad days txt file
             bad_days.append(f'{date}')
         else:
-            filename = f'{date}_plotpreprocess.pkl'
+            filename = f'{date}_preprocess.pkl'
             with open(os.path.join(config.preprocessingpath,filename),'wb') as f:
                 pickle.dump((data_CO, data_RD), f)
 
@@ -79,16 +79,16 @@ def load_day(date):
             runs_RD.append(run)
 
     #then do the logic to decide what to keep and preprocess
+    (data_CO, run_CO) = choose_data(data_CO, runs_CO) if data_CO else (pd.DataFrame([]), None)
+    (data_RD, run_RD) = choose_data(data_RD, runs_RD) if data_RD else (pd.DataFrame([]), None)
 
-    data_CO = choose_data(data_CO) if data_CO else None
-    data_RD = choose_data(data_RD) if data_RD else None
     #once we know we have enough trials, do preprocessing
-    if data_CO != None:
+    if not data_CO.empty:
         print("PREPROCESSING CO")
-        data_CO = preprocessing(data_CO, runs_CO)
-    if data_RD != None:
+        data_CO = preprocessing(data_CO, run_CO)
+    if not data_RD.empty:
         print("PREPROCESSING RD")
-        data_RD = preprocessing(data_RD, runs_RD)
+        data_RD = preprocessing(data_RD, run_RD)
     
     return data_CO, data_RD
 
@@ -122,112 +122,59 @@ def load_run(date, run):
 
     return z, target_style
 
-num_runs_by_trial = []
-
-def choose_data(data):
-    # check how many runs are in a day
-    num_runs = len(data)
-    trials_per_run = np.asarray([len(z) for z in data])
-    num_runs_by_trial = trials_per_run
-    trials_per_run_sorted = np.flip(np.sort(trials_per_run))
-    tpr_indices = np.flip(np.argsort(trials_per_run))
+def choose_data(data, runs):
+    # check trials are in each run
+    max_trials = np.max(np.asarray([len(z) for z in data]))
+    argmax_trials = np.argmax(np.asarray([len(z) for z in data]))
     
-    # logic (THIS COULD BE DONE BETTER)
-    enough_trials = False
-    i = 0
-    num_trials = 0
+    # from the largest - see if there are 375 trials
+    if max_trials >= 375:
+        # take it
+        trim_amount = max_trials - 375
+        new_data = data[argmax_trials].iloc[0:-1*trim_amount]
+        run = runs[argmax_trials]
+    else:
+        new_data = None
+        run = None
 
-    new_data = [data[tpr_indices[i]]]
-    while not enough_trials:
-        # check num trials in next run
-        num_trials += trials_per_run_sorted[i]
-        # pdb.set_trace()
-        if num_trials >= 400:
-            enough_trials = True
-            # trim the last run so that there are only 400 trials
-            if num_trials > 400:
-                trim_amount = num_trials - 400
-                new_data[i] = new_data[i].iloc[0:-1*trim_amount]
-        else:
-            if num_runs > i+1:
-                # add run and continue
-                i += 1
-                new_data.append(data[tpr_indices[i]])
-            elif num_trials >= 375:
-                # if we've reached 375 and there are no other runs, call it good.
-                enough_trials == True
-            else:
-                # if there's no other runs and we don't have at least 375, reject entirely
-                new_data = None
-                enough_trials = True
-    return new_data
+    return new_data, run
 
-def concat_runs(processed_runs):
-    concatenated_data = {}
-    for key in processed_runs[0].keys():
-        if key == 'target_style':
-            concatenated_data[key] = processed_runs[0][key]
-        else:
-            concatenated_data[key] = []
-            for run in processed_runs:
-                concatenated_data[key].extend(run[key])
-            concatenated_data[key] = np.array(concatenated_data[key])
-    return concatenated_data
-
-def preprocessing(data, runs):
-    processed = []
+def preprocessing(data, run):
     
-    # I'm doing the trial number trial index things here, not in the concat_runs function
-    # keeping track of the last index and count here, will need to add to the index of later runs 
-    trial_index_prev = []
-    trial_count_prev = []
-    count = 0
+    processed_run = {}
+    style_mode = data['TargetPosStyle'].mode()[0]
+    target_style = 'CO' if style_mode == 34.0 else 'RD'
 
-    for z, run in zip(data, runs):
-        processed_run = {}
-        style_mode = z['TargetPosStyle'].mode()[0]
-        target_style = 'CO' if style_mode == 34.0 else 'RD'
+    # first 5 trials have already been trimmed
+    feats = ZTools.getZFeats(data, 
+                             binsize=config.data_params['binsize'],
+                             removeFirstTrial = False,
+                             featList=('FingerAnglesTIMRL',
+                                       'NeuralFeature',
+                                       'TrialNumber',
+                                       'TargetPos',
+                                       'ExperimentTime',
+                                       'Channel'))
+    
+    FingerAngles = feats["FingerAnglesTIMRL"][:, (1, 3, 6, 8)]  #selecting only position and velocity
+    TrialNumber, TrialIndex, TrialCount = np.unique(feats["TrialNumber"], return_index = True, return_counts = True)
 
-        # first 5 trials have already been trimmed
-        feats = ZTools.getZFeats(z, 
-                                 binsize=config.data_params['binsize'],
-                                 removeFirstTrial = False,
-                                 featList=('FingerAnglesTIMRL',
-                                           'NeuralFeature',
-                                           'TrialNumber',
-                                           'TargetPos',
-                                           'ExperimentTime',
-                                           'Channel'))
-        
-        FingerAngles = feats["FingerAnglesTIMRL"][:, (1, 3, 6, 8)]  #selecting only position and velocity
-        TrialNumber, TrialIndex, TrialCount = np.unique(feats["TrialNumber"], return_index = True, return_counts = True)
-        
-        trial_index_prev.append(TrialIndex[-1])
-        trial_count_prev.append(TrialCount[-1])
+    sbp = np.abs(feats['NeuralFeature'])
+    # sbp = (sbp - np.mean(sbp, axis=0)) / np.std(sbp, axis=0)
 
-        sbp = np.abs(feats['NeuralFeature'])
-        sbp = (sbp - np.mean(sbp, axis=0)) / np.std(sbp, axis=0)
+    # putting things together. I'm doing the adjust index thing here
+    processed_run['target_style'] = target_style
+    processed_run['trial_number'] = TrialNumber
+    processed_run['trial_index'] = TrialIndex
+    processed_run['trial_count'] = TrialCount
+    processed_run['run_id'] = run
+    processed_run['target_positions'] = feats["TargetPos"][TrialIndex][:, [1, 3]]
+    processed_run['time'] = feats['ExperimentTime']
+    processed_run['finger_kinematics'] = FingerAngles
+    processed_run['sbp'] = sbp
+    processed_run['tcfr'] = feats['Channel']
 
-        # putting things together. I'm doing the adjust index thing here
-        processed_run['target_style'] = target_style
-        processed_run['trial_number'] = [x + 1000*(count) for x in TrialNumber]
-        if run == runs[0]:
-            processed_run['trial_index'] = TrialIndex
-        else:
-            processed_run['trial_index'] = [x + sum(trial_index_prev[:count]) + trial_count_prev[count-1] for x in TrialIndex]
-        processed_run['trial_count'] = TrialCount
-        processed_run['run_id'] = np.zeros_like(TrialCount, dtype=int) + run
-        processed_run['target_positions'] = feats["TargetPos"][TrialIndex][:, [1, 3]]
-        processed_run['time'] = feats['ExperimentTime']
-        processed_run['finger_kinematics'] = FingerAngles
-        processed_run['sbp'] = sbp
-        processed_run['tcfr'] = feats['Channel']
-        processed.append(processed_run)
-
-        count += 1 
-
-    data = concat_runs(processed)
-    return data
+    return processed_run
 
 if __name__=="__main__":
     prep_data(resume=False)
