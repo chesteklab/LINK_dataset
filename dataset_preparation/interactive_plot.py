@@ -13,7 +13,7 @@ class neural_plot(widgets.VBox):
 
     def __init__(self, resume=True):
         super().__init__()
-        self.datapath = config.preprocessingpath
+        self.datapath = config.preprocessingdir
         self.filenames = [f for f in os.listdir(self.datapath) if not f.startswith('.')] #in case there are any hidden files
         self.filenames.remove('bad_days.txt')
         self.filenames.sort() #for some reason the files weren't in chronological order if left unsorted, maybe a macOS problem?
@@ -42,9 +42,9 @@ class neural_plot(widgets.VBox):
         for i in range(96):
             line, = self.ax[0].plot(np.arange(100), np.zeros((100,1)), linewidth=0.4, color=[np.random.rand(), np.random.rand(), np.random.rand()])
             self.neural_data.append(line)
-        self.ax[0].set(ylim=(-3,3))
+
         self.average_line, = self.ax[0].plot([], [], color='red', linewidth=1.5)
-        self.ax[0].set(xlabel='Time (seconds)', ylabel='Normalized Binned SBP', title='Neural (Unsmoothed, red trace = average over chans)')
+        self.ax[0].set(xlabel='Time (seconds)', ylabel='Binned SBP', title='Neural (Unsmoothed, red trace = average over chans)')
 
         # Init Finger lines
         self.finger_positions = []
@@ -122,7 +122,6 @@ class neural_plot(widgets.VBox):
         # self.start(resume=resume)
 
     def start(self, resume):
-        #TODO: add relative day?
 
         # start from first day or resume based on save file
         if resume:
@@ -218,15 +217,14 @@ class neural_plot(widgets.VBox):
         
         # update neural data
         for i, line in enumerate(self.neural_data):
-            line.set_data(exp_time,self.Data['sbp'][time_slice,i])
-        self.average_line.set_data(exp_time,np.mean(self.Data['sbp'],axis=1)[time_slice])
-        self.ax[0].set(xlabel=None, ylabel='Normalized Binned SBP', title='Neural (Unsmoothed + Average (Red))', xlim=time_lims,ylim=(-5,5))
-
+            line.set_data(exp_time,self.Data['sbp'][time_slice,i]*.25)
+        self.average_line.set_data(exp_time,np.mean(self.Data['sbp'],axis=1)[time_slice]*.25)
+        self.ax[0].set(xlabel=None, ylabel='Binned SBP', title='Neural (Unsmoothed + Average (Red))', xlim=time_lims, ylim=(0,25))
         # update finger positions
         for i, line_pos in enumerate(self.finger_positions):
             line_pos.set_data(exp_time, self.Data['finger_kinematics'][time_slice,i])
         self.ax[1].set(xlabel=None, ylabel='Flexion', title='Finger Positions', xlim=time_lims,ylim=(-0.1,1.1)) # changed ylim a bit
-
+        self.fig.savefig(os.path.join(config.characterizationdir, "review_tool.pdf"))
         
         # update finger velocities
         for i, line_vel in enumerate(self.finger_velocities):
