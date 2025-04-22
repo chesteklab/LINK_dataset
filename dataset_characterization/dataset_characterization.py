@@ -17,7 +17,6 @@ from sklearn.model_selection import train_test_split
 from scipy import stats
 
 from collections import defaultdict
-import datetime
 import pdb
 
 
@@ -176,7 +175,7 @@ def create_time_plot(dates):
     fig, ax = plt.subplots(figsize=(10, 1), layout='constrained')
     ax.hist(dates_dt, bins=100, color='k')
     ax.spines[['right','top','left']].set_visible(False)
-    plt.savefig(fig, os.path.join(config.characterizationdir,"time_hist.pdf"))
+    fig.savefig(os.path.join(config.outputdir,"time_hist.pdf"))
     plt.show()
 
 def plot_target_examples():

@@ -2,7 +2,7 @@ import os
 
 pybmipath = 'C:\Repos\pybmi'
 datapath = 'Z:\Data\Monkeys'
-outputdir = "Z:\Student Folders\Hisham_Temmar\\big_dataset"
+outputdir = "C:\\Files\\UM\\ND\\SFN"
 
 firstpassdir = os.path.join(outputdir, "1_notes_data_pruning")
 notesdir = os.path.join(firstpassdir,'joker_notes_firstpass')
@@ -11,7 +11,7 @@ sheetpath = os.path.join(firstpassdir, 'firstpass_datesruns.csv')
 dfpath = os.path.join(firstpassdir, 'firstpass_datesruns.pkl')
 # dfpath = os.path.join(firstpassdir, 'sfn_datasets.pkl')
 
-preprocessingdir = os.path.join("Z:\Student Folders\Hisham_Temmar\\big_dataset\\2_autotrimming_and_preprocessing","preprocessing_092024_no7822nofalcon")
+preprocessingdir = os.path.join("C:\\Files\\UM\\ND\\SFN","preprocessing_092024_no7822nofalcon")
 # preprocessingpath = os.path.join("Z:\Student Folders\Hisham_Temmar\\big_dataset\\sfn_round_2")
 
 datareviewdir = "Z:\Student Folders\Hisham_Temmar\\big_dataset\\3_data_review_results"
@@ -35,7 +35,7 @@ good_chans_indexed = [chan - 1 for chan in good_chans]
 
 import matplotlib as mpl
 #some basic text parameters for figures
-mpl.rcParams['font.family'] = "Atkinson Hyperlegible" # if installed but not showing up, rebuild mpl cache
+#mpl.rcParams['font.family'] = "Atkinson Hyperlegible" # if installed but not showing up, rebuild mpl cache
 mpl.rcParams['font.size'] = 18
 mpl.rcParams['savefig.format'] = 'pdf'
 mpl.rcParams['axes.unicode_minus'] = False
