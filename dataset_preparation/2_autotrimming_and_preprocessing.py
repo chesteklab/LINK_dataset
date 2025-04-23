@@ -17,8 +17,6 @@ def prep_data(resume=True):
     else:
         resumeidx = 0
     idxs = np.arange(resumeidx, len(datesruns))
-    # data, data = load_day('2020-02-11')
-    # pass
     extra_bad_days = ['2022-06-09','2023-05-05','2024-01-29'] # first and second, notes file is wrong, third pickling went wrong, can't import.
     
 
@@ -35,7 +33,7 @@ def prep_data(resume=True):
             #save to bad days txt file
             bad_days.append(f'{date}')
         else:
-            filename = f'{date}_preprocess2.pkl'
+            filename = f'{date}_preprocess.pkl'
             with open(os.path.join(config.preprocessingpath,filename),'wb') as f:
                 pickle.dump((data_CO, data_RD), f)
 
