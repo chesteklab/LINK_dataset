@@ -9,7 +9,10 @@ from pynwb.file import Subject
 from typing import Tuple, Optional
 
 
-def convert_pkl_to_nwb(data_dir):
+def convert_pkl_to_nwb(data_dir, end_dir=None):
+    if end_dir is None:
+        end_dir = data_dir
+
     trial_fields = [
         "trial_number",
         "trial_count",
@@ -313,7 +316,7 @@ def convert_pkl_to_nwb(data_dir):
 
             # Write the NWB file
             output_filename = os.path.join(
-                data_dir, f"{date}_{trials_df['target_style'][0]}.nwb"
+                end_dir, f"{date}_{trials_df['target_style'][0]}.nwb"
             )
             with NWBHDF5IO(output_filename, "w") as io:
                 io.write(nwbfile)
@@ -408,6 +411,7 @@ def dicts_from_nwb(pickle_path: str) -> Tuple[Optional[dict], Optional[dict]]:
 
 if __name__ == "__main__":
     data_dir = "Z:/Student Folders/Hisham_Temmar/big_dataset/2_autotrimming_and_preprocessing/preprocessing_092024_no7822nofalcon"
-    convert_pkl_to_nwb(data_dir)
+    end_dir = "Z:/Student Folders/Hisham_Temmar/big_dataset/2_autotrimming_and_preprocessing/preprocessing_092024_no7822nofalcon_nwb"
+    convert_pkl_to_nwb(data_dir, end_dir)
     # dicts = dicts_from_nwb(f"{data_dir}/2021-10-15_preprocess.pkl")
     # print(dicts)
