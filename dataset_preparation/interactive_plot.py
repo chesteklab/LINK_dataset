@@ -8,11 +8,14 @@ import config
 import os
 import pandas as pd
 import pdb
+import matplotlib.cm as cm
+#import matplotlib.gridspec as gridspec 
 
 class neural_plot(widgets.VBox):
 
-    def __init__(self, resume=True):
+    def __init__(self):
         super().__init__()
+        self.debug = True
         self.datapath = config.preprocessingpath
         self.filenames = [f for f in os.listdir(self.datapath) if not f.startswith('.')] #in case there are any hidden files
         self.filenames.remove('bad_days.txt')
@@ -29,35 +32,62 @@ class neural_plot(widgets.VBox):
         self.both_TS_present = False
         self.trial_num_printed = False # added this to stop the keep printing the number of trials
         self.trial_lines = [] # added this to keep track of the vertical lines to avoid duplication
+        self.trial_texts = [] # (Nina) to store trial number text annotations
         
         self.timerange = 500
         self.figoutput = widgets.Output()
         self.results_df = pd.DataFrame(columns=['Date','Status','Note'])
 
         with self.figoutput:
-            self.fig, self.ax = plt.subplots(3, 1, gridspec_kw={'height_ratios': [2, 1, 1]}, constrained_layout=True)
+            self.fig, self.ax = plt.subplots(4, 1, figsize= (12,12), constrained_layout=True)
+
+            self.ax[0].set_title('Neural (Unsmoothed, red trace = average over chans)')
+            self.ax[0].set_ylabel('Normalized Binned SBP')
+            self.ax[0].set_ylim([-3,3])
+
+            self.ax[1].set_title('Threshold Crossings(TCFR)')
+            self.ax[1].set_ylabel('TCFR')
+            self.ax[1].set_ylim([-5,5])
+
+            self.ax[2].set_title('Finger Position (blue = index, orange = MRL)')
+            self.ax[2].set_ylabel('Proportion of Flexion')
+            self.ax[2].set_ylim([-0.1,1.1])
+
+            self.ax[3].set_title('Finger Velocity')
+            self.ax[3].set_ylabel('Flexion per .01s')
+            self.ax[3].set_xlabel('Time (seconds)')
+            self.ax[3].set_ylim([-0.125, 0.125])
+
 
         # Init neural lines
+        cmap = cm.get_cmap('viridis', 96) # (Nina) standardized color of neural lines
         self.neural_data = []
         for i in range(96):
             line, = self.ax[0].plot(np.arange(100), np.zeros((100,1)), linewidth=0.4, color=[np.random.rand(), np.random.rand(), np.random.rand()])
             self.neural_data.append(line)
-        self.ax[0].set(ylim=(-3,3))
         self.average_line, = self.ax[0].plot([], [], color='red', linewidth=1.5)
         self.ax[0].set(xlabel='Time (seconds)', ylabel='Normalized Binned SBP', title='Neural (Unsmoothed, red trace = average over chans)')
 
+        # (Nina) Init TCFR plots
+        self.tcfr_data = []
+        for i in range(96):
+            line, = self.ax[1].plot(np.arange(100), np.zeros((100, 1)), linewidth=0.4, color=cmap(i))
+            self.tcfr_data.append(line)
+        self.tcfr_avg_line, = self.ax[1].plot(np.arange(100), np.zeros((100,1)), linewidth=0.4,color=cmap(i))
+        self.ax[1].set(xlabel='Time (seconds)', ylabel='TCFR', title='Threshold Crossings (TCFR)', ylim=(-5,5))
+        
         # Init Finger lines
         self.finger_positions = []
         self.finger_velocities = []
         clist = ['b','orange','g','r']
         for i in range(2):
-            line_pos, = self.ax[1].plot([], [], color=clist[i])
+            line_pos, = self.ax[2].plot([], [], color=clist[i])
             self.finger_positions.append(line_pos)
-            line_vel, = self.ax[2].plot([], [], color=clist[i+2])
+            line_vel, = self.ax[3].plot([], [], color=clist[i+2])
             self.finger_velocities.append(line_vel)
             
-        self.ax[1].set(xlabel='Time (s)', ylabel='Proportion of Flexion', title='Finger Position (blue = index, orange = MRL)')
-        self.ax[2].set(xlabel='Time (s)', ylabel='Proportion of Flexion \nper .01s', title='Finger Velocity')
+        self.ax[2].set(xlabel='Time (s)', ylabel='Proportion of Flexion', title='Finger Position (blue = index, orange = MRL)', ylim=(-0.1,1.1))
+        self.ax[3].set(xlabel='Time (s)', ylabel='Proportion of Flexion \nper .01s', title='Finger Velocity', ylim=(-.125,.125))
 
         # DEFINE WIDGETS
 
@@ -111,21 +141,33 @@ class neural_plot(widgets.VBox):
             padding='5px 5px 5px 5px'
             )
         
-        with self.figoutput:
-            display(self.fig)
+
         with self.text_output:
             print('Plot Initialized')
 
         self.children = [self.figoutput, controls]
 
         self.displayhandle = display(self)
-        # self.start(resume=resume)
 
-    def start(self, resume):
+    def start(self, resume, start_from_date = None):
         #TODO: add relative day?
 
         # start from first day or resume based on save file
-        if resume:
+        if resume and start_from_date:
+            if start_from_date:
+                #look for specific date
+                date_found = False
+                for i in range(len(self.filenames)):
+                    if self.filenames[i][0:10] == start_from_date:
+                        self.fileidx = i
+                        date_found = True
+                if date_found == False:
+                    with self.text_output:
+                        print('Date not found, resuming from save state/default')
+                else:
+                    with self.text_output:
+                        print('Date found, resuming')
+        elif resume:
             with open(config.savestatepath, 'rb') as f:
                 self.fileidx = pickle.load(f)
             with self.text_output:
@@ -140,9 +182,11 @@ class neural_plot(widgets.VBox):
         return
 
     def load_current_day(self):
-        print(self.datapath)
+        if self.debug:
+            print("DEBUG: Loading day from", os.path.join(self.datapath, self.filenames[self.fileidx]))
         with open(os.path.join(self.datapath, self.filenames[self.fileidx]), 'rb') as f:
-            self.data_CO, self.data_RD = pickle.load(f)
+            self.data_CO, self.data_RD = pickle.load(f) 
+
             
         if (self.data_CO is not None) and (self.data_RD is not None):
             self.both_TS_present = True
@@ -157,7 +201,12 @@ class neural_plot(widgets.VBox):
                 print(f'loaded {self.filenames[self.fileidx]}, {self.current_TS}')
 
         self.plot_start_index = 0
-        self.plot_day()
+
+        # if self.debug: # (Nina) Debug: check for NaN values in data
+            # nan_count = np.isnan(self.data_CO['sbp']).sum()
+            # print(f"DEBUG: Found {nan_count} NaN values in neural data.")
+        # else:
+            # print("DEBUG: data_CO is None, skipping NaN check.")
 
     
     def load_adj_day(self):
@@ -212,8 +261,8 @@ class neural_plot(widgets.VBox):
         
         time_slice = slice(self.plot_start_index, self.end_index)
         exp_time = self.Data['time'][time_slice] / 1000 # put in sec
-        if self.filenames[self.fileidx] == '2020-02-05_plotpreprocess.pkl':
-            print(len(self.Data['time']))
+        #if self.filenames[self.fileidx] == '2020-02-05_plotpreprocess.pkl':
+            #print(len(self.Data['time']))
         time_lims = (exp_time[0],exp_time[-1])
         
         # update neural data
@@ -222,34 +271,51 @@ class neural_plot(widgets.VBox):
         self.average_line.set_data(exp_time,np.mean(self.Data['sbp'],axis=1)[time_slice])
         self.ax[0].set(xlabel=None, ylabel='Normalized Binned SBP', title='Neural (Unsmoothed + Average (Red))', xlim=time_lims,ylim=(-5,5))
 
+        # (Nina) update TCFR data
+        for i, line in enumerate(self.tcfr_data):
+            line.set_data(exp_time, self.Data['tcfr'][time_slice, i])
+        self.tcfr_avg_line.set_data(exp_time, np.mean(self.Data['tcfr'],axis=1)[time_slice])
+        self.ax[1].set(xlabel=None, ylabel='TCFR', title='Threshold Crossings (TCFR)', xlim=time_lims, ylim=(-5,5))
+
         # update finger positions
         for i, line_pos in enumerate(self.finger_positions):
             line_pos.set_data(exp_time, self.Data['finger_kinematics'][time_slice,i])
-        self.ax[1].set(xlabel=None, ylabel='Flexion', title='Finger Positions', xlim=time_lims,ylim=(-0.1,1.1)) # changed ylim a bit
+        self.ax[2].set(xlabel=None, ylabel='Flexion', title='Finger Positions', xlim=time_lims,ylim=(-0.1,1.1)) # changed ylim a bit
 
         
         # update finger velocities
         for i, line_vel in enumerate(self.finger_velocities):
             line_vel.set_data(exp_time, self.Data['finger_kinematics'][time_slice,i+2])
-        self.ax[2].set(xlabel='Time (sec)', ylabel='Flexion/Bin', title='Finger Velocities', xlim=time_lims,ylim=(-.125,.125)) # changed ylim a bit
+        self.ax[3].set(xlabel='Time (sec)', ylabel='Flexion/Bin', title='Finger Velocities', xlim=time_lims,ylim=(-.125,.125)) # changed ylim a bit
 
         # update trial bars
         # find all trial starts within the time range
         for line in self.trial_lines:
             line.remove() # clears any vertical lines already present
         self.trial_lines.clear() 
+        for txt in self.trial_texts:
+            txt.remove()
+        self.trial_texts.clear()
 
         # find all trial starts within the time range
         trial_indexes_in_range = self.Data['trial_index'][np.logical_and(self.Data['trial_index'] > self.plot_start_index, self.Data['trial_index'] < self.end_index)]
         # Draw new trial start lines
-        for index in trial_indexes_in_range:
+        for count, index in enumerate(trial_indexes_in_range, start=1):
+            x_value = self.Data['time'][index] / 1000
             for a in self.ax:
-                line_sep = a.axvline(x=self.Data['time'][index]/1000, color='black', linewidth=2, alpha=0.3)
-                self.trial_lines.append(line_sep)  # Store the line reference
-
+                line_sep = a.axvline(x=x_value, color='black', linewidth=2, alpha=0.3)
+                self.trial_lines.append(line_sep)
+            txt = self.ax[0].text(x_value, self.ax[0].get_ylim()[1]*0.95, f'{count}',
+                                  color='black', fontsize=8, rotation=90, verticalalignment='top')
+            self.trial_texts.append(txt)
+        
+        # TO DO: add run 
+        #day_str = self.filenames[self.fileidx]
+        #run_str = self.Data.get('run_id')
+        
         with self.figoutput:
-            clear_output(wait=True)
-            display(self.fig)
+                clear_output(wait=True)
+                display(self.fig)
 
 
     def shift_plot(self, change):
