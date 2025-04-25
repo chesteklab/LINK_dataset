@@ -6,6 +6,7 @@ import numpy as np
 from datetime import datetime, timezone
 from pynwb import NWBFile, TimeSeries, NWBHDF5IO
 from pynwb.file import Subject
+from typing import Tuple, Optional
 
 
 def convert_pkl_to_nwb(data_dir):
@@ -321,13 +322,6 @@ def convert_pkl_to_nwb(data_dir):
             )
 
 
-import os
-from typing import Tuple, Optional
-
-import numpy as np
-from pynwb import NWBHDF5IO
-
-
 def dicts_from_nwb(pickle_path: str) -> Tuple[Optional[dict], Optional[dict]]:
     """
     Re-create the two data-dictionaries (CO first, RD second) that produced the
@@ -413,7 +407,7 @@ def dicts_from_nwb(pickle_path: str) -> Tuple[Optional[dict], Optional[dict]]:
 
 
 if __name__ == "__main__":
-    data_dir = "Z:/Student Folders/Hisham_Temmar/big_dataset/sfn_round_2"
-    # convert_pkl_to_nwb(data_dir)
-    dicts = dicts_from_nwb(f"{data_dir}/2021-10-15_preprocess.pkl")
-    print(dicts)
+    data_dir = "Z:/Student Folders/Hisham_Temmar/big_dataset/2_autotrimming_and_preprocessing/preprocessing_092024_no7822nofalcon"
+    convert_pkl_to_nwb(data_dir)
+    # dicts = dicts_from_nwb(f"{data_dir}/2021-10-15_preprocess.pkl")
+    # print(dicts)
