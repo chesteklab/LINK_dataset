@@ -9,13 +9,13 @@ import os
 import pandas as pd
 import pdb
 import matplotlib.cm as cm
-#import matplotlib.gridspec as gridspec 
 
 class neural_plot(widgets.VBox):
-
+    """
+    Interactive widget for visualizing preprocessed neural data.
+    """
     def __init__(self):
         super().__init__()
-        self.debug = True
         self.datapath = config.preprocessingpath
         self.filenames = [f for f in os.listdir(self.datapath) if not f.startswith('.')] #in case there are any hidden files
         self.filenames.remove('bad_days.txt')
@@ -32,7 +32,7 @@ class neural_plot(widgets.VBox):
         self.both_TS_present = False
         self.trial_num_printed = False # added this to stop the keep printing the number of trials
         self.trial_lines = [] # added this to keep track of the vertical lines to avoid duplication
-        self.trial_texts = [] # (Nina) to store trial number text annotations
+        self.trial_texts = [] # added this to keep track of the text annotations for each trial start
         
         self.timerange = 500
         self.figoutput = widgets.Output()
@@ -60,7 +60,7 @@ class neural_plot(widgets.VBox):
 
 
         # Init neural lines
-        cmap = cm.get_cmap('viridis', 96) # (Nina) standardized color of neural lines
+        cmap = cm.get_cmap('viridis', 96) 
         self.neural_data = []
         for i in range(96):
             line, = self.ax[0].plot(np.arange(100), np.zeros((100,1)), linewidth=0.4, color=[np.random.rand(), np.random.rand(), np.random.rand()])
@@ -68,7 +68,7 @@ class neural_plot(widgets.VBox):
         self.average_line, = self.ax[0].plot([], [], color='red', linewidth=1.5)
         self.ax[0].set(xlabel='Time (seconds)', ylabel='Normalized Binned SBP', title='Neural (Unsmoothed, red trace = average over chans)')
 
-        # (Nina) Init TCFR plots
+        # Init TCFR plots
         self.tcfr_data = []
         for i in range(96):
             line, = self.ax[1].plot(np.arange(100), np.zeros((100, 1)), linewidth=0.4, color=cmap(i))
@@ -130,6 +130,7 @@ class neural_plot(widgets.VBox):
         controls = widgets.VBox([hbox1, hbox2, hbox3, self.text_output])
         out_box = widgets.Box([self.figoutput])
 
+        # style the borders/padding
         self.figoutput.layout = widgets.Layout(
             border='solid 1px black',
             margin='0px 10px 10px 0px',
@@ -146,7 +147,6 @@ class neural_plot(widgets.VBox):
             print('Plot Initialized')
 
         self.children = [self.figoutput, controls]
-
         self.displayhandle = display(self)
 
     def start(self, resume, start_from_date = None):
@@ -177,13 +177,11 @@ class neural_plot(widgets.VBox):
                 print(f'Starting at {self.filenames[self.fileidx]}')
 
         self.load_current_day()
-        #update the plot
         self.plot_day()
         return
 
     def load_current_day(self):
-        if self.debug:
-            print("DEBUG: Loading day from", os.path.join(self.datapath, self.filenames[self.fileidx]))
+
         with open(os.path.join(self.datapath, self.filenames[self.fileidx]), 'rb') as f:
             self.data_CO, self.data_RD = pickle.load(f) 
 
@@ -201,13 +199,6 @@ class neural_plot(widgets.VBox):
                 print(f'loaded {self.filenames[self.fileidx]}, {self.current_TS}')
 
         self.plot_start_index = 0
-
-        # if self.debug: # (Nina) Debug: check for NaN values in data
-            # nan_count = np.isnan(self.data_CO['sbp']).sum()
-            # print(f"DEBUG: Found {nan_count} NaN values in neural data.")
-        # else:
-            # print("DEBUG: data_CO is None, skipping NaN check.")
-
     
     def load_adj_day(self):
         self.trial_num_printed = False
@@ -226,6 +217,7 @@ class neural_plot(widgets.VBox):
             return
 
         self.load_current_day()
+        self.plot_day()
 
     def next_day(self, b):
         self.prev = False
@@ -261,8 +253,6 @@ class neural_plot(widgets.VBox):
         
         time_slice = slice(self.plot_start_index, self.end_index)
         exp_time = self.Data['time'][time_slice] / 1000 # put in sec
-        #if self.filenames[self.fileidx] == '2020-02-05_plotpreprocess.pkl':
-            #print(len(self.Data['time']))
         time_lims = (exp_time[0],exp_time[-1])
         
         # update neural data
@@ -271,7 +261,7 @@ class neural_plot(widgets.VBox):
         self.average_line.set_data(exp_time,np.mean(self.Data['sbp'],axis=1)[time_slice])
         self.ax[0].set(xlabel=None, ylabel='Normalized Binned SBP', title='Neural (Unsmoothed + Average (Red))', xlim=time_lims,ylim=(-5,5))
 
-        # (Nina) update TCFR data
+        # update TCFR data
         for i, line in enumerate(self.tcfr_data):
             line.set_data(exp_time, self.Data['tcfr'][time_slice, i])
         self.tcfr_avg_line.set_data(exp_time, np.mean(self.Data['tcfr'],axis=1)[time_slice])
@@ -299,7 +289,7 @@ class neural_plot(widgets.VBox):
 
         # find all trial starts within the time range
         trial_indexes_in_range = self.Data['trial_index'][np.logical_and(self.Data['trial_index'] > self.plot_start_index, self.Data['trial_index'] < self.end_index)]
-        # Draw new trial start lines
+        # draw new trial start lines
         for count, index in enumerate(trial_indexes_in_range, start=1):
             x_value = self.Data['time'][index] / 1000
             for a in self.ax:
@@ -309,9 +299,18 @@ class neural_plot(widgets.VBox):
                                   color='black', fontsize=8, rotation=90, verticalalignment='top')
             self.trial_texts.append(txt)
         
-        # TO DO: add run 
-        #day_str = self.filenames[self.fileidx]
-        #run_str = self.Data.get('run_id')
+        # print day and run in title
+        day_str = self.filenames[self.fileidx][:10]
+        
+        run_ids = []
+        if self.data_CO is not None and 'run_id' in self.data_CO:
+            run_ids.append(str(self.data_CO['run_id']))
+        if self.data_RD is not None and 'run_id' in self.data_RD:
+            run_ids.append(str(self.data_RD['run_id']))
+
+        run_label = "Runs" if len(run_ids) > 1 else "Run"
+        run_str = ", ".join(run_ids) if run_ids else "unknown"
+        self.fig.suptitle(f"Date: {day_str}     {run_label}: {run_str}", fontsize=14)
         
         with self.figoutput:
                 clear_output(wait=True)
