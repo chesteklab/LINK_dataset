@@ -124,7 +124,7 @@ def prepare_tuning_data(results):
     trial_counts = []
 
     for date, pop_data in results.items():
-        print(date)
+        # print(date)
         dates.append(date)
         kinematics.append(pop_data['finger_kinematics'])
         threshold_crossings.append(pop_data['tcfr'])
@@ -224,12 +224,14 @@ def explained_var_over_time(df_tuning):
     plt.figure(figsize=(15, 10))
 
     # Define base colors for each year
-    year_colors = {
-        2020: '#FFD700',  # Gold/Yellow
-        2021: '#4169E1',  # Royal Blue
-        2022: '#32CD32',  # Lime Green
-        2023: '#FF4500'   # Orange Red
-    }
+    # year_colors = {
+    #     2020: '#FFD700',  # Gold/Yellow
+    #     2021: '#4169E1',  # Royal Blue
+    #     2022: '#32CD32',  # Lime Green
+    #     2023: '#FF4500'   # Orange Red
+    # }
+    year_colors = {2020: 'red', 2021: 'green', 2022: 'blue' , 2023: "orange"}
+
 
     # Process each quarter
     for quarter_label, group in quarter_groups:
@@ -259,6 +261,8 @@ def explained_var_over_time(df_tuning):
         # Calculate average
         avg_quarter_variance = quarter_variance / count
         
+        
+        print(quarter_color)
         # Plot the line for this quarter
         plt.plot(range(1, n_features + 1), avg_quarter_variance, 
                 label=quarter_label, color=quarter_color)
@@ -278,14 +282,33 @@ def explained_var_over_time(df_tuning):
     plt.show()
 
 # Create color variations for quarters within each year
-def get_quarter_color(quarter, base_color):
+def get_quarter_color(quarter, base_color, n_periods = 4):
     base_rgb = mcolors.to_rgb(base_color)
     # Darken the color progressively for each quarter
-    factor = 1 - (quarter - 1) * 0.15
+    scale = 1/(n_periods)
+    factor = 1 - (quarter - 1) * scale
     return tuple(min(1, c * factor) for c in base_rgb)
 
-
 ## population level analysis ##
+
+def movement_onset(trial_data, kinematics, std_multiplier):
+    # Use first 10% of trial kinematics as baseline
+    baseline_period = kinematics[:int(kinematics.shape[0] * 0.1)]
+    baseline_mean = np.mean(baseline_period)
+    baseline_std = np.std(baseline_period)
+
+    # Calculate threshold
+    threshold = baseline_mean + (baseline_std * std_multiplier)
+    min_threshold = baseline_mean - (baseline_std * std_multiplier)
+
+    # Find first index where SBP exceeds threshold
+    movement_onset_idx = next(
+        (i for i, value in enumerate(kinematics) if ((value > threshold) or (value < min_threshold))),
+        0
+    )
+    
+    return movement_onset_idx
+      
 def direction_map(all_directions=False): 
     ''' 
     First step is to define the reach directions and mapping from coords to directions that we are looking for
@@ -330,8 +353,7 @@ def direction_map(all_directions=False):
     
     return dir_list, position_map
 
-
-def trim_neural_data_at_movement_onset_std_and_smooth(data_dict, std_multiplier=2, sigma=5, display_alignment=False):
+def trim_neural_data_at_movement_onset_std_and_smooth(data_dict, std_multiplier=2, sigma=5, display_alignment=False, trim_pt = movement_onset):
     """
     Trims neural data using standard deviations above baseline mean, then smooths using Gaussian kernel
     
@@ -346,11 +368,11 @@ def trim_neural_data_at_movement_onset_std_and_smooth(data_dict, std_multiplier=
     """
     trimmed_data = {}
     kin_data = {}
-    
+
+    trim_pt = movement_onset
     for year in data_dict:
         trimmed_data[year] = {}
         kin_data[year] = {}
-        
         
         for target_pos in data_dict[year]:
 
@@ -358,61 +380,178 @@ def trim_neural_data_at_movement_onset_std_and_smooth(data_dict, std_multiplier=
                 fig, ax = plt.subplots(figsize=(8, 4))
 
             for trial_data, kinematics in data_dict[year][target_pos]:
-
                 
-                # Use first 10% of trial kinematics as baseline
-                baseline_period = kinematics[:int(kinematics.shape[0] * 0.1)]
-                baseline_mean = np.mean(baseline_period)
-                baseline_std = np.std(baseline_period)
+                ind = trim_pt(trial_data, kinematics, std_multiplier) 
+                  # Trim the data to start from movement onset and smooth it 
+                start = ind-(150 // 20) # want 150 ms pre movement and 20 ms bins 
+                end = ind + (600 // 20) # want 600 ms post movement and 20 ms bins 
+                # pre_movement_start = movement_onset_idx # want 150 ms pre movement and 20 ms bins 
+                # post_movement_end = len(kinematics)-1 # want 600 ms post movement and 20 ms bins 
 
-                # Calculate threshold
-                threshold = baseline_mean + (baseline_std * std_multiplier)
-                min_threshold = baseline_mean - (baseline_std * std_multiplier)
-
-                
-                # Find first index where SBP exceeds threshold
-                movement_onset_idx = next(
-                    (i for i, value in enumerate(kinematics) if ((value > threshold) or (value < min_threshold))),
-                    0
-                )
-                
-                # Trim the data to start from movement onset and smooth it 
-                pre_movement_start = movement_onset_idx-(150 // 20) # want 150 ms pre movement and 20 ms bins 
-                post_movement_end = movement_onset_idx + (600 // 20) # want 600 ms post movement and 20 ms bins 
-
-
-                if pre_movement_start < 0: # (drop trials where movement onset seems too close to start or too close to end)
+                if start < 0: # (drop trials where movement onset seems too close to start or too close to end)
                     continue
-                if post_movement_end > trial_data.shape[0]-1:
+                if end > trial_data.shape[0]-1:
                     continue
 
-                smoothed_trial = gaussian_filter1d(trial_data[pre_movement_start:post_movement_end, :], sigma=1)
-
-                if display_alignment:
-                    time = np.arange(len(kinematics[pre_movement_start:post_movement_end]))
-                    ax.plot(time, kinematics[pre_movement_start:post_movement_end])
+                trimmed_neural = gaussian_filter1d(trial_data[start:end, :], sigma=1)
+                trimmed_kin = kinematics[start:end]
                 
                 if target_pos not in trimmed_data[year]:
-                    trimmed_data[year][target_pos] = [smoothed_trial]
-                    kin_data[year][target_pos] =  [kinematics[pre_movement_start:post_movement_end]]
+                    trimmed_data[year][target_pos] = [trimmed_neural]
+                    kin_data[year][target_pos] =  [trimmed_kin]
                 else:
-                    trimmed_data[year][target_pos].append(smoothed_trial)
-                    kin_data[year][target_pos].append(kinematics[pre_movement_start:post_movement_end])
-    
+                    trimmed_data[year][target_pos].append(trimmed_neural)
+                    kin_data[year][target_pos].append(trimmed_kin)
+                  
+                if display_alignment:
+                    time = np.arange(len(trimmed_kin))
+                    ax.plot(time, trimmed_kin, alpha = .8)        
+
             if display_alignment:
                 ax.set_xlabel("Bins")
                 ax.set_ylabel("Value")
                 ax.set_title(f"Kinematics Over Time for Target {target_pos} (Year {year})")
                 ax.grid(True)
+                # plt.plot(np.array(traces).mean(axis = 0), color = 'black')
                 plt.show()
+
     
     return trimmed_data,  kin_data
 
-def calculate_pca_and_split(df_yearly, time_periods, position_map, type_of_data, jpca=False):
+def trim_neural_data_at_movement_onset_std_align_and_smooth(data_dict, std_multiplier=2, sigma=5, display_alignment=False, trim_pt = movement_onset):
+    """
+    Trims neural data using standard deviations above baseline mean, then smooths using Gaussian kernel
+    
+    Parameters:
+    - data_dict: Dictionary containing neural data organized by year, and target position
+    - std_multiplier: Number of standard deviations above baseline mean (default: 2)
+    - sigma: Standard deviation for Gaussian kernel (in units of samples)
+    - display_alignment: flag that specifies whether to visualize kinematic alignment
+    
+    Returns:
+    - Dictionary with trimmed and smoothed neural data maintaining the same structure
+    """
+    trimmed_data = {}
+    kin_data = {}
+
+    trim_pt = movement_onset
+    for year in data_dict:
+        trimmed_data[year] = {}
+        kin_data[year] = {}
+        
+        neurals = []
+        m_onsets = [[] for k in data_dict[year].keys()]
+        for i, target_pos in enumerate(data_dict[year]):
+
+            for j, (trial_data, kinematics) in enumerate(data_dict[year][target_pos]):
+                
+                ind = trim_pt(trial_data, kinematics, std_multiplier) 
+                  # Trim the data to start from movement onset and smooth it 
+                start = ind - 5 # want 150 ms pre movement and 20 ms bins 
+                end = ind  # want 600 ms post movement and 20 ms bins 
+                # start = movement_onset_idx # want 150 ms pre movement and 20 ms bins 
+                # post_movement_end = len(kinematics)-1 # want 600 ms post movement and 20 ms bins 
+
+                if (start < 0) or (end < 2) or (end > trial_data.shape[0]-1): # (drop trials where movement onset seems too close to start or too close to end)
+                    m_onsets[i].append(-1)
+                    continue
+                else:
+                    m_onsets[i].append(end)
+                    neurals.append(gaussian_filter1d(trial_data[start:end, :], sigma=1))
+                
+        center = get_closest_points(neurals, neural_dist, True)
+        for i, target_pos in enumerate(data_dict[year]):
+            if display_alignment:
+                fig, ax = plt.subplots(figsize=(8, 4))
+
+            for j, (trial_data, kinematics) in enumerate(data_dict[year][target_pos]):
+                if m_onsets[i][j] == -1:
+                    continue
+                else: 
+                    ind = m_onsets[i][j]
+                    smoothed_neural = gaussian_filter1d(trial_data, sigma=1)
+                    distances = np.array([neural_dist(center, p) for p in smoothed_neural[ind-5:ind, :]])
+                    start = np.argmin(distances) + ind-5
+                    # start = start +5
+                    # print(f"{ind}, {start}")
+                    end = start + (400 // 20)
+            
+                    if start < 0: # (drop trials where movement onset seems too close to start or too close to end)
+                        continue
+                    if end > trial_data.shape[0]-1:
+                        continue
+
+                    trimmed_neural = smoothed_neural[start:end, :]
+                    trimmed_kin = kinematics[start:end]
+                    
+                    if target_pos not in trimmed_data[year]:
+                        trimmed_data[year][target_pos] = [trimmed_neural]
+                        kin_data[year][target_pos] =  [trimmed_kin]
+                    else:
+                        trimmed_data[year][target_pos].append(trimmed_neural)
+                        kin_data[year][target_pos].append(trimmed_kin)
+                    
+                    if display_alignment:
+                        time = np.arange(len(trimmed_kin))
+                        ax.plot(time, trimmed_kin, alpha = .8)        
+
+            if display_alignment:
+                ax.set_xlabel("Bins")
+                ax.set_ylabel("Value")
+                ax.set_title(f"Kinematics Over Time for Target {target_pos} (Year {year})")
+                ax.grid(True)
+                # plt.plot(np.array(traces).mean(axis = 0), color = 'black')
+                plt.show()
+
+             
+        
+    
+    return trimmed_data,  kin_data
+
+def get_closest_points(arrays, distance, center_pt = False):
+    best_total_distance = np.inf
+    best_path = None
+    best_closest_points = None
+
+    start_array = arrays[0]
+    other_arrays = arrays[1:]
+
+    for start_idx, start_point in enumerate(start_array):
+        path = [start_idx]  # Start with the index in array 0
+        total_distance = 0
+        current_point = start_point
+        closest_points = [start_point]  # Start with the initial point's coordinates
+
+        for arr in other_arrays:
+            if len(arr) < 3:
+                path.append(-1)
+            else:
+                distances = np.array([distance(current_point, p) for p in arr])
+                closest_idx = np.argmin(distances)
+                total_distance += distances[closest_idx]
+                path.append(closest_idx)
+                current_point = arr[closest_idx]
+                closest_points.append(current_point)
+
+        if total_distance < best_total_distance:
+            best_total_distance = total_distance
+            best_path = path
+            best_closest_points = closest_points
+            
+    # Compute the center of all closest points
+    if center_pt:
+        return np.mean(best_closest_points, axis=0)
+    else:
+        return best_path
+          
+def neural_dist(a, b):
+    return abs(np.linalg.norm(a - b))
+
+def calculate_pca_and_split(df_time, time_periods, position_map, type_of_data, jpca=False, kinematic_type = 'vel'):
     '''
     Calculates PCA on all data and splits the trials up using that data
 
-        Params: df_yearly: dataframe that contains all the relevant data
+        Params: df_time: dataframe that contains all the relevant data
                 time_periods: list containing years we want to look at
                 position_map: hash_map that maps target direction coordinates to the compass direction, so that its possible to group by target direction
                 type_of_data: str that specifies SBPs vs TCFR
@@ -422,17 +561,11 @@ def calculate_pca_and_split(df_yearly, time_periods, position_map, type_of_data,
                  pca_results: hash_map containing pca results, indexed by each year
     '''
 
-
+    print(time_periods)
     # Now we will begin to Calculate neural trajectories with PCA 
-    neural_data_for_direction = {
-        2020: {},
-        2021: {},
-        2022: {},
-        2023: {}
-    }
-    #neural_data_for_direction = {period: {} for period in time_periods}
+    neural_data_for_direction = {str(key): {} for key in time_periods}
 
-    
+    #neural_data_for_direction = {period: {} for period in time_periods}
 
     # initialize PCA storage for ALL data
     n_components = 3
@@ -443,7 +576,7 @@ def calculate_pca_and_split(df_yearly, time_periods, position_map, type_of_data,
     #Collect all sbps data across years and trials (that are CO)
     all_sbps = []
     for year in time_periods:
-        year_group = df_yearly.get_group(year)
+        year_group = df_time.get_group(year)
         for _, yearly_data in year_group.iterrows():
             if yearly_data["target_styles"] == "CO":
                 all_sbps.append(yearly_data[type_of_data])
@@ -480,20 +613,31 @@ def calculate_pca_and_split(df_yearly, time_periods, position_map, type_of_data,
         # jpca_var_capt) = jpca.fit(jpca_trials, times=list(times), tstart=-150, tend=600)
         # plot_projections(direction_pca_results)
         pass
+    
+    
+    if kinematic_type =="vel":
+        index_ind = 2
+        MRP_ind = 3
+    elif kinematic_type == "pos":
+        index_ind = 0
+        MRP_ind = 1
+    else: 
+        raise ValueError("kinematic_type must be either 'vel' or 'pos")
+
 
     # extract data
     for year in time_periods:
         # for channel_num in top_channel_indices:
-        neural_data_for_direction[year] = {}
+        neural_data_for_direction[str(year)] = {}
 
-        for  _, yearly_data in df_yearly.get_group(year).iterrows(): #[year].iterrows(): 
+        for  _, yearly_data in df_time.get_group(year).iterrows(): #[year].iterrows(): 
             
 
             # pca = PCA(n_components=n_components) # if you want to apply PCA transforms to each day
             # day_pca_results = pca.fit_transform(gaussian_filter1d(np.sqrt(yearly_data[type_of_data]), sigma=2))
 
             day_pca_results = global_pca.transform(yearly_data[type_of_data])
-            pca_results[year].append(day_pca_results.copy())
+            pca_results[str(year)].append(day_pca_results.copy())
 
             if yearly_data["target_styles"] != "CO": # only include it if its CO data
                 continue
@@ -512,16 +656,15 @@ def calculate_pca_and_split(df_yearly, time_periods, position_map, type_of_data,
 
                     # if (target_pos != "N"):
                     #     continue
-
                     if (target_pos == "N") or (target_pos == "S"):
-                        trial_kinematics = yearly_data['finger_kinematics'][:, 3][trial_index_start:trial_index_start+trial_length] # finger kinematics is [index_position, MRP_position, index_velocity, MRP_velocity]. We are indexing the MRP velocity here (N,S)
+                        trial_kinematics = yearly_data['finger_kinematics'][:, MRP_ind][trial_index_start:trial_index_start+trial_length] # finger kinematics is [index_position, MRP_position, index_velocity, MRP_velocity]. We are indexing the MRP velocity here (N,S)
                     else:
-                        trial_kinematics = yearly_data['finger_kinematics'][:, 2][trial_index_start:trial_index_start+trial_length] # finger kinematics is [index_position, MRP_position, index_velocity, MRP_velocity]. We are indexing the Index velocity here (E,W, or default to index in all other directions)
-
-                    if target_pos not in neural_data_for_direction[year]:
-                        neural_data_for_direction[year][target_pos] = [(channel_pca_sbps, trial_kinematics)]
+                        trial_kinematics = yearly_data['finger_kinematics'][:, index_ind][trial_index_start:trial_index_start+trial_length] # finger kinematics is [index_position, MRP_position, index_velocity, MRP_velocity]. We are indexing the Index velocity here (E,W, or default to index in all other directions)
+                        
+                    if target_pos not in neural_data_for_direction[str(year)]:
+                        neural_data_for_direction[str(year)][target_pos] = [(channel_pca_sbps, trial_kinematics)]
                     else:
-                        neural_data_for_direction[year][target_pos].append((channel_pca_sbps, trial_kinematics))
+                        neural_data_for_direction[str(year)][target_pos].append((channel_pca_sbps, trial_kinematics))
 
 
     
@@ -560,14 +703,13 @@ def average_trial_PCA_data(dir_list, kinematics ,processed_neural_data_for_direc
 
     return averaged_pca_results, averaged_kinematic_results
 
-def visualize_trajectories(averaged_pca_results, time_periods, ALL_DIRS_ACROSS_YEARS=True, ALL_DIRS_ALL_YEARS_ONE_PLOT=True, ALL_DIRS_GROUPED_BY_YEAR=True):
+def visualize_trajectories(averaged_pca_results, time_periods, color_dict, label, ALL_DIRS_ACROSS_YEARS=True, ALL_DIRS_ALL_YEARS_ONE_PLOT=True, ALL_DIRS_GROUPED_BY_YEAR=True):
 
     if ALL_DIRS_ACROSS_YEARS:
-        colors = {2020: 'red', 2021: 'green', 2022: 'blue' , 2023: "orange"}
         fig = plt.figure(figsize=(10,25))
         fig.suptitle("Neural Trajectories by Reach Direction and Year (PCA)", fontsize=16)
 
-        for row, direction in enumerate(sorted(averaged_pca_results[2020].keys())): # iterate through directions (2020 just used to get dirs)
+        for row, direction in enumerate(sorted(averaged_pca_results[str(time_periods[0])].keys())): # iterate through directions (2020 just used to get dirs)
 
             ax = fig.add_subplot(8,1, row+1, projection='3d') # have to expand this if want to break it down by magnitude
             #ax = fig.add_subplot(1,1, row+1, projection='3d')
@@ -575,13 +717,13 @@ def visualize_trajectories(averaged_pca_results, time_periods, ALL_DIRS_ACROSS_Y
             ax.grid(True)
             
             for year in time_periods:
-                if averaged_pca_results[year][direction] is not None:
-                    trajectory = averaged_pca_results[year][direction]          
+                if averaged_pca_results[str(year)][direction] is not None:
+                    trajectory = averaged_pca_results[str(year)][direction]          
 
-                    ax.plot(trajectory[:,0], trajectory[:,1], trajectory[:,2],color=colors[year], label=f'Year {year}')
+                    ax.plot(trajectory[:,0], trajectory[:,1], trajectory[:,2], color=color_dict[str(year)], label=f'Year {year}')
 
                     # Plot starting point as a dot
-                    ax.scatter(trajectory[0, 0], trajectory[0, 1], trajectory[0, 2], color=colors[year], s=30, marker='o', edgecolor='black')
+                    ax.scatter(trajectory[0, 0], trajectory[0, 1], trajectory[0, 2], color=color_dict[str(year)], s=30, marker='o', edgecolor='black')
 
                     ax.set_xlabel("PC1")
                     ax.set_ylabel("PC2")
@@ -591,7 +733,7 @@ def visualize_trajectories(averaged_pca_results, time_periods, ALL_DIRS_ACROSS_Y
 
 
         # global legend
-        handles = [plt.Line2D([0], [0], color=colors[year], lw=3, label=f'Year {year}') for year in colors]
+        handles = [plt.Line2D([0], [0], color=color_dict[year], lw=3, label=f'{label} {year}') for year in color_dict]
         fig.legend(handles=handles, loc='upper right', fontsize=14, bbox_to_anchor=(1.05, 0.98))
 
         # Adjust layout
@@ -603,12 +745,7 @@ def visualize_trajectories(averaged_pca_results, time_periods, ALL_DIRS_ACROSS_Y
         
     if ALL_DIRS_ALL_YEARS_ONE_PLOT:
         # Color scheme by year (2020-2023)
-        year_colors = {
-            2020: '#FF0000',  # Red
-            2021: '#0000FF',  # Blue
-            2022: '#00FF00',  # Green
-            2023: '#800080'   # Purple
-        }
+
 
         fig = plt.figure(figsize=(10, 8))
         ax = fig.add_subplot(111, projection='3d')
@@ -619,19 +756,20 @@ def visualize_trajectories(averaged_pca_results, time_periods, ALL_DIRS_ACROSS_Y
         # Store legend handles manually
         legend_handles = []
 
-        for year_idx, year in enumerate([2020, 2021, 2022, 2023]):
+        for year_idx, year in enumerate(time_periods):
             # Get color for this year
-            color = year_colors[year]
+            color = color_dict[str(year)]
             
             # Add to legend once per year
             legend_handles.append(plt.Line2D([0], [0], 
                                 linestyle='-', 
                                 color=color,
-                                label=f'Year {year}'))
+                                label=f'{label} {year}'))
             
             # Plot all directions for this year
-            for direction in sorted(averaged_pca_results[year].keys()):
-                trajectory = averaged_pca_results[year][direction]
+            trajs = []
+            for direction in sorted(averaged_pca_results[str(year)].keys()):
+                trajectory = averaged_pca_results[str(year)][direction]
                 if trajectory is not None:
                     # Plot trajectory line
                     line = ax.plot(trajectory[:,0], 
@@ -641,7 +779,6 @@ def visualize_trajectories(averaged_pca_results, time_periods, ALL_DIRS_ACROSS_Y
                                 alpha=0.6,
                                 linewidth=1.5)[0]
                     
-                    # Plot starting point
                     ax.scatter(trajectory[0,0], 
                             trajectory[0,1], 
                             trajectory[0,2],
@@ -649,6 +786,24 @@ def visualize_trajectories(averaged_pca_results, time_periods, ALL_DIRS_ACROSS_Y
                             s=40,
                             marker='o',
                             edgecolor='black')
+                    
+                    trajs.append(trajectory)
+                    
+            # s_trajs = [arr[:arr.shape[0] // 5, :] for arr in trajs]
+
+            # pts = get_closest_points(s_trajs, neural_dist)
+            # for i, direction in enumerate(sorted(averaged_pca_results[str(year)].keys())):
+            #     trajectory = averaged_pca_results[str(year)][direction]
+            #     if trajectory is not None:
+                    
+            #         pt = pts[i]
+            #         ax.scatter(trajectory[pt,0], 
+            #                 trajectory[pt,1], 
+            #                 trajectory[pt,2],
+            #                 color='black',
+            #                 s=40,
+            #                 marker='x',
+            #                 edgecolor='black')
 
         # Axis labels and legend
         ax.set_xlabel("PC1", labelpad=10)
@@ -666,8 +821,10 @@ def visualize_trajectories(averaged_pca_results, time_periods, ALL_DIRS_ACROSS_Y
         plt.show()
 
 
-
     if ALL_DIRS_GROUPED_BY_YEAR:
+        if label != 'Year':
+            print("Can only make ALL_DIRS_GROUPED_BY_YEAR plot if 'group_by' is 'years'")
+            return
         colors = {
             0: 'red', 1: 'blue', 2: 'green', 3: 'purple', 
             4: 'orange', 5: 'brown', 6: 'pink', 7: 'gray'
@@ -676,14 +833,14 @@ def visualize_trajectories(averaged_pca_results, time_periods, ALL_DIRS_ACROSS_Y
         fig = plt.figure(figsize=(18, 6))
         fig.suptitle("Neural Trajectories by Reach Direction and Year (PCA)", fontsize=16)
 
-        for i, year in enumerate([2020, 2021, 2022, 2023]):  # One plot per year
+        for i, year in enumerate(time_periods):  # One plot per year
             ax = fig.add_subplot(1, 4, i+1, projection='3d')
             ax.set_box_aspect([1,1,1])  # Make the plot cubic
             ax.grid(True)
 
-            for j, direction in enumerate(sorted(averaged_pca_results[year].keys())):
-                if averaged_pca_results[year][direction] is not None:
-                    trajectory = averaged_pca_results[year][direction]
+            for j, direction in enumerate(sorted(averaged_pca_results[str(year)].keys())):
+                if averaged_pca_results[str(year)][direction] is not None:
+                    trajectory = averaged_pca_results[str(year)][direction]
 
                     ax.plot(trajectory[:,0], trajectory[:,1], trajectory[:,2], color=colors[j], label=f'Dir {direction}')
 
@@ -701,8 +858,6 @@ def visualize_trajectories(averaged_pca_results, time_periods, ALL_DIRS_ACROSS_Y
         plt.tight_layout(rect=[0, 0.03, 1, 0.95])
         plt.show()
 
-
-
 def compute_velocity(pca_trajectories):
     """
     Compute velocity as the discrete time derivative of PCA trajectories.
@@ -714,7 +869,6 @@ def compute_velocity(pca_trajectories):
         return 0
 
     return np.gradient(pca_trajectories, axis=0)  # Axis=0 corresponds to time
-
 
 def compute_entanglement(pca_velocity, movement_velocity):
     """
@@ -730,9 +884,6 @@ def compute_entanglement(pca_velocity, movement_velocity):
 
     entanglement_index = unexplained_variance / total_variance  # Ratio of unexplained variance
     return entanglement_index
-
-
-
 
 def cross_corr_viz(pca_data):
 
@@ -782,7 +933,6 @@ def cross_corr_viz(pca_data):
     print("Mean r (2020-2022) after:", np.mean(r_vals_after_XZ))
     print("Improvement:", np.mean(r_vals_after_XZ) - np.mean(r_vals_before_XZ))
 
-
 def visualize_monthly_trajectories(averaged_pca_results, time_periods):
 
     base_cmaps = {
@@ -830,47 +980,96 @@ def visualize_monthly_trajectories(averaged_pca_results, time_periods):
 
         break  # Done after "N"
 
-
-
-def pca_of_reach_directions(df_tuning, type_of_data, smoothing=False):
+def pca_of_reach_directions(df_tuning, type_of_data, group_by = "year", smoothing=False, display_alignment = False, kinematic_type = 'vel', trim_method = trim_neural_data_at_movement_onset_std_and_smooth, trim_pt = movement_onset, years_to_skip = [2023, 2024]):
 
     # define directions
     dir_list, position_map = direction_map(all_directions=False)
+    year_color_dict = {'2020': 'red', '2021': 'green', '2022': 'blue' , '2023': "orange" }
+
+
+    ## Remove 2024 and 2023 from data
+    for year in years_to_skip:
+        df_tuning = df_tuning[~df_tuning.index.astype(str).str.startswith(str(year))]
 
     # choose years we want to look at
-    time_periods = [2020, 2021, 2022]#, 2023]
+    # time_periods = [2020, 2021, 2022]#, 2023]
 
 
+    if group_by == "year":
+        df_time = df_tuning.groupby(df_tuning.index.year) 
+        color_dict = year_color_dict
+        time_periods = [g for g in list(df_time.groups.keys())]
+        label = 'Year'
+        ## Remove 2024
+        # time_periods = time_periods[:-1]
+    elif group_by == "month":
+        df_time = df_tuning.groupby(df_tuning.index.to_period("M"))
+        # print(list(df_monthly.groups.keys()))
+        # raise NotImplementedError
+     
+        time_periods = [g for g in list(df_time.groups.keys())]
+        color_dict = {}
 
-    df_yearly = df_tuning.groupby(df_tuning.index.year) 
-    # df_monthly = df_tuning.groupby(df_tuning.index.to_period("M"))
+        for time_period in time_periods: 
+            year = str(time_period)[:4]
+            period = str(time_period)[-2:]
+            # if year != '2024':
+            period_color = get_quarter_color(int(period), year_color_dict[year], n_periods = 12)
+            color_dict[str(time_period)] = period_color
+        label = "Month"
+    elif group_by == "quarter":
+        
+        dates = df_tuning.index
+
+        # Create quarter labels
+        dates = pd.to_datetime(dates)
+        quarters = pd.PeriodIndex(dates, freq='Q').quarter
+        years = pd.PeriodIndex(dates, freq='Q').year
+        quarter_label = [f'Q{q} {y}' for q, y in zip(quarters, years)]
+
+        df_tuning = df_tuning.copy()  # (optional, good habit)
+        df_tuning['quarter_label'] = quarter_label
+
+        # Now group by quarter_label
+        df_time = df_tuning.groupby('quarter_label') 
+        time_periods = [g for g in list(df_time.groups.keys())]
+        
+        color_dict = {}
+
+        for time_period in time_periods: 
+            year = str(time_period)[-4:]
+            period = str(time_period)[1]
+            period_color = get_quarter_color(int(period), year_color_dict[year])
+            color_dict[str(time_period)] = period_color
+        
+        label = "Quarter"
+    else:
+        raise ValueError("group_by must be either 'year', 'quarter', or 'month'")
+  
     # print(list(df_monthly.groups.keys()))
     # df_monthly = dict(islice(df_monthly, 33))
-
-
 
     # #time_periods = df_monthly.groups.keys()
     # time_periods = list(df_monthly.keys())
 
-
-
     # calculates PCA on all data and split up the trials using that data
-    neural_data_for_direction, pca_results = calculate_pca_and_split(df_yearly=df_yearly, time_periods=time_periods, position_map=position_map, type_of_data=type_of_data, jpca=False)
+    neural_data_for_direction, pca_results = calculate_pca_and_split(df_time=df_time, time_periods=time_periods, position_map=position_map, type_of_data=type_of_data, jpca=False, kinematic_type=kinematic_type)
 
     print("Calculated PCA")
 
     # Trim and Smooth data (note that data is binned in 20 ms increments, so for example 40 ms smoothing is sigma=2)
     chosen_sigma = 1 if not smoothing else 2
-    processed_neural_data_for_direction, kinematics_data = trim_neural_data_at_movement_onset_std_and_smooth(neural_data_for_direction, std_multiplier=2, sigma=chosen_sigma, display_alignment=False)
+    processed_neural_data_for_direction, kinematics_data = trim_method(neural_data_for_direction, std_multiplier=2, sigma=chosen_sigma, display_alignment=display_alignment, trim_pt = trim_pt)
 
+    # plot_kin(kinematics_data)
     print("Trimmed Data")
 
 
     # average the PCA data across trials
+    # averaged_pca_results = processed_neural_data_for_direction
     averaged_pca_results, averaged_kin_results = average_trial_PCA_data(dir_list=dir_list, kinematics=kinematics_data, processed_neural_data_for_direction=processed_neural_data_for_direction)
 
     print("Averaged PCA")
-
 
     # velocity_pca_results = {
     # year: {direction: compute_velocity(averaged_pca_results[year][direction]) 
@@ -885,13 +1084,336 @@ def pca_of_reach_directions(df_tuning, type_of_data, smoothing=False):
     # }
 
     # visualize PCA trajectories
-    visualize_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods, ALL_DIRS_ACROSS_YEARS=True, ALL_DIRS_ALL_YEARS_ONE_PLOT=False, ALL_DIRS_GROUPED_BY_YEAR=False)
-    visualize_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods, ALL_DIRS_ACROSS_YEARS=False, ALL_DIRS_ALL_YEARS_ONE_PLOT=True, ALL_DIRS_GROUPED_BY_YEAR=False)
-    visualize_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods, ALL_DIRS_ACROSS_YEARS=False, ALL_DIRS_ALL_YEARS_ONE_PLOT=False, ALL_DIRS_GROUPED_BY_YEAR=True)
-    #visualize_monthly_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods)
+    visualize_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods, color_dict=color_dict, label = label, ALL_DIRS_ACROSS_YEARS=True, ALL_DIRS_ALL_YEARS_ONE_PLOT=False, ALL_DIRS_GROUPED_BY_YEAR=False)
+    visualize_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods, color_dict=color_dict, label = label, ALL_DIRS_ACROSS_YEARS=False, ALL_DIRS_ALL_YEARS_ONE_PLOT=True, ALL_DIRS_GROUPED_BY_YEAR=False)
+    visualize_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods, color_dict=color_dict, label = label, ALL_DIRS_ACROSS_YEARS=False, ALL_DIRS_ALL_YEARS_ONE_PLOT=False, ALL_DIRS_GROUPED_BY_YEAR=True)
+    # visualize_monthly_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods)
 
 
     
     #cross_corr_viz(averaged_pca_results)
+
+# ### TEMP ### 
+# def visualize_trajectories(averaged_pca_results, time_periods, ALL_DIRS_ACROSS_YEARS=True, ALL_DIRS_ALL_YEARS_ONE_PLOT=True, ALL_DIRS_GROUPED_BY_YEAR=True):
+
+#     if ALL_DIRS_ACROSS_YEARS:
+#         colors = {2020: 'red', 2021: 'green', 2022: 'blue' , 2023: "orange"}
+#         fig = plt.figure(figsize=(10,25))
+#         fig.suptitle("Neural Trajectories by Reach Direction and Year (PCA)", fontsize=16)
+
+#         for row, direction in enumerate(sorted(averaged_pca_results[2020].keys())): # iterate through directions (2020 just used to get dirs)
+
+#             ax = fig.add_subplot(8,1, row+1, projection='3d') # have to expand this if want to break it down by magnitude
+#             #ax = fig.add_subplot(1,1, row+1, projection='3d')
+#             ax.set_box_aspect([1,1,1])  # Make the plot cubic
+#             ax.grid(True)
+            
+#             for year in time_periods:
+#                 if averaged_pca_results[year][direction] is not None:
+#                     trajectory = averaged_pca_results[year][direction]          
+
+#                     ax.plot(trajectory[:,0], trajectory[:,1], trajectory[:,2],color=colors[year], label=f'Year {year}')
+
+#                     # Plot starting point as a dot
+#                     ax.scatter(trajectory[0, 0], trajectory[0, 1], trajectory[0, 2], color=colors[year], s=30, marker='o', edgecolor='black')
+
+#                     ax.set_xlabel("PC1")
+#                     ax.set_ylabel("PC2")
+#                     ax.set_zlabel("PC3")
+#                     ax.set_title(f'Direction {direction}')
+#                     #ax.legend()
+
+
+#         # global legend
+#         handles = [plt.Line2D([0], [0], color=colors[year], lw=3, label=f'Year {year}') for year in colors]
+#         fig.legend(handles=handles, loc='upper right', fontsize=14, bbox_to_anchor=(1.05, 0.98))
+
+#         # Adjust layout
+#         plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+#         fig.tight_layout(pad=3.5)
+
+#         plt.show()
+
+        
+#     if ALL_DIRS_ALL_YEARS_ONE_PLOT:
+#         # Color scheme by year (2020-2023)
+#         year_colors = {
+#             2020: '#FF0000',  # Red
+#             2021: '#0000FF',  # Blue
+#             2022: '#00FF00',  # Green
+#             2023: '#800080'   # Purple
+#         }
+
+#         fig = plt.figure(figsize=(10, 8))
+#         ax = fig.add_subplot(111, projection='3d')
+#         ax.set_box_aspect([1,1,1])
+#         ax.grid(True)
+#         ax.set_title("Combined Neural Trajectories by Year (PCA)", pad=20)
+
+#         # Store legend handles manually
+#         legend_handles = []
+
+#         for year_idx, year in enumerate([2020, 2021, 2022, 2023]):
+#             # Get color for this year
+#             color = year_colors[year]
+            
+#             # Add to legend once per year
+#             legend_handles.append(plt.Line2D([0], [0], 
+#                                 linestyle='-', 
+#                                 color=color,
+#                                 label=f'Year {year}'))
+            
+#             # Plot all directions for this year
+#             for direction in sorted(averaged_pca_results[year].keys()):
+#                 trajectory = averaged_pca_results[year][direction]
+#                 if trajectory is not None:
+#                     # Plot trajectory line
+#                     line = ax.plot(trajectory[:,0], 
+#                                 trajectory[:,1], 
+#                                 trajectory[:,2],
+#                                 color=color,
+#                                 alpha=0.6,
+#                                 linewidth=1.5)[0]
+                    
+#                     # Plot starting point
+#                     ax.scatter(trajectory[0,0], 
+#                             trajectory[0,1], 
+#                             trajectory[0,2],
+#                             color=color,
+#                             s=40,
+#                             marker='o',
+#                             edgecolor='black')
+
+#         # Axis labels and legend
+#         ax.set_xlabel("PC1", labelpad=10)
+#         ax.set_ylabel("PC2", labelpad=10)
+#         ax.set_zlabel("PC3", labelpad=10)
+#         ax.legend(handles=legend_handles, 
+#                 loc='upper left',
+#                 bbox_to_anchor=(0.05, 0.95),
+#                 frameon=True)
+
+#         # Better viewing angle
+#         ax.view_init(elev=20, azim=-45)
+
+#         plt.tight_layout()
+#         plt.show()
+
+
+
+#     if ALL_DIRS_GROUPED_BY_YEAR:
+#         colors = {
+#             0: 'red', 1: 'blue', 2: 'green', 3: 'purple', 
+#             4: 'orange', 5: 'brown', 6: 'pink', 7: 'gray'
+#         }  # Different colors for each direction
+
+#         fig = plt.figure(figsize=(18, 6))
+#         fig.suptitle("Neural Trajectories by Reach Direction and Year (PCA)", fontsize=16)
+
+#         for i, year in enumerate([2020, 2021, 2022, 2023]):  # One plot per year
+#             ax = fig.add_subplot(1, 4, i+1, projection='3d')
+#             ax.set_box_aspect([1,1,1])  # Make the plot cubic
+#             ax.grid(True)
+
+#             for j, direction in enumerate(sorted(averaged_pca_results[year].keys())):
+#                 if averaged_pca_results[year][direction] is not None:
+#                     trajectory = averaged_pca_results[year][direction]
+
+#                     ax.plot(trajectory[:,0], trajectory[:,1], trajectory[:,2], color=colors[j], label=f'Dir {direction}')
+
+#                     # Plot starting point as a dot
+#                     ax.scatter(trajectory[0, 0], trajectory[0, 1], trajectory[0, 2], 
+#                             color=colors[j], s=30, marker='o', edgecolor='black')
+
+#             ax.set_xlabel("PC1")
+#             ax.set_ylabel("PC2")
+#             ax.set_zlabel("PC3")
+#             ax.set_title(f'Year {year}')
+#             ax.legend()
+
+#         # Adjust layout
+#         plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+#         plt.show()
+
+# def pca_of_reach_directions(df_tuning, type_of_data, smoothing=False):
+
+#     # define directions
+#     dir_list, position_map = direction_map(all_directions=False)
+
+#     # choose years we want to look at
+#     time_periods = [2020, 2021, 2022]#, 2023]
+
+
+
+#     df_yearly = df_tuning.groupby(df_tuning.index.year) 
+#     # df_monthly = df_tuning.groupby(df_tuning.index.to_period("M"))
+#     # print(list(df_monthly.groups.keys()))
+#     # df_monthly = dict(islice(df_monthly, 33))
+
+
+
+#     # #time_periods = df_monthly.groups.keys()
+#     # time_periods = list(df_monthly.keys())
+
+
+
+#     # calculates PCA on all data and split up the trials using that data
+#     neural_data_for_direction, pca_results = calculate_pca_and_split(df_yearly=df_yearly, time_periods=time_periods, position_map=position_map, type_of_data=type_of_data, jpca=False)
+
+#     print("Calculated PCA")
+
+#     # Trim and Smooth data (note that data is binned in 20 ms increments, so for example 40 ms smoothing is sigma=2)
+#     chosen_sigma = 1 if not smoothing else 2
+#     processed_neural_data_for_direction, kinematics_data = trim_neural_data_at_movement_onset_std_and_smooth(neural_data_for_direction, std_multiplier=2, sigma=chosen_sigma, display_alignment=False)
+
+#     print("Trimmed Data")
+
+
+#     # average the PCA data across trials
+#     averaged_pca_results, averaged_kin_results = average_trial_PCA_data(dir_list=dir_list, kinematics=kinematics_data, processed_neural_data_for_direction=processed_neural_data_for_direction)
+
+#     print("Averaged PCA")
+
+
+#     # velocity_pca_results = {
+#     # year: {direction: compute_velocity(averaged_pca_results[year][direction]) 
+#     #        for direction in averaged_pca_results[year]}
+#     # for year in averaged_pca_results
+#     # }
+
+#     # entanglement_results = {
+#     # year: {direction: compute_entanglement(velocity_pca_results[year][direction], averaged_kin_results[year][direction])
+#     #        for direction in velocity_pca_results[year]}
+#     # for year in velocity_pca_results
+#     # }
+
+#     # visualize PCA trajectories
+#     visualize_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods, ALL_DIRS_ACROSS_YEARS=True, ALL_DIRS_ALL_YEARS_ONE_PLOT=False, ALL_DIRS_GROUPED_BY_YEAR=False)
+#     visualize_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods, ALL_DIRS_ACROSS_YEARS=False, ALL_DIRS_ALL_YEARS_ONE_PLOT=True, ALL_DIRS_GROUPED_BY_YEAR=False)
+#     visualize_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods, ALL_DIRS_ACROSS_YEARS=False, ALL_DIRS_ALL_YEARS_ONE_PLOT=False, ALL_DIRS_GROUPED_BY_YEAR=True)
+#     #visualize_monthly_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods)
+
+
+    
+#     #cross_corr_viz(averaged_pca_results)
+
+# def calculate_pca_and_split(df_yearly, time_periods, position_map, type_of_data, jpca=False):
+#     '''
+#     Calculates PCA on all data and splits the trials up using that data
+
+#         Params: df_yearly: dataframe that contains all the relevant data
+#                 time_periods: list containing years we want to look at
+#                 position_map: hash_map that maps target direction coordinates to the compass direction, so that its possible to group by target direction
+#                 type_of_data: str that specifies SBPs vs TCFR
+#                 jpca: flag indicating whether to do JPCA or PCA (not done yet)
+        
+#         Returns: neural_data_for_direction: hashmap containing grouped neural PCA data; indexed by year, and target_pos
+#                  pca_results: hash_map containing pca results, indexed by each year
+#     '''
+
+
+#     # Now we will begin to Calculate neural trajectories with PCA 
+#     neural_data_for_direction = {
+#         2020: {},
+#         2021: {},
+#         2022: {},
+#         2023: {}
+#     }
+#     #neural_data_for_direction = {period: {} for period in time_periods}
+
+    
+
+#     # initialize PCA storage for ALL data
+#     n_components = 3
+#     pca_results = {year: [] for year in neural_data_for_direction.keys()}
+#     #pca_results = {period: [] for period in time_periods}
+
+
+#     #Collect all sbps data across years and trials (that are CO)
+#     all_sbps = []
+#     for year in time_periods:
+#         year_group = df_yearly.get_group(year)
+#         for _, yearly_data in year_group.iterrows():
+#             if yearly_data["target_styles"] == "CO":
+#                 all_sbps.append(yearly_data[type_of_data])
+
+#     # all_sbps = []
+#     # for period in time_periods:
+#     #     month_group = df_yearly[period] #.get_group(period)
+#     #     for _, monthly_data in month_group.iterrows():
+#     #         if monthly_data["target_styles"] == "CO":
+#     #             all_sbps.append(monthly_data[type_of_data])
+                
+#     # Stack into matrix (n_samples × n_features)
+#     global_data = np.vstack(all_sbps)  # Shape: (total_trials*timepoints, n_channels)
+
+#     # normalize data
+#     scaler = StandardScaler()
+#     global_data = scaler.fit_transform(global_data) 
+
+#     # Fit global PCA
+#     if not jpca:
+#         n_components = 3
+#         global_pca = PCA(n_components=n_components).fit(global_data)
+#     else:
+#         # TODO: JPCA stuff
+#         # jpca_trials = [trial_array for trial_array in processed_neural_data_for_direction[year][direction]]
+
+
+#         # jpca = jPCA.JPCA(num_jpcs=2)
+#         # times = np.linspace(-150, 600, 37)
+
+#         # (direction_pca_results, 
+#         # full_data_var,
+#         # pca_var_capt,
+#         # jpca_var_capt) = jpca.fit(jpca_trials, times=list(times), tstart=-150, tend=600)
+#         # plot_projections(direction_pca_results)
+#         pass
+
+#     # extract data
+#     for year in time_periods:
+#         # for channel_num in top_channel_indices:
+#         neural_data_for_direction[year] = {}
+
+#         for  _, yearly_data in df_yearly.get_group(year).iterrows(): #[year].iterrows(): 
+            
+
+#             # pca = PCA(n_components=n_components) # if you want to apply PCA transforms to each day
+#             # day_pca_results = pca.fit_transform(gaussian_filter1d(np.sqrt(yearly_data[type_of_data]), sigma=2))
+
+#             day_pca_results = global_pca.transform(yearly_data[type_of_data])
+#             pca_results[year].append(day_pca_results.copy())
+
+#             if yearly_data["target_styles"] != "CO": # only include it if its CO data
+#                 continue
+
+#             for i in range(0, len(yearly_data['target_positions'])):
+#                 trial_index_start = yearly_data["trial_indices"][i]
+#                 trial_length = yearly_data['trial_counts'][i]
+#                 channel_pca_sbps = day_pca_results[trial_index_start:trial_index_start+trial_length] 
+
+
+#                 target_pos_coords = tuple(yearly_data['target_positions'][i])
+#                 target_pos_coords = (round(float(target_pos_coords[0]), 1), round(float(target_pos_coords[1]), 1))
+#                 if target_pos_coords in position_map: # skips (0.5, 0.5)
+
+#                     target_pos = position_map[target_pos_coords]
+
+#                     # if (target_pos != "N"):
+#                     #     continue
+
+#                     if (target_pos == "N") or (target_pos == "S"):
+#                         trial_kinematics = yearly_data['finger_kinematics'][:, 3][trial_index_start:trial_index_start+trial_length] # finger kinematics is [index_position, MRP_position, index_velocity, MRP_velocity]. We are indexing the MRP velocity here (N,S)
+#                     else:
+#                         trial_kinematics = yearly_data['finger_kinematics'][:, 2][trial_index_start:trial_index_start+trial_length] # finger kinematics is [index_position, MRP_position, index_velocity, MRP_velocity]. We are indexing the Index velocity here (E,W, or default to index in all other directions)
+
+#                     if target_pos not in neural_data_for_direction[year]:
+#                         neural_data_for_direction[year][target_pos] = [(channel_pca_sbps, trial_kinematics)]
+#                     else:
+#                         neural_data_for_direction[year][target_pos].append((channel_pca_sbps, trial_kinematics))
+
+
+    
+#     return neural_data_for_direction, pca_results
 
 
