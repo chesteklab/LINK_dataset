@@ -2,56 +2,50 @@ import pandas as pd
 import os
 import numpy as np
 from scipy import stats
+from sklearn.linear_model import LinearRegression
 import pickle
 import glob
 import tqdm
+import pdb
 
-def compute_single_channel_tuning(data):
-    # Check if data is a tuple and extract the dictionary if necessary
-    if isinstance(data, tuple):
-        if data[0] is None and isinstance(data[1], dict):
-            data = data[1]
-        elif isinstance(data[0], dict):
-            data = data[0]
-        else:
-            print(f"Unexpected data structure: {type(data)}")
-            return None
+def compute_channel_tuning(neural, full_behavior, velocity_tuning = False):
 
-    # Extract relevant data
-    finger_kinematics = data['finger_kinematics']
-    sbp = data['sbp']
-    
-    channel_tuning = {}
-    
-    for i in range(sbp.shape[1]):  # Iterate over channels
-        channel_data = sbp[:, i]
+    if velocity_tuning:
+        behavior = full_behavior[:,[2,3]]
+    else:
+        behavior = full_behavior[:,[0,1]]
+
+    channel_tunings = np.zeros((neural.shape[1], behavior.shape[1]))
+    for channel in range(neural.shape[1]):
+        single_channel = neural[:, channel]
+        single_channel = (single_channel - np.mean(single_channel))/np.std(single_channel)
         
-        # Check if channel_data or finger_kinematics are constant
-        if np.all(channel_data == channel_data[0]) or np.all(finger_kinematics[:, 0] == finger_kinematics[0, 0]) or np.all(finger_kinematics[:, 1] == finger_kinematics[0, 1]):
-            # If any are constant, set correlation to 0
-            channel_tuning[f'sbp_channel_{i}'] = {
-                'magnitude': 0,
-                'angle': 0,
-                'corr_index': 0,
-                'corr_mrp': 0
-            }
-        else:
-            # Compute correlation with index and mrp positions
-            corr_index = stats.pearsonr(channel_data, finger_kinematics[:, 0])[0]
-            corr_mrp = stats.pearsonr(channel_data, finger_kinematics[:, 1])[0]
-            
-            # Treat correlations as vector components
-            magnitude = np.sqrt(corr_index**2 + corr_mrp**2)
-            angle = np.degrees(np.arctan2(corr_mrp, corr_index))
-            
-            channel_tuning[f'sbp_channel_{i}'] = {
-                'magnitude': magnitude,
-                'angle': angle,
-                'corr_index': corr_index,
-                'corr_mrp': corr_mrp
-            }
+        # calculate tuning to each dof at a variety of lags, pick the one which gives the largest l2 norm across the 2 dof
+        lag_range = 11 # look up to 10 bins of lag
+        tuning_vec = np.zeros((lag_range, behavior.shape[1]))
+        for lag in range(lag_range):
+            if lag != 0:
+                lagged_channel = single_channel[:-lag]
+                lagged_behavior = behavior[lag:,:]
+            else:
+                lagged_channel = single_channel
+                lagged_behavior = behavior
+            # calculate tuning for each dof
+            lm= LinearRegression(fit_intercept=True)
+            lm.fit(lagged_channel.reshape(-1,1), lagged_behavior)
+            tuning_vec[lag, :] = lm.coef_[:,0]
+        
+        best_lag = np.argmax(np.linalg.norm(tuning_vec, 2, axis=1))
+        channel_tunings[channel, :] = tuning_vec[best_lag, :]
+
+    # calculate magnitudes and angles
+    magnitudes = np.linalg.norm(channel_tunings, 2, 1)
+    angles = np.degrees(np.arctan2(channel_tunings[:,1], channel_tunings[:,0]))
     
-    return channel_tuning
+    channels = np.arange(neural.shape[1])
+    tuning_df = pd.DataFrame(np.concat((channels.reshape(-1,1), channel_tunings, magnitudes.reshape(-1,1), angles.reshape(-1,1)), axis=1), columns=('channel', 'idx', 'mrs', 'magnitude', 'angle'))
+
+    return tuning_df
 
 def compute_tuning_data(load_dir, is_save = False, save_dir = None):
     # Path to the folder containing pkl files
@@ -73,7 +67,7 @@ def compute_tuning_data(load_dir, is_save = False, save_dir = None):
     pkl_files = sorted(glob.glob(os.path.join(data_folder, '*.pkl')))
 
     # Dictionary to store results
-    results = {}
+    df_list = []
 
     # Process each pkl file
     for file in tqdm.tqdm(pkl_files, desc=f"Processing files in {data_folder}"):
@@ -82,33 +76,23 @@ def compute_tuning_data(load_dir, is_save = False, save_dir = None):
 
         # Load data
         with open(file, 'rb') as f:
-            data = pickle.load(f)
+            data_CO, data_RD = pickle.load(f)
             
         # Compute channel tuning
         try:
-            channel_tuning = compute_single_channel_tuning(data)
-            if channel_tuning is not None:
-                results[date] = channel_tuning
-        except Exception as e:
-            print(f"Error processing file {file}: {str(e)}")
+            if data_CO != None: 
+                channel_tuning = compute_channel_tuning(data_CO['sbp'], data_CO['finger_kinematics'], velocity_tuning=True)
+            elif data_RD != None:
+                channel_tuning = compute_channel_tuning(data_RD['sbp'], data_RD['finger_kinematics'], velocity_tuning=True)
+        except:
+            print(f"Error processing file {file}")
             continue
 
-        results[date] = channel_tuning
-
-    data_rows = []
-
-    #TODO: this way of conversion is inefficient, could be done in one go, but it is working for now so it is kept that way.
-
-    # Iterate through the results dictionary
-    for date, channels in results.items():
-        for channel, metrics in channels.items():
-            magnitude = metrics['magnitude']
-            angle = metrics['angle']
-            channel_value = int(channel.split('_')[-1])
-            data_rows.append({'date': date, 'channel': channel_value, 'magnitude': magnitude, 'angle': angle})
-
-    df = pd.DataFrame(data_rows)
-
+        channel_tuning['date'] = date
+        df_list.append(channel_tuning)
+    
+    df = pd.concat(df_list)
+    pdb.set_trace()
     # Save the DataFrame to a CSV file
     if is_save:
         output_file = os.path.join(save_dir, 'channelwise_stability_tuning.csv')
@@ -116,8 +100,8 @@ def compute_tuning_data(load_dir, is_save = False, save_dir = None):
         print(f"Data saved to {output_file}")
     return df
 
-def load_tuning_data(dir):
-    if not os.path.exists(os.path.join(dir, 'channelwise_stability_tuning.csv')):
+def load_tuning_data(dir, overwrite=False):
+    if not os.path.exists(os.path.join(dir, 'channelwise_stability_tuning.csv')) or overwrite:
         print(f"Directory {dir} does not exist, computing tuning data. Note that user input is required to continue.")
         load_dir = input("Please enter the directory containing the data files: ")
         df = compute_tuning_data(load_dir, is_save=True, save_dir=dir)
