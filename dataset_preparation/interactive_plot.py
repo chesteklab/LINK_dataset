@@ -278,30 +278,40 @@ class neural_plot(widgets.VBox):
             line_vel.set_data(exp_time, self.Data['finger_kinematics'][time_slice,i+2])
         self.ax[3].set(xlabel='Time (sec)', ylabel='Flexion/Bin', title='Finger Velocities', xlim=time_lims,ylim=(-.125,.125)) # changed ylim a bit
 
-        # update trial bars
-        # find all trial starts within the time range
+        # clear any existing trial lines/texts
         for line in self.trial_lines:
-            line.remove() # clears any vertical lines already present
+            line.remove() 
         self.trial_lines.clear() 
         for txt in self.trial_texts:
             txt.remove()
         self.trial_texts.clear()
 
-        # find all trial starts within the time range
-        trial_indexes_in_range = self.Data['trial_index'][np.logical_and(self.Data['trial_index'] > self.plot_start_index, self.Data['trial_index'] < self.end_index)]
+        # grab arrays of trial-start indices and counts
+        trial_indexes = self.Data['trial_index']
+        trial_numbers = self.Data['trial_number']
+        
+        # find all trial starts within the current window
+        trial_indexes_in_range = trial_indexes[(trial_indexes > self.plot_start_index) & (trial_indexes < self.end_index)]
+        
         # draw new trial start lines
-        for count, index in enumerate(trial_indexes_in_range, start=1):
+        for index in trial_indexes_in_range:
             x_value = self.Data['time'][index] / 1000
+            position = np.where(trial_indexes == index)[0][0]
+            actual_trial = trial_numbers[position]
+
             for a in self.ax:
                 line_sep = a.axvline(x=x_value, color='black', linewidth=2, alpha=0.3)
                 self.trial_lines.append(line_sep)
-            txt = self.ax[0].text(x_value, self.ax[0].get_ylim()[1]*0.95, f'{count}',
+            
+            txt = self.ax[0].text(x_value, self.ax[0].get_ylim()[1]*0.95, str(actual_trial),
                                   color='black', fontsize=8, rotation=90, verticalalignment='top')
             self.trial_texts.append(txt)
         
+        
+        
         # print day and run in title
         day_str = self.filenames[self.fileidx][:10]
-        
+
         run_ids = []
         if self.data_CO is not None and 'run_id' in self.data_CO:
             run_ids.append(str(self.data_CO['run_id']))
