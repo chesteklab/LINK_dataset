@@ -5,6 +5,8 @@ import matplotlib.colors as mcolors
 import numpy as np
 from scipy.signal import savgol_filter
 from scipy import stats
+import matplotlib as mpl
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import pdb
 
 def plot_polar_tuning(ax, dataframe, channel_number, ylim = None, cmap = 'crest'):
@@ -96,7 +98,8 @@ def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type 
     ax.set_xticks(xticks)
     ax.set_xticklabels(pd.to_datetime(all_dates[xticks]).strftime('%Y-%m-%d'), rotation=45)
 
-def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type = 'magnitude', cmap = 'coolwarm', plot_xlabel = True):
+def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type = 'magnitude', cmap = 'coolwarm', plot_xlabel = True, is_circle_cbar = False):
+        
     all_dates = pd.date_range(dataframe['date'].min(), dataframe['date'].max())
     matrix    = (dataframe.pivot(index='channel', columns='date', values=type).reindex(columns=all_dates))
 
@@ -117,19 +120,57 @@ def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type 
     elif choice == 'second_derivative':
         data      = matrix.diff(axis=1).diff(axis=1)
         cbar_label = 'Second Derivative'
+    sns.heatmap(data, ax=ax, cmap=cmapn, vmin=lower, vmax=upper, cbar=False if is_circle_cbar else True, cbar_kws={'label': cbar_label})
 
-    sns.heatmap(data,ax=ax,cmap=cmapn,vmin=lower, vmax=upper,cbar_kws={'label': cbar_label, 'orientation': 'vertical'})
-
-    ax.set(title=f'Heatmap of {choice.capitalize()} {type.capitalize()}', xlabel='Date', ylabel='Channel')
-    xticks = [i for i, date in enumerate(all_dates) if date.month in [3, 9] and date.day == 1]
-    ax.set_xticks(xticks)
-    ax.set_yticks([0 , 32, 64, 95])
-    ax.set_yticklabels([f'Ch {i}' for i in ax.get_yticks()])
     if(plot_xlabel):
+        ax.set(title=f'Heatmap of {choice.capitalize()} {type.capitalize()} Tuning', xlabel='Date', ylabel='Channel')
+        xticks = [i for i, date in enumerate(all_dates) if date.month in [3, 9] and date.day == 1]
+        ax.set_xticks(xticks)
+        ax.set_yticks([0 , 32, 64, 95])
+        ax.set_yticklabels([f'Ch {i}' for i in ax.get_yticks()])
         ax.set_xticklabels(pd.to_datetime(all_dates[xticks]).strftime('%Y-%m-%d'), rotation = 0)
     else:
+        ax.set(title=f'Heatmap of {choice.capitalize()} {type.capitalize()} Tuning', ylabel='Channel')
+        xticks = [i for i, date in enumerate(all_dates) if date.month in [3, 9] and date.day == 1]
+        ax.set_xticks(xticks)
+        ax.set_yticks([0 , 32, 64, 95])
+        ax.set_yticklabels([f'Ch {i}' for i in ax.get_yticks()])
         ax.set_xticklabels([])
-    
+
+# def draw_magnitude_cbar(ax, df, cmap):
+#     all_dates = pd.date_range(df['date'].min(), df['date'].max())
+#     matrix    = (df.pivot(index='channel', columns='date', values=type).reindex(columns=all_dates))
+
+#     lower, upper = np.nanquantile(matrix.values, [0.01, 0.99])
+#     clipped      = matrix.clip(lower=lower, upper=upper)
+#     norm = mpl.colors.Normalize(vmin=lower, vmax=upper)
+#     cbar = mpl.colorbar.ColorbarBase(ax, cmap=cmap, norm=norm, orientation='horizontal')
+#     cbar.set_label('Magnitude')
+
+def draw_angle_wheel(ax, cmap):
+    if ax.name != 'polar':
+        fig = ax.figure
+        pos = ax.get_position()
+        ax.remove()
+        ax = fig.add_axes(pos, projection='polar')
+    inner_radius = 40
+    outer_radius = 100
+    azimuths = np.arange(-180, 181, 1)
+    zeniths = np.linspace(inner_radius, outer_radius, 2)
+
+    values = ((azimuths + 180) % 360) * np.ones((len(zeniths), len(azimuths)))
+
+    theta = np.radians(azimuths)
+    ax.pcolormesh(theta, zeniths, values, cmap=cmap, shading='auto')
+
+    ax.set_yticks([])
+    ax.set_theta_zero_location('E')
+    ax.set_theta_direction(-1)
+    ax.set_thetamin(-180)
+    ax.set_thetamax(180)
+
+    ax.set_ylim(inner_radius, outer_radius)
+
 def plot_heat_map_HSV(ax, df, q_clip=(0.01, 0.99), sat=1.0):
 
     all_dates = pd.date_range(df['date'].min(), df['date'].max())
