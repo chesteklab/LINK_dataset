@@ -18,8 +18,15 @@ def compute_channel_tuning(neural, full_behavior, velocity_tuning = False):
     channel_tunings = np.zeros((neural.shape[1], behavior.shape[1]))
     for channel in range(neural.shape[1]):
         single_channel = neural[:, channel]
-        single_channel = (single_channel - np.mean(single_channel))/np.std(single_channel)
-        
+
+        eps = 1e-8
+        std = np.std(single_channel)
+
+        if std < eps:
+            single_channel = single_channel - np.mean(single_channel)
+        else:
+            single_channel = (single_channel - np.mean(single_channel)) / std
+
         # calculate tuning to each dof at a variety of lags, pick the one which gives the largest l2 norm across the 2 dof
         lag_range = 11 # look up to 10 bins of lag
         tuning_vec = np.zeros((lag_range, behavior.shape[1]))
@@ -81,9 +88,9 @@ def compute_tuning_data(load_dir, is_save = False, save_dir = None):
         # Compute channel tuning
         try:
             if data_CO != None: 
-                channel_tuning = compute_channel_tuning(data_CO['sbp'], data_CO['finger_kinematics'], velocity_tuning=True)
+                channel_tuning = compute_channel_tuning(data_CO['sbp'], data_CO['finger_kinematics'], velocity_tuning=False)
             elif data_RD != None:
-                channel_tuning = compute_channel_tuning(data_RD['sbp'], data_RD['finger_kinematics'], velocity_tuning=True)
+                channel_tuning = compute_channel_tuning(data_RD['sbp'], data_RD['finger_kinematics'], velocity_tuning=False)
         except:
             print(f"Error processing file {file}")
             continue
@@ -101,8 +108,12 @@ def compute_tuning_data(load_dir, is_save = False, save_dir = None):
     return df
 
 def load_tuning_data(dir, overwrite=False):
-    if not os.path.exists(os.path.join(dir, 'channelwise_stability_tuning.csv')) or overwrite:
+    if not os.path.exists(os.path.join(dir, 'channelwise_stability_tuning.csv')):
         print(f"Directory {dir} does not exist, computing tuning data. Note that user input is required to continue.")
+        load_dir = input("Please enter the directory containing the data files: ")
+        df = compute_tuning_data(load_dir, is_save=True, save_dir=dir)
+    elif(overwrite):
+        print(f"Directory {dir} exists, but overwrite is set to True. Computing tuning data.")
         load_dir = input("Please enter the directory containing the data files: ")
         df = compute_tuning_data(load_dir, is_save=True, save_dir=dir)
     else:

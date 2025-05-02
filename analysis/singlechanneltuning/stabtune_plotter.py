@@ -1,6 +1,7 @@
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 import numpy as np
 from scipy.signal import savgol_filter
 from scipy import stats
@@ -45,21 +46,147 @@ def plot_heat_map(ax, dataframe, choice = 'original', type = 'magnitude', cmap =
     clipped_matrix = matrix.clip(lower=lower_bound, upper=upper_bound)
 
     if choice == 'original':
-        sns.heatmap(clipped_matrix, ax=ax, cmap=cmap, cbar_kws={'label': type, 'orientation': 'horizontal'})
+        sns.heatmap(clipped_matrix, ax=ax, cmap=cmap, cbar_kws={'label': type, 'orientation': 'vertical'})
         ax.set_title('Heatmap of ' + choice.capitalize() + ' ' + type.capitalize())
     elif choice == 'first_derivative':
         first_derivative = matrix.diff(axis=1)
-        sns.heatmap(first_derivative, ax=ax, cmap=cmap, cbar_kws={'label': 'First Derivative', 'orientation': 'horizontal'})
+        sns.heatmap(first_derivative, ax=ax, cmap=cmap, cbar_kws={'label': 'First Derivative', 'orientation': 'vertical'})
         ax.set_title('Heatmap of ' + choice.capitalize() + ' ' + type.capitalize())
     elif choice == 'second_derivative':
         second_derivative = matrix.diff(axis=1).diff(axis=1)
-        sns.heatmap(second_derivative, ax=ax, cmap=cmap, cbar_kws={'label': 'Second Derivative', 'orientation': 'horizontal'})
+        sns.heatmap(second_derivative, ax=ax, cmap=cmap, cbar_kws={'label': 'Second Derivative', 'orientation': 'vertical'})
         ax.set_title('Heatmap of ' + choice.capitalize() + ' ' + type.capitalize())
 
     ax.set_xlabel('Date')
     ax.set_ylabel('Channel')
     ax.set_xticklabels([])  # Disable x-axis tick labels
 
+def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type = 'magnitude', cmap = 'coolwarm'):
+    all_dates = pd.date_range(dataframe['date'].min(), dataframe['date'].max())
+    matrix    = (dataframe
+                 .pivot(index='channel', columns='date', values=type)
+                 .reindex(columns=all_dates))
+
+    lower, upper = np.nanquantile(matrix.values, [0.01, 0.99])
+    clipped      = matrix.clip(lower=lower, upper=upper)
+
+    cmapn = sns.color_palette(cmap, as_cmap=True).copy()
+    cmapn.set_bad('black')
+
+    if choice == 'original':
+        data      = clipped
+        cbar_label = type
+    elif choice == 'first_derivative':
+        data      = matrix.diff(axis=1)
+        cbar_label = 'First Derivative'
+    elif choice == 'second_derivative':
+        data      = matrix.diff(axis=1).diff(axis=1)
+        cbar_label = 'Second Derivative'
+
+    sns.heatmap(data,
+                ax=ax,
+                cmap=cmapn,
+                vmin=lower, vmax=upper,
+                cbar_kws={'label': cbar_label, 'orientation': 'vertical'})
+
+    ax.set(
+        title=f'Heatmap of {choice.capitalize()} {type.capitalize()}',
+        xlabel='Date', ylabel='Channel')
+    xticks = np.linspace(0, len(all_dates) - 1, 10, dtype=int)
+    ax.set_xticks(xticks)
+    ax.set_xticklabels(pd.to_datetime(all_dates[xticks])
+                       .strftime('%Y-%m-%d'), rotation=45)
+
+def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type = 'magnitude', cmap = 'coolwarm'):
+    all_dates = pd.date_range(dataframe['date'].min(), dataframe['date'].max())
+    matrix    = (dataframe.pivot(index='channel', columns='date', values=type).reindex(columns=all_dates))
+
+    lower, upper = np.nanquantile(matrix.values, [0.01, 0.99])
+    clipped      = matrix.clip(lower=lower, upper=upper)
+
+    if isinstance(cmap, str):
+        cmapn = sns.color_palette(cmap, as_cmap=True).copy()
+        cmapn.set_bad('black')
+    else:
+        cmapn = cmap
+    if choice == 'original':
+        data      = clipped
+        cbar_label = type
+    elif choice == 'first_derivative':
+        data      = matrix.diff(axis=1)
+        cbar_label = 'First Derivative'
+    elif choice == 'second_derivative':
+        data      = matrix.diff(axis=1).diff(axis=1)
+        cbar_label = 'Second Derivative'
+
+    sns.heatmap(data,ax=ax,cmap=cmapn,vmin=lower, vmax=upper,cbar_kws={'label': cbar_label, 'orientation': 'vertical'})
+
+    ax.set(title=f'Heatmap of {choice.capitalize()} {type.capitalize()}', xlabel='Date', ylabel='Channel')
+    xticks = np.linspace(0, len(all_dates) - 1, 10, dtype=int)
+    ax.set_xticks(xticks)
+    ax.set_xticklabels(pd.to_datetime(all_dates[xticks])
+                       .strftime('%Y-%m-%d'), rotation=45)
+    
+def plot_heat_map_HSV(ax, df, q_clip=(0.01, 0.99), sat=1.0):
+
+    all_dates = pd.date_range(df['date'].min(), df['date'].max())
+    mag_mat = (df.pivot(index='channel', columns='date', values='magnitude').reindex(columns=all_dates))
+    ang_mat = (df.pivot(index='channel', columns='date', values='angle').reindex(columns=all_dates))
+
+    mask = mag_mat.isna() | ang_mat.isna()
+
+    lo, hi = np.nanquantile(mag_mat.values, q_clip)
+    V = (mag_mat.clip(lower=lo, upper=hi) - lo) / (hi - lo)
+    V = np.power(V, 0.5)
+    V[mask] = 1
+
+    H = ((ang_mat + 180) % 360) / 360
+    H[mask] = 0
+
+    
+    S = np.full_like(H, sat)
+    S[mask] = 0
+    hsv = np.dstack([H.values, S, V.values])
+    rgb = mcolors.hsv_to_rgb(hsv)
+
+    ax.imshow(rgb, aspect='auto', origin='lower',interpolation='none')
+    ax.set(title='Angle (H), Magnitude (V)', xlabel='Date', ylabel='Channel')
+
+    ticks = np.linspace(0, len(all_dates) - 1, 10, dtype=int)
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(pd.to_datetime(all_dates[ticks]).strftime('%Y-%m-%d'), rotation=45)
+
+# DO NOT REMOVE, structure kept for writing future functions
+# def plot_heat_map_uniform(ax, dataframe, choice = 'original', type = 'magnitude', cmap = 'coolwarm'):
+#     all_dates = pd.date_range(start=dataframe['date'].min(), end=dataframe['date'].max())
+#     matrix = dataframe.pivot(index='channel', columns='date', values=type).reindex(columns=all_dates)
+#     lower_bound = np.nanquantile(matrix.values.flatten(), 0.01)
+#     upper_bound = np.nanquantile(matrix.values.flatten(), 0.99)
+#     clipped_matrix = matrix.clip(lower=lower_bound, upper=upper_bound)
+
+#     no_data_value = lower_bound - (upper_bound - lower_bound) * 0.1
+#     clipped_matrix = clipped_matrix.fillna(no_data_value)
+
+#     # Define a custom colormap with a specific color for no_data_value
+#     custom_cmap = sns.color_palette(cmap, as_cmap=True)
+#     custom_cmap.set_bad('gray')  # Replace 'gray' with your desired color for blanks
+
+#     if choice == 'original':
+#         sns.heatmap(clipped_matrix, ax=ax, cmap=custom_cmap, cbar_kws={'label': type, 'orientation': 'vertical'}, vmin=no_data_value)
+#         ax.set_title('Heatmap of ' + choice.capitalize() + ' ' + type.capitalize())
+#     elif choice == 'first_derivative':
+#         first_derivative = matrix.diff(axis=1)
+#         sns.heatmap(first_derivative, ax=ax, cmap=custom_cmap, cbar_kws={'label': 'First Derivative', 'orientation': 'vertical'})
+#         ax.set_title('Heatmap of ' + choice.capitalize() + ' ' + type.capitalize())
+#     elif choice == 'second_derivative':
+#         second_derivative = matrix.diff(axis=1).diff(axis=1)
+#         sns.heatmap(second_derivative, ax=ax, cmap=custom_cmap, cbar_kws={'label': 'Second Derivative', 'orientation': 'vertical'})
+#         ax.set_title('Heatmap of ' + choice.capitalize() + ' ' + type.capitalize())
+
+#     ax.set_xlabel('Date')
+#     ax.set_ylabel('Channel')
+#     ax.set_xticks(np.linspace(0, len(all_dates) - 1, 10))
+#     ax.set_xticklabels(pd.to_datetime(all_dates[np.linspace(0, len(all_dates) - 1, 10, dtype=int)]).strftime('%Y-%m-%d'), rotation=45)
 
 def plot_time_graph(ax, dataframe, choice = 'original', type='magnitude', channels=None, apply_smoothing=False, smoothing_params=None):
     #todo: choice change to derivative
