@@ -121,12 +121,12 @@ def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type 
     sns.heatmap(data,ax=ax,cmap=cmapn,vmin=lower, vmax=upper,cbar_kws={'label': cbar_label, 'orientation': 'vertical'})
 
     ax.set(title=f'Heatmap of {choice.capitalize()} {type.capitalize()}', xlabel='Date', ylabel='Channel')
-    xticks = [i for i, date in enumerate(all_dates) if date.is_month_end]
+    xticks = [i for i, date in enumerate(all_dates) if date.month in [3, 9] and date.day == 1]
     ax.set_xticks(xticks)
     ax.set_yticks([0 , 32, 64, 95])
     ax.set_yticklabels([f'Ch {i}' for i in ax.get_yticks()])
     if(plot_xlabel):
-        ax.set_xticklabels(pd.to_datetime(all_dates[xticks]).strftime('%Y-%m-%d'), rotation=45)
+        ax.set_xticklabels(pd.to_datetime(all_dates[xticks]).strftime('%Y-%m-%d'), rotation = 0)
     else:
         ax.set_xticklabels([])
     
