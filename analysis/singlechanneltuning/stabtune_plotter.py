@@ -94,10 +94,9 @@ def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type 
         xlabel='Date', ylabel='Channel')
     xticks = np.linspace(0, len(all_dates) - 1, 10, dtype=int)
     ax.set_xticks(xticks)
-    ax.set_xticklabels(pd.to_datetime(all_dates[xticks])
-                       .strftime('%Y-%m-%d'), rotation=45)
+    ax.set_xticklabels(pd.to_datetime(all_dates[xticks]).strftime('%Y-%m-%d'), rotation=45)
 
-def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type = 'magnitude', cmap = 'coolwarm'):
+def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type = 'magnitude', cmap = 'coolwarm', plot_xlabel = True):
     all_dates = pd.date_range(dataframe['date'].min(), dataframe['date'].max())
     matrix    = (dataframe.pivot(index='channel', columns='date', values=type).reindex(columns=all_dates))
 
@@ -106,7 +105,7 @@ def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type 
 
     if isinstance(cmap, str):
         cmapn = sns.color_palette(cmap, as_cmap=True).copy()
-        cmapn.set_bad('black')
+        cmapn.set_bad('grey')
     else:
         cmapn = cmap
     if choice == 'original':
@@ -122,10 +121,14 @@ def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type 
     sns.heatmap(data,ax=ax,cmap=cmapn,vmin=lower, vmax=upper,cbar_kws={'label': cbar_label, 'orientation': 'vertical'})
 
     ax.set(title=f'Heatmap of {choice.capitalize()} {type.capitalize()}', xlabel='Date', ylabel='Channel')
-    xticks = np.linspace(0, len(all_dates) - 1, 10, dtype=int)
+    xticks = [i for i, date in enumerate(all_dates) if date.is_month_end]
     ax.set_xticks(xticks)
-    ax.set_xticklabels(pd.to_datetime(all_dates[xticks])
-                       .strftime('%Y-%m-%d'), rotation=45)
+    ax.set_yticks([0 , 32, 64, 95])
+    ax.set_yticklabels([f'Ch {i}' for i in ax.get_yticks()])
+    if(plot_xlabel):
+        ax.set_xticklabels(pd.to_datetime(all_dates[xticks]).strftime('%Y-%m-%d'), rotation=45)
+    else:
+        ax.set_xticklabels([])
     
 def plot_heat_map_HSV(ax, df, q_clip=(0.01, 0.99), sat=1.0):
 
