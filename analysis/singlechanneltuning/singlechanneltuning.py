@@ -11,15 +11,16 @@ from scipy.signal import savgol_filter
 from sklearn.linear_model import Ridge
 from sklearn.preprocessing import StandardScaler
 from sklearn import linear_model
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, r2_score, mutual_info_score
+from sklearn.feature_selection import mutual_info_regression
 from sklearn.model_selection import train_test_split
 from collections import defaultdict
 import glob
 import sys
 import pdb
-from dataset_characterization import dataset_characterization
+#from dataset_characterization import dataset_characterization
 import matplotlib.gridspec as gridspec
-import config
+#import config
 
 def create_single_channel_tuning_figure():
     #oof 
@@ -93,6 +94,7 @@ def create_channelwise_tuning_dataframe(preprocessingdir, outputdir):
 
     # Dictionary to store results
     results = {}
+    all_mi = []
 
     # Process each pkl file
     counter = 405
@@ -159,3 +161,133 @@ def create_channelwise_tuning_plot(outputdir):
 
     # Save the plot
     plt.savefig(os.path.join(outputdir, 'channelwise_stability_tuning_plot.png'))
+
+
+
+def compute_channel_mutual_information(data):
+    # Check if data is a tuple and extract the dictionary if necessary
+    if isinstance(data, tuple):
+        if data[0] is None and isinstance(data[1], dict):
+            data = data[1]
+        elif isinstance(data[0], dict):
+            data = data[0]
+        else:
+            print(f"Unexpected data structure: {type(data)}")
+            return None
+
+    # Extract relevant data
+    finger_kinematics = data['finger_kinematics']  # shape (n_samples, num_dofs)
+    sbp = data['sbp']                              # shape (n_samples, 96)
+
+    num_channels = sbp.shape[1]
+    num_dofs = finger_kinematics.shape[1]
+    
+    channel_mi = np.zeros((num_channels, num_dofs))
+
+    # For each channel
+    for ch in range(num_channels):
+        channel_data = sbp[:, ch]
+
+        # Check if channel_data is constant
+        if np.all(channel_data == channel_data[0]):
+            continue  # MI would be zero anyway
+
+        # For each DoF
+        for dof in range(num_dofs):
+            dof_data = finger_kinematics[:, dof]
+
+            if np.all(dof_data == dof_data[0]):
+                continue  # skip constant dof
+
+            # Compute mutual information
+            mi = mutual_info_regression(channel_data.reshape(-1,1), dof_data, discrete_features=False)
+            channel_mi[ch, dof] = mi[0]
+
+            # mi_value = mutual_info_score(
+            #     pd.qcut(channel_data, 10, duplicates='drop'),
+            #     pd.qcut(dof_data, 10, duplicates='drop')
+            # )
+            # channel_mi[ch, dof] = mi_value
+
+    return channel_mi
+
+
+
+def create_channelwise_mutual_information_matrix(preprocessingdir, outputdir):
+    # Path to the folder containing pkl files
+    data_folder = preprocessingdir
+
+    # Get list of pkl files
+    pkl_files = sorted(glob.glob(os.path.join(data_folder, '*.pkl')))
+
+    # Find number of channels and dofs by looking at one file
+    with open(pkl_files[0], 'rb') as f:
+        sample_data = pickle.load(f)
+    if isinstance(sample_data, tuple):
+        if sample_data[0] is None:
+            sample_data = sample_data[1]
+        else:
+            sample_data = sample_data[0]
+
+    num_channels = sample_data['sbp'].shape[1]
+    num_dofs = sample_data['finger_kinematics'].shape[1]
+
+    # Initialize storage
+    all_mi = []
+    dates = []
+
+    for file in pkl_files:
+        sys.stdout.write(f"\rProcessing for MI: {file}")
+        sys.stdout.flush()
+
+        date = pd.to_datetime(os.path.basename(file).split('_')[0])
+
+        # Load data
+        with open(file, 'rb') as f:
+            data = pickle.load(f)
+
+        try:
+            mi_matrix = compute_channel_mutual_information(data)
+            all_mi.append(mi_matrix)
+            dates.append(date)
+        except Exception as e:
+            print(f"Error processing file {file}: {str(e)}")
+            continue
+
+    all_mi = np.array(all_mi)  # Shape: (num_days, 96, num_dofs)
+    dates = np.array(dates)
+
+    # Save matrix and dates
+    np.save(os.path.join(outputdir, 'channelwise_mutual_information.npy'), all_mi)
+    np.save(os.path.join(outputdir, 'channelwise_mi_dates.npy'), dates)
+
+    print(f"\nSaved MI matrix of shape {all_mi.shape}")
+
+
+
+def create_channelwise_mutual_information_plot(outputdir):
+    # Load
+    all_mi = np.load(os.path.join(outputdir, 'channelwise_mutual_information.npy'))  # (num_days, 96, num_dofs)
+    dates = np.load(os.path.join(outputdir, 'channelwise_mi_dates.npy'), allow_pickle=True)
+
+    # Average across channels
+    mean_mi = np.mean(all_mi, axis=1)  # (num_days, num_dofs)
+
+    # Plot
+    legend_dict = {0: "index_position", 1: "MRP_position", 2: "index_velocity", 3: "MRP_velocity"}
+    plt.figure(figsize=(10,6))
+    for dof_idx in range(mean_mi.shape[1]):
+        plt.plot(dates, mean_mi[:, dof_idx], label=legend_dict[dof_idx])
+
+    plt.title('Mutual Information over Time')
+    plt.xlabel('Date')
+    plt.ylabel('Average Mutual Information')
+    plt.legend()
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig(os.path.join(outputdir, 'channelwise_mutual_information_plot.png'))
+    plt.show()
+
+if __name__ == "__main__":
+    create_channelwise_mutual_information_matrix("../test_data", "../test_data")
+    create_channelwise_mutual_information_plot("../test_data")
