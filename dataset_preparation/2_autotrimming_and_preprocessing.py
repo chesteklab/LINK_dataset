@@ -17,8 +17,8 @@ def prep_data(resume=True):
     else:
         resumeidx = 0
     idxs = np.arange(resumeidx, len(datesruns))
-    # data, data = load_day('2020-03-12')
     extra_bad_days = ['2022-06-09','2023-05-05','2024-01-29'] # first and second, notes file is wrong, third pickling went wrong, can't import.
+    
 
     for i in idxs:
         date = datesruns['Date'].iloc[i]
@@ -79,16 +79,16 @@ def load_day(date):
             runs_RD.append(run)
 
     #then do the logic to decide what to keep and preprocess
-    (data_CO, run_CO) = choose_data(data_CO, runs_CO) if data_CO else (pd.DataFrame([]), None)
-    (data_RD, run_RD) = choose_data(data_RD, runs_RD) if data_RD else (pd.DataFrame([]), None)
+    (data_CO, run_CO) = choose_data(data_CO, runs_CO) if data_CO else (None, None)
+    (data_RD, run_RD) = choose_data(data_RD, runs_RD) if data_RD else (None, None)
 
     #once we know we have enough trials, do preprocessing
-    if not data_CO.empty:
+    if data_CO is not None:
         print("PREPROCESSING CO")
-        data_CO = preprocessing(data_CO, run_CO)
-    if not data_RD.empty:
+        data_CO = preprocessing(data_CO, run_CO, "CO")
+    if data_RD is not None:
         print("PREPROCESSING RD")
-        data_RD = preprocessing(data_RD, run_RD)
+        data_RD = preprocessing(data_RD, run_RD, "RD")
     
     return data_CO, data_RD
 
@@ -103,6 +103,7 @@ def load_run(date, run):
     fpath = os.path.join(config.datapath, config.data_params['monkey'], date, runstr)
     z = ZTools.ZStructTranslator(fpath, use_py=False).asdataframe()
 
+
     # filters based on the most common style AND if it's 29 or 34, so we don't have one 29 in a mix of 34 
     # remove closed loop and unsuccessful trials
     z = z[5:] #trim first 5
@@ -110,8 +111,9 @@ def load_run(date, run):
     z = z[(z['TargetPosStyle'] == style_mode) 
           & (z['TargetPosStyle'].isin([29.0, 34.0])) 
           & (z['ClosedLoop'] == 0) 
-          & (z['TrialSuccess'] == 1)]
-    # TODO: only 750ms hold time
+          & (z['TrialSuccess'] == 1)
+          & (z['TargetHoldTime'] == 750)]
+          
 
     if style_mode == 34.0:
         target_style = 'CO'
@@ -128,10 +130,14 @@ def choose_data(data, runs):
     argmax_trials = np.argmax(np.asarray([len(z) for z in data]))
     
     # from the largest - see if there are 375 trials
-    if max_trials >= 375:
+    if max_trials > 375:
         # take it
         trim_amount = max_trials - 375
         new_data = data[argmax_trials].iloc[0:-1*trim_amount]
+        run = runs[argmax_trials]
+    # else if
+    elif max_trials == 375:
+        new_data = data[argmax_trials]  
         run = runs[argmax_trials]
     else:
         new_data = None
@@ -139,11 +145,9 @@ def choose_data(data, runs):
 
     return new_data, run
 
-def preprocessing(data, run):
+def preprocessing(data, run, target_style):
     
     processed_run = {}
-    style_mode = data['TargetPosStyle'].mode()[0]
-    target_style = 'CO' if style_mode == 34.0 else 'RD'
 
     # first 5 trials have already been trimmed
     feats = ZTools.getZFeats(data, 
@@ -160,7 +164,7 @@ def preprocessing(data, run):
     TrialNumber, TrialIndex, TrialCount = np.unique(feats["TrialNumber"], return_index = True, return_counts = True)
 
     sbp = np.abs(feats['NeuralFeature'])
-    # sbp = (sbp - np.mean(sbp, axis=0)) / np.std(sbp, axis=0)
+    sbp = (sbp - np.mean(sbp, axis=0)) / np.std(sbp, axis=0)
 
     # putting things together. I'm doing the adjust index thing here
     processed_run['target_style'] = target_style
