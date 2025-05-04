@@ -63,40 +63,40 @@ def plot_heat_map(ax, dataframe, choice = 'original', type = 'magnitude', cmap =
     ax.set_ylabel('Channel')
     ax.set_xticklabels([])  # Disable x-axis tick labels
 
-def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type = 'magnitude', cmap = 'coolwarm'):
-    all_dates = pd.date_range(dataframe['date'].min(), dataframe['date'].max())
-    matrix    = (dataframe
-                 .pivot(index='channel', columns='date', values=type)
-                 .reindex(columns=all_dates))
+# def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type = 'magnitude', cmap = 'coolwarm'):
+#     all_dates = pd.date_range(dataframe['date'].min(), dataframe['date'].max())
+#     matrix    = (dataframe
+#                  .pivot(index='channel', columns='date', values=type)
+#                  .reindex(columns=all_dates))
 
-    lower, upper = np.nanquantile(matrix.values, [0.01, 0.99])
-    clipped      = matrix.clip(lower=lower, upper=upper)
+#     lower, upper = np.nanquantile(matrix.values, [0.01, 0.99])
+#     clipped      = matrix.clip(lower=lower, upper=upper)
 
-    cmapn = sns.color_palette(cmap, as_cmap=True).copy()
-    cmapn.set_bad('black')
+#     cmapn = sns.color_palette(cmap, as_cmap=True).copy()
+#     cmapn.set_bad('black')
 
-    if choice == 'original':
-        data      = clipped
-        cbar_label = type
-    elif choice == 'first_derivative':
-        data      = matrix.diff(axis=1)
-        cbar_label = 'First Derivative'
-    elif choice == 'second_derivative':
-        data      = matrix.diff(axis=1).diff(axis=1)
-        cbar_label = 'Second Derivative'
+#     if choice == 'original':
+#         data      = clipped
+#         cbar_label = type
+#     elif choice == 'first_derivative':
+#         data      = matrix.diff(axis=1)
+#         cbar_label = 'First Derivative'
+#     elif choice == 'second_derivative':
+#         data      = matrix.diff(axis=1).diff(axis=1)
+#         cbar_label = 'Second Derivative'
 
-    sns.heatmap(data,
-                ax=ax,
-                cmap=cmapn,
-                vmin=lower, vmax=upper,
-                cbar_kws={'label': cbar_label, 'orientation': 'vertical'})
+#     sns.heatmap(data,
+#                 ax=ax,
+#                 cmap=cmapn,
+#                 vmin=lower, vmax=upper,
+#                 cbar_kws={'label': cbar_label, 'orientation': 'vertical'})
 
-    ax.set(
-        title=f'Heatmap of {choice.capitalize()} {type.capitalize()}',
-        xlabel='Date', ylabel='Channel')
-    xticks = np.linspace(0, len(all_dates) - 1, 10, dtype=int)
-    ax.set_xticks(xticks)
-    ax.set_xticklabels(pd.to_datetime(all_dates[xticks]).strftime('%Y-%m-%d'), rotation=45)
+#     ax.set(
+#         title=f'Heatmap of {choice.capitalize()} {type.capitalize()}',
+#         xlabel='Date', ylabel='Channel')
+#     xticks = np.linspace(0, len(all_dates) - 1, 10, dtype=int)
+#     ax.set_xticks(xticks)
+#     ax.set_xticklabels(pd.to_datetime(all_dates[xticks]).strftime('%Y-%m-%d'), rotation=45)
 
 def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type = 'magnitude', cmap = 'coolwarm', plot_xlabel = True, is_circle_cbar = False):
         
@@ -295,6 +295,60 @@ def plot_time_graph(ax, dataframe, choice = 'original', type='magnitude', channe
     ax.set_xlabel('Date')
     ax.set_ylabel(type.capitalize())
     ax.legend()
+
+def plot_tuning_variance_histogram(ax, dataframe, type='angle', bins = 10, metric = 'variance'):
+    '''
+    metric can be 'variance', 'mean'
+    '''
+    if metric == 'variance':
+        values = dataframe.groupby('channel')[type].var()
+        ax.hist(values, bins=bins)
+        ax.set_title(f'Variance of Tuning {type.capitalize()} Across Channels')
+        ax.set_xlabel(f'Tuning {type.capitalize()} Variance')
+        ax.set_ylabel('Number of Channels')
+    elif metric == 'mean':
+        values = dataframe.groupby('channel')[type].mean()
+        ax.hist(values, bins=bins)
+        ax.set_title(f'Mean of Tuning {type.capitalize()} Across Channels')
+        ax.set_xlabel(f'Tuning {type.capitalize()} Mean')
+        ax.set_ylabel('Number of Channels')
+    else:
+        raise ValueError("Invalid metric")
+
+def plot_daily_spatial_tuning(ax,dataframe,date_choice,mapping_dir,correspondence = False):
+    mapping = pd.read_csv(mapping_dir)
+    day_choice = date_choice
+    daily_tuning = dataframe[dataframe['date'] == day_choice]
+    spatial_magnitude = np.zeros((8,8,2))
+    spatial_angles = np.zeros((8,8,2))
+    array_correspondence = np.zeros((8,8,2))
+    for ch in daily_tuning['channel']:
+        row = mapping[mapping['Channel']== ch+1]['Array Row'].values[0]
+        col = mapping[mapping['Channel']== ch+1]['Array Column'].values[0]
+        array_name = mapping[mapping['Channel']== ch+1]['Array Name'].values[0]
+        spatial_magnitude[row-1,col-1,array_name-1] = daily_tuning[daily_tuning['channel'] == ch]['magnitude'].values[0]
+        spatial_angles[row-1,col-1,array_name-1] = daily_tuning[daily_tuning['channel'] == ch]['angle'].values[0]
+        array_correspondence[row-1,col-1,array_name-1] = ch+1
+    if(not correspondence):
+        sns.heatmap(spatial_magnitude[:, :, 0], ax=ax[0, 0], cmap='viridis', cbar=True, vmin=0.000828924594908148, vmax=0.05302147033920138)
+        ax[0, 0].set_title('Spatial Magnitude (Array 1)')
+
+        sns.heatmap(spatial_magnitude[:, :, 1], ax=ax[0, 1], cmap='viridis', cbar=True, vmin=0.000828924594908148, vmax=0.05302147033920138)
+        ax[0, 1].set_title('Spatial Magnitude (Array 2)')
+
+        sns.heatmap(spatial_angles[:, :, 0], ax=ax[1, 0], cmap='hsv', cbar=True, vmin=-180, vmax=180)
+        ax[1, 0].set_title('Spatial Angles (Array 1)')
+
+        sns.heatmap(spatial_angles[:, :, 1], ax=ax[1, 1], cmap='hsv', cbar=True, vmin=-180, vmax=180)
+        ax[1, 1].set_title('Spatial Angles (Array 2)')
+    else:
+        sns.heatmap(array_correspondence[:, :, 0], annot=True, fmt=".0f", cmap=None, cbar=False, ax=ax[0])
+        ax[0].set_title("Array Correspondence (Array 1)")
+
+        # Plot Array Correspondence for Array 2
+        sns.heatmap(array_correspondence[:, :, 1], annot=True, fmt=".0f", cmap=None, cbar=False, ax=ax[1])
+        ax[1].set_title("Array Correspondence (Array 2)")
+
 
 # the following functions are from Nicholas's Stability Tuning Code adopted to work with the new dataframe format
 def stability_tuning_load(dataframe):
