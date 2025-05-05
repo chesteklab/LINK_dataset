@@ -9,6 +9,8 @@ import pickle
 import pdb
 import os 
 import sys
+import glob
+import re
 
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score, mutual_info_score
@@ -35,10 +37,24 @@ def create_signal_quality_figure():
     #maybe do this for all channels? find a way to combine
     
     # add mutual information calculations per day
-    #dates = ["2021-10-25", "2021-10-26", "2021-10-27", "2021-10-29", "2021-11-01"]
-    #calc_mutual_information(dates, preprocessingdir="../test_data", characterizationdir="../test_data")
+    dates = extract_dates_from_filenames(folder_path="/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Hisham_Temmar/big_dataset/2_autotrimming_and_preprocessing/preprocessing_092024_no7822nofalcon")
+    print(f"Found {len(dates)} dates")
+    calc_mutual_information(dates, preprocessingdir="/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Hisham_Temmar/big_dataset/2_autotrimming_and_preprocessing/preprocessing_092024_no7822nofalcon", characterizationdir="./output_dir")
 
     pass
+
+def extract_dates_from_filenames(folder_path):
+    # Find all matching .pkl files
+    pkl_files = glob.glob(os.path.join(folder_path, '*_preprocess.pkl'))
+
+    dates = []
+    for file_path in pkl_files:
+        filename = os.path.basename(file_path)
+        match = re.match(r'(\d{4}-\d{2}-\d{2})_preprocess\.pkl', filename)
+        if match:
+            dates.append(match.group(1))
+
+    return dates #sorted(dates) 
 
 def calc_mutual_information(dates, preprocessingdir, characterizationdir):
     mi_dict = {'date': [], 'channel': [], 'mutual_information': []}
