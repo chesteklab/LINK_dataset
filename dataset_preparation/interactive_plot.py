@@ -73,8 +73,8 @@ class neural_plot(widgets.VBox):
         for i in range(96):
             line, = self.ax[1].plot(np.arange(100), np.zeros((100, 1)), linewidth=0.4, color=cmap(i))
             self.tcfr_data.append(line)
-        self.tcfr_avg_line, = self.ax[1].plot(np.arange(100), np.zeros((100,1)), linewidth=0.4,color=cmap(i))
-        self.ax[1].set(xlabel='Time (seconds)', ylabel='TCFR', title='Threshold Crossings (TCFR)', ylim=(-5,5))
+        self.tcfr_avg_line, = self.ax[1].plot(np.arange(100), np.zeros((100,1)), linewidth=1.5,color='red')
+        self.ax[1].set(xlabel='Time (seconds)', ylabel='TCFR', title='Threshold Crossings (TCFR)', ylim=(0, 10))
         
         # Init Finger lines
         self.finger_positions = []
