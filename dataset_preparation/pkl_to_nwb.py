@@ -9,7 +9,10 @@ from pynwb.file import Subject
 from typing import Tuple, Optional
 import config
 
-def convert_pkl_to_nwb(data_dir):
+def convert_pkl_to_nwb(data_dir, end_dir=None):
+    if end_dir is None:
+        end_dir = data_dir
+
     trial_fields = [
         "trial_number",
         "trial_count",
@@ -104,7 +107,7 @@ def convert_pkl_to_nwb(data_dir):
             ts_df = ts_df[ts_df["trial_number"].isin(valid_trial_numbers)]
 
             # Add target style information to the dataframe
-            ts_df["target_style"] = trials_df["target_style"][0]
+            ts_df["target_style"] = trials_df["target_style"]
 
             # Adjust the timestamps to milliseconds
             times = ts_df["time"].values / 1000  # Convert to seconds
@@ -112,7 +115,7 @@ def convert_pkl_to_nwb(data_dir):
             # Create an NWB file with timezone-aware datetime objects
             nwbfile = NWBFile(
                 session_description=f"Neural and behavioral data for target style {trials_df['target_style'][0]}",
-                identifier=f"{date}_{trials_df['target_style'][0]}_nwb",
+                identifier=f"{date}_{trials_df['target_style']}_nwb",
                 session_start_time=datetime.strptime(date, "%Y-%m-%d").replace(
                     tzinfo=timezone.utc
                 ),
@@ -129,7 +132,7 @@ def convert_pkl_to_nwb(data_dir):
                 description="Monkey N",
                 species="Macaca mulatta",
                 sex="M",
-                date_of_birth=datetime.strptime("2012-05-26", "%Y-%m-%d"),
+                date_of_birth=datetime.strptime("2012-05-26", "%Y-%m-%d").replace(tzinfo=timezone.utc),
             )
             nwbfile.subject = subject
 
@@ -166,9 +169,9 @@ def convert_pkl_to_nwb(data_dir):
             mrp_velocity = ts_df["mrp_velocity"].values
 
             # Create a processing module for behavior
-            behavior_module = nwbfile.create_processing_module(
-                name="behavior", description="Processed behavioral data"
-            )
+            # behavior_module = nwbfile.create_processing_module(
+            #     name="behavior", description="Processed behavioral data"
+            # )
 
             # Create TimeSeries objects for positions
             index_position_ts = TimeSeries(
@@ -188,9 +191,12 @@ def convert_pkl_to_nwb(data_dir):
                 comments="Processed position data (averaged over 20 ms bins)",
             )
 
+            # Add positions to analysis
+            nwbfile.add_analysis(index_position_ts)
+            nwbfile.add_analysis(mrp_position_ts)
             # Add positions to the behavior module
-            behavior_module.add_data_interface(index_position_ts)
-            behavior_module.add_data_interface(mrp_position_ts)
+            # behavior_module.add_data_interface(index_position_ts)
+            # behavior_module.add_data_interface(mrp_position_ts)
 
             # Create TimeSeries objects for velocities
             index_velocity_ts = TimeSeries(
@@ -207,10 +213,13 @@ def convert_pkl_to_nwb(data_dir):
                 timestamps=times,
                 description="Velocity of middle-ring-pinky flexion",
             )
+            # Add velocities to analysis
+            nwbfile.add_analysis(index_velocity_ts)
+            nwbfile.add_analysis(mrp_velocity_ts)
 
             # Add velocities to the behavior module
-            behavior_module.add_data_interface(index_velocity_ts)
-            behavior_module.add_data_interface(mrp_velocity_ts)
+            # behavior_module.add_data_interface(index_velocity_ts)
+            # behavior_module.add_data_interface(mrp_velocity_ts)
 
             # Process neural data
             # SBP channels
@@ -230,9 +239,9 @@ def convert_pkl_to_nwb(data_dir):
             ].values  # Shape: (num_timepoints, num_channels)
 
             # Create the ecephys processing module
-            ecephys_module = nwbfile.create_processing_module(
-                name="ecephys", description="Binned (20ms) and processed neural data"
-            )
+            # ecephys_module = nwbfile.create_processing_module(
+            #     name="ecephys", description="Binned (20ms) and processed neural data"
+            # )
 
             # Create TimeSeries for SpikingBandPower
             sbp_timeseries = TimeSeries(
@@ -255,10 +264,13 @@ def convert_pkl_to_nwb(data_dir):
                 comments="Number of threshold crossings (threshold = -4.5RMS) per each 20ms bin",
                 conversion=1.0,
             )
+            # Add sbp and tcfr to analysis
+            nwbfile.add_analysis(sbp_timeseries)
+            nwbfile.add_analysis(tcfr_timeseries)
 
             # Add TimeSeries to the ecephys processing module
-            ecephys_module.add_data_interface(sbp_timeseries)
-            ecephys_module.add_data_interface(tcfr_timeseries)
+            # ecephys_module.add_data_interface(sbp_timeseries)
+            # ecephys_module.add_data_interface(tcfr_timeseries)
 
             # Add trials with start and stop times
             # Add custom columns to the trials table
@@ -300,7 +312,7 @@ def convert_pkl_to_nwb(data_dir):
                     run_id=trial_meta["run_id"],
                     index_target_position=trial_meta["index_target_position"],
                     mrp_target_position=trial_meta["mrp_target_position"],
-                    target_style=trial_meta["target_style"][0],
+                    target_style=trial_meta["target_style"],
                     timeseries=[
                         index_position_ts,
                         mrp_position_ts,
@@ -313,7 +325,7 @@ def convert_pkl_to_nwb(data_dir):
 
             # Write the NWB file
             output_filename = os.path.join(
-                data_dir, f"{date}_{trials_df['target_style'][0]}.nwb"
+                end_dir, f"{date}_{trials_df['target_style'][0]}.nwb"
             )
             with NWBHDF5IO(output_filename, "w") as io:
                 io.write(nwbfile)
@@ -322,91 +334,94 @@ def convert_pkl_to_nwb(data_dir):
             )
 
 
-def dicts_from_nwb(pickle_path: str) -> Tuple[Optional[dict], Optional[dict]]:
+
+def dicts_from_pickle(
+    pickle_path: str, nwb_dir: Optional[str] = None
+) -> Tuple[Optional[dict], Optional[dict]]:
     """
-    Re-create the two data-dictionaries (CO first, RD second) that produced the
-    given *pickle* file, by reading the corresponding NWB files written by
-    `convert_pkl_to_nwb`.  If one target-style was never recorded the function
-    returns `None` for that slot.
+    Re-create the two data-dictionaries that generated *pickle_path* when
+    `convert_pkl_to_nwb` last saved its NWB files (TimeSeries now live only
+    in /analysis).
+
+    Returns `(CO_dict, RD_dict)` – a slot is `None` if its NWB file is
+    missing.
 
     Parameters
     ----------
     pickle_path : str
-        Path to the original pickle file (e.g. "2024-12-01_preprocess.pkl").
-
-    Returns
-    -------
-    (dict_or_None, dict_or_None)
-        Tuple ordered (CO_dict, RD_dict).
+        Path to the original pickle (e.g. ".../2025-01-15_preprocess.pkl").
+    nwb_dir : str | None, optional
+        Directory containing the NWB files.  Defaults to the pickle's folder.
     """
 
-    def _load(path: str) -> dict:
-        with NWBHDF5IO(path, "r", load_namespaces=True) as io:
+    def load_one_nwb(fp: str) -> dict:
+        with NWBHDF5IO(fp, "r", load_namespaces=True) as io:
             nwb = io.read()
+            ana = nwb.analysis  # TimeSeries are stored only here
 
-            # ---------- time series ----------
-            beh = nwb.processing["behavior"]
-            ece = nwb.processing["ecephys"]
+            # helper → fetch from /analysis or raise clear error
+            def ts(name: str):
+                try:
+                    return ana[name]
+                except KeyError as e:
+                    raise KeyError(f"TimeSeries '{name}' not in /analysis of '{fp}'") from e
 
-            t_sec = beh["index_position"].timestamps[:]
-            time = (t_sec * 1000).astype(np.float32)  # ms
+            # --- time and kinematics ---
+            t_sec = ts("index_position").timestamps[:]
+            time_ms = (t_sec * 1000).astype(np.float32)
 
-            fk = np.column_stack(  # (N,4)
-                [
-                    beh[name].data[:].ravel()
-                    for name in (
-                        "index_position",
-                        "mrp_position",
-                        "index_velocity",
-                        "mrp_velocity",
-                    )
-                ]
+            finger_kinematics = np.column_stack(
+                [ts(n).data[:].ravel()
+                 for n in ("index_position", "mrp_position",
+                           "index_velocity", "mrp_velocity")]
             ).astype(np.float32)
 
-            sbp = (ece["SpikingBandPower"].data[:] / 0.25).astype(np.float32)
-            tcfr = ece["ThresholdCrossings"].data[:].astype(np.int16)
+            # --- neural features ---
+            sbp  = (ts("SpikingBandPower").data[:] / 0.25).astype(np.float32)
+            tcfr =  ts("ThresholdCrossings").data[:].astype(np.int16)
 
-            # ---------- trial-level ----------
+            # --- trial info ---
             tr = nwb.trials.to_dataframe()
-            trial_number = tr["trial_number"].to_numpy()
-            trial_count = tr["trial_count"].to_numpy()
-            target_positions = tr[
-                ["index_target_position", "mrp_target_position"]
-            ].to_numpy()
-            run_id = tr["run_id"].iloc[0]
-            target_style = tr["target_style"].iloc[0]
+            trial_number     = tr["trial_number"].to_numpy()
+            trial_count      = tr["trial_count"].to_numpy()
+            target_positions = tr[["index_target_position",
+                                   "mrp_target_position"]].to_numpy()
+            run_id       = tr["run_id"].iloc[0]
+            target_style = tr["target_style"]
 
-            # sample index at start of each trial
-            trial_index = np.searchsorted(t_sec, tr["start_time"].to_numpy()).astype(
-                np.int32
-            )
+            trial_index = np.searchsorted(
+                t_sec, tr["start_time"].to_numpy()
+            ).astype(np.int32)
+
 
             return dict(
-                trial_number=trial_number,
-                trial_count=trial_count,
-                target_positions=target_positions,
-                time=time,
-                finger_kinematics=fk,
-                sbp=sbp,
-                tcfr=tcfr,
-                trial_index=trial_index,
-                target_style=target_style,
-                run_id=run_id,
+                trial_number      = trial_number,
+                trial_count       = trial_count,
+                target_positions  = target_positions,
+                time              = time_ms,
+                finger_kinematics = finger_kinematics,
+                sbp               = sbp,
+                tcfr              = tcfr,
+                trial_index       = trial_index,
+                target_style      = target_style[0],
+                run_id            = np.full_like(trial_number, run_id),
             )
 
-    # ------------------------------------------------------------------
     date = os.path.basename(pickle_path).split(".")[0].split("_")[0]
-    folder = os.path.dirname(pickle_path)
-    co_path = os.path.join(folder, f"{date}_CO.nwb")
-    rd_path = os.path.join(folder, f"{date}_RD.nwb")
+    root = nwb_dir or os.path.dirname(pickle_path)
 
-    co_dict = _load(co_path) if os.path.isfile(co_path) else None
-    rd_dict = _load(rd_path) if os.path.isfile(rd_path) else None
+    co_fp = os.path.join(root, f"{date}_CO.nwb")
+    rd_fp = os.path.join(root, f"{date}_RD.nwb")
+
+    co_dict = load_one_nwb(co_fp) if os.path.isfile(co_fp) else None
+    rd_dict = load_one_nwb(rd_fp) if os.path.isfile(rd_fp) else None
+    if co_dict is None and rd_dict is None:
+        raise ValueError(f"No NWB files found for date {date}")
 
     return co_dict, rd_dict
 
 
 if __name__ == "__main__":
-    convert_pkl_to_nwb(config.good_daysdir)
+    convert_pkl_to_nwb(config.good_daysdir, config.nwb_out)
     # dicts = dicts_from_nwb(f"{data_dir}/2021-10-15_preprocess.pkl")
     # print(dicts)
