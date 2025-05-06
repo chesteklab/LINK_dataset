@@ -11,6 +11,7 @@ import os
 import sys
 import glob
 import re
+import signal_utils
 
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score, mutual_info_score
@@ -21,10 +22,35 @@ from scipy import stats
 from collections import defaultdict
 
 def create_signal_quality_figure():
-    # create figure which contains sbp over time, 
-    # calc_avg_sbps(dates,preprocessingdir,characterizationdir)
-    # signal_power_over_time(dates, characterizationdir, crunch=False)
+    dates = signal_utils.extract_dates_from_filenames()
+    print(f"Found {len(dates)} dates")
+    
+    fig, ax = plt.subplots(2,2)
+    # data_CO, data_RD = signal_utils.load_day(dates[0])
+    # for i in range(96):
+    #     plt.hist(data_CO['sbp'][:,i])
+    # plt.show()
 
+    #show example channel heatmap over time
+    channel = 0
+    
+
+    #average sbp figure
+    calc_avg_sbp = False
+    if calc_avg_sbp:
+        signal_utils.calc_avg_sbps(dates)
+    
+    create_avg_sbp_plot(ax[0])
+    
+    # calculate participation ratio on each day
+    calculate_pr = False
+    if calculate_pr:
+        signal_utils.calc_pr_all_days(dates)
+
+    # create pr figure
+    create_pr_plot(ax[1])
+
+    plt.show()
     # per channel sbp distributions over time
     # channels = 4
     # channels = [1,3,5] # select multiple channels
@@ -37,36 +63,54 @@ def create_signal_quality_figure():
     #maybe do this for all channels? find a way to combine
     
     # add mutual information calculations per day
-    dates = extract_dates_from_filenames(folder_path="/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Hisham_Temmar/big_dataset/2_autotrimming_and_preprocessing/preprocessing_092024_no7822nofalcon")
-    print(f"Found {len(dates)} dates")
-    calc_mutual_information(dates, preprocessingdir="/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Hisham_Temmar/big_dataset/2_autotrimming_and_preprocessing/preprocessing_092024_no7822nofalcon", characterizationdir="./output_dir")
 
-    pass
+    # calc_mutual_information(dates, characterizationdir="./output_dir")
 
-def extract_dates_from_filenames(folder_path):
-    # Find all matching .pkl files
-    pkl_files = glob.glob(os.path.join(folder_path, '*_preprocess.pkl'))
+def create_pr_plot(ax):
+    pr_df = pd.read_csv(os.path.join(signal_utils.output_path,"participation_ratios.csv"))
+    pr_df.set_index(['date'], inplace=True)
+    pr_df.index = pd.to_datetime(pr_df.index)
+    pr_df['days'] = (pr_df.index - pr_df.index[0]).to_series().dt.days.to_numpy()
 
-    dates = []
-    for file_path in pkl_files:
-        filename = os.path.basename(file_path)
-        match = re.match(r'(\d{4}-\d{2}-\d{2})_preprocess\.pkl', filename)
-        if match:
-            dates.append(match.group(1))
+    p = sns.regplot(data=pr_df, x="days", y="participation_ratio_active", marker='.', color='k', 
+                line_kws={'color':'r'}, scatter_kws={'alpha':0.6}, ax=ax, label="Single-day PR", ci=None)
+    
+    slope, intercept, r, p_val, sterr = stats.linregress(x=pr_df['days'], y=pr_df['participation_ratio_active'])
 
-    return dates #sorted(dates) 
+    ax.annotate(f'slope: {slope:.3e} PR/day\nint: {intercept:.3f}\nr^2:{r**2:.3f},\np:{p_val:.3f}', (0, 10), ha='left')
+    ax.set(title='Participation ratio over time', ylabel='Participation Ratio (PR)*', 
+           xlabel="Day since first recording")
+    ax.legend()
 
-def calc_mutual_information(dates, preprocessingdir, characterizationdir):
+def create_avg_sbp_plot(ax):
+    sbp_avgs = pd.read_csv(os.path.join(signal_utils.output_path, "sbp_avgs.csv"), index_col=0)
+    sbp_avgs.index = pd.to_datetime(sbp_avgs.index)
+
+    sbp_avgs['days'] = (sbp_avgs.index - sbp_avgs.index[0]).to_series().dt.days.to_numpy()
+
+    sbp_long = sbp_avgs.reset_index(names="date").melt(id_vars=["date",'days'], var_name='channel', value_name='sbp')
+    sbp_long['sbp'] = sbp_long['sbp']*0.25
+    
+    # plot average
+    slope, intercept, r, p_val, sterr = stats.linregress(x=sbp_long['days'], y=sbp_long['sbp'])
+
+    per_day_mean = sbp_long.groupby('days')['sbp'].mean()
+    ax.plot(per_day_mean)
+    sns.regplot(data=sbp_long, x="days", y="sbp", marker='.', color='k', 
+                line_kws={'color':'r'}, scatter_kws={'alpha':0.5}, ax=ax, label="Per-channel, single day averages")
+    
+    ax.annotate(f'slope: {slope:.3e} PR/day\nint: {intercept:.3f}\nr^2:{r**2:.3f},\np:{p_val:.3f}', (0, 10), ha='left')
+
+    ax.set(xlabel='Day since first recording',
+           ylabel='Mean SBP (uV)',
+           title='SBP across channels over time')
+
+def calc_mutual_information(dates, characterizationdir):
     mi_dict = {'date': [], 'channel': [], 'mutual_information': []}
-
     first_signal = None
-
     for date in dates:
-
-        file = os.path.join(preprocessingdir, f'{date}_preprocess.pkl')
-
-        with open(file, 'rb') as f:
-            data_CO, data_RD = pickle.load(f)
+        
+        data_CO, data_RD = signal_utils.load_day(date)
 
         if data_CO and data_RD:
             sbp = np.concatenate((data_CO['sbp'], data_RD['sbp']), axis=0)
@@ -102,122 +146,7 @@ def calc_mutual_information(dates, preprocessingdir, characterizationdir):
     mi_df.to_pickle(os.path.join(characterizationdir, "mutual_information_df.pkl"))
     mi_df.to_csv(os.path.join(characterizationdir, "mutual_information.csv"), index=False)
 
-def participation_ratio(dx_flat):
-    # Dxflat is a 2D array of shape (n_features, n_samples)
-    dx_flat = dx_flat - np.mean(dx_flat, axis=1)[:,np.newaxis] # subtract the mean so that we can actually get the covariance matrix
-    DD = np.matmul(dx_flat, dx_flat.T) # 96 x 135 * 135 x 96
-    U, S, V = np.linalg.svd(DD)
-    pr = np.sum(S)**2/np.sum(S**2)
-    return pr
 
-def calc_participation_ratios(dates):
-    pr_dict = {'date': [],
-               'chan_mask': [],
-               'pr':[],
-               'pr_mask':[],
-               'target_style': []
-               }
-    
-    for date in dates:
-        file = os.path.join(config.preprocessingdir,f'{date}_preprocess.pkl')
-
-        with open(file, 'rb') as f:
-            data_CO, data_RD = pickle.load(f)
-
-        # use CO if its there
-        feat = data_CO if data_CO else data_RD
-        TS = 'CO' if data_CO else 'RD'
-
-        tcfr = feat['tcfr'] * 1000 / config.data_params['binsize']
-        sbp = feat['sbp'] * 1000 / config.data_params['binsize']
-
-        if np.sum(np.isnan(sbp)) > 0:
-            continue
-
-        chanMask = np.where(np.mean(tcfr, axis=0) > 1)[0]
-        if chanMask.shape[0] == 0:
-            continue
-
-        PR_mask = participation_ratio(sbp[:, chanMask].T)
-        PR = participation_ratio(sbp.T)
-        print(PR_mask, PR, chanMask.shape)
-
-        pr_dict['date'].append(date)
-        pr_dict['chan_mask'].append(chanMask)
-        pr_dict['pr'].append(PR)
-        pr_dict['pr_mask'].append(PR_mask)
-        pr_dict['target_style'].append(TS)
-
-    pr_df = pd.DataFrame.from_dict(pr_dict)
-    pr_df.to_csv(os.path.join(config.characterizationdir,"participation_ratios.csv"))
-
-def create_pr_plot(ax):
-    pr_df = pd.read_csv(os.path.join(config.characterizationdir,"participation_ratios.csv"))
-    pr_df.set_index(['date'], inplace=True)
-    pr_df.index = pd.to_datetime(pr_df.index)
-    pr_df['days'] = (pr_df.index - pr_df.index[0]).to_series().dt.days.to_numpy()
-
-    p = sns.regplot(data=pr_df, x="days", y="pr_mask", marker='.', color='k', 
-                line_kws={'color':'r'}, scatter_kws={'alpha':0.6}, ax=ax, label="Single-day PR", ci=None)
-    
-    slope, intercept, r, p_val, sterr = stats.linregress(x=pr_df['days'], y=pr_df['pr_mask'])
-
-    ax.annotate(f'slope: {slope:.3e} PR/day\nint: {intercept:.3f}\nr^2:{r**2:.3f},\np:{p_val:.3f}', (0, 10), ha='left')
-    xticks = (0, 500, 1000, 1500)
-    ax.set(title='Participation ratio over time', ylabel='Participation Ratio (PR)*', 
-           xlabel="Day since first recording", xticks=xticks, yticks=(0,4,8,12,16))
-    ax.legend()
-
-def calc_avg_sbps(dates,preprocessingdir,characterizationdir):
-    sbp_avgs = pd.DataFrame(np.zeros((len(dates), 96), dtype=float), index=dates)
-    sbp_avgs.index = pd.to_datetime(sbp_avgs.index)
-
-    for date in dates:
-        file = os.path.join(preprocessingdir,f'{date}_preprocess.pkl')
-
-        with open(file, 'rb') as f:
-            data_CO, data_RD = pickle.load(f)
-        
-        if data_CO and data_RD:
-            sbp = np.concatenate((data_CO['sbp'], data_RD['sbp']),axis=0)
-        elif data_RD:
-            sbp = data_RD['sbp']
-        else:
-            sbp = data_CO['sbp']
-
-        sbp_avgs.loc[date] = np.mean(sbp, axis=0)
-
-    # once everything is in, take date out of index and make its own column
-    #pdb.set_trace()
-    sbp_avgs.to_csv(os.path.join(characterizationdir, "sbp_avgs.csv"))
-
-def signal_power_over_time(dates, characterizationdir, crunch=False):
-    fig, ax = plt.subplots(1, 1, figsize = (19.5, 6), sharex=True)
-    if crunch:
-        calc_avg_sbps(dates)
-    
-    sbp_avgs = pd.read_csv(os.path.join(characterizationdir, "sbp_avgs.csv"), index_col=0)
-    sbp_avgs.index = pd.to_datetime(sbp_avgs.index)
-
-    sbp_avgs['days'] = (sbp_avgs.index - sbp_avgs.index[0]).to_series().dt.days.to_numpy()
-
-    sbp_long = sbp_avgs.reset_index(names="date").melt(id_vars=["date",'days'], var_name='channel', value_name='sbp')
-    sbp_long['sbp'] = sbp_long['sbp']*0.25
-    
-    # plot average
-    slope, intercept, r, p_val, sterr = stats.linregress(x=sbp_long['days'], y=sbp_long['sbp'])
-
-    sns.regplot(data=sbp_long, x="days", y="sbp", marker='.', color='k', 
-                line_kws={'color':'r'}, scatter_kws={'alpha':0.5}, ax=ax, label="Per-channel, single day averages")
-    
-    ax.annotate(f'slope: {slope:.3e} PR/day\nint: {intercept:.3f}\nr^2:{r**2:.3f},\np:{p_val:.3f}', (0, 10), ha='left')
-
-    ax.set(xlabel='Day since first recording',
-           ylabel='Mean SBP (uV)',
-           title='SBP across channels over time',
-           ylim=(0,70*.25),
-           yticks=(0,4,8,16))
-    
 def sbp_distributions(ds,channels,preprocessingdir,characterizationdir):
     if isinstance(channels, int):
         ch_list = [channels]
@@ -233,10 +162,7 @@ def sbp_distributions(ds,channels,preprocessingdir,characterizationdir):
     distributions = []
     
     for date in ds:
-        file = os.path.join(preprocessingdir, f'{date}_preprocess.pkl')
-
-        with open(file, 'rb') as f:
-            data_CO, data_RD = pickle.load(f)
+        data_CO, data_RD = signal_utils.load_day(date)
         
         for ch in ch_list:
             if data_CO and data_RD:
@@ -259,7 +185,7 @@ def sbp_distributions(ds,channels,preprocessingdir,characterizationdir):
     
     return distributions_df
 
-def sbp_distributions_per_ch(ds, ch, preprocessingdir, characterizationdir):
+def sbp_distributions_per_ch(dates, ch, preprocessingdir, characterizationdir):
     distributions = []
     for date in ds:
         file = os.path.join(preprocessingdir,f'{date}_preprocess.pkl')
