@@ -20,6 +20,7 @@ dfpath = os.path.join(firstpassdir, 'firstpass_datesruns.pkl')
 
 preprocessingdir = os.path.join(outputdir, 'adjusted_times')
 good_daysdir = os.path.join(outputdir, 'only_good_days')
+nwbdir = os.path.join(outputdir, 'nwb_out')
 
 datareviewdir = os.path.join(outputdir, 'datareview' )
 reviewpath = os.path.join(datareviewdir, 'review_results_ht.csv')

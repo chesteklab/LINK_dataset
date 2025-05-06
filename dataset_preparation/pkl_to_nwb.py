@@ -422,6 +422,6 @@ def dicts_from_pickle(
 
 
 if __name__ == "__main__":
-    convert_pkl_to_nwb(config.good_daysdir, config.nwb_out)
+    convert_pkl_to_nwb(config.good_daysdir, config.nwbdir)
     # dicts = dicts_from_nwb(f"{data_dir}/2021-10-15_preprocess.pkl")
     # print(dicts)
