@@ -12,7 +12,8 @@ extractedDates = [re.split('NapierNotes|\.txt', note)[1] for note in noteList]
 extractedDates.sort()
 extractedDates = [[datetime.datetime.strptime(date, '%Y%m%d').date().isoformat()] for date in extractedDates]
 
-with open('firstpass_dates.csv', 'w', newline='') as f:
+outpath = config.sheetpath
+with open(outpath, 'w', newline='') as f:
     write = csv.writer(f)
     write.writerow(['Date', 'Runs'])
     write.writerows(extractedDates)
