@@ -3,11 +3,11 @@ import os
 # get cwd for making the folders - so that all the data should generate/get saved into the right places
 cwd = os.getcwd()
 
-server_dir = "/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/"
-#server_dir = "Z:\"
+#server_dir = "/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/"
+server_dir = "Z:\\"
 
-#pybmipath = 'C:\Repos\pybmi'
-pybmipath = '/home/chesteklab/Repos/pybmi'
+pybmipath = 'C:\Repos\pybmi'
+# pybmipath = '/home/chesteklab/Repos/pybmi'
 datapath = os.path.join(server_dir, 'Data', 'Monkeys')
 outputdir = os.path.join(server_dir, 'Student Folders', 'Nina_Gill', 'data')
 
