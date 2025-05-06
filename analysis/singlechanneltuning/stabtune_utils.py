@@ -7,6 +7,8 @@ import pickle
 import glob
 import tqdm
 import pdb
+import matplotlib.colors as colors
+import matplotlib.pyplot as plt
 
 def compute_channel_tuning(neural, full_behavior, velocity_tuning = False):
 
@@ -120,3 +122,22 @@ def load_tuning_data(dir, overwrite=False):
         df = pd.read_csv(os.path.join(dir, 'channelwise_stability_tuning.csv'))
     return df
     
+def desaturate_hsv(colormap = 'hsv', s = 0.75):
+    # 1 ) grab the built‑in cyclic map (256 samples give a smooth gradient)
+    base = plt.cm.get_cmap(colormap, 256)
+
+    # 2 ) split RGB and α
+    rgba = base(np.linspace(0, 1, 256))
+    rgb  = rgba[:, :3]                 # (N,3)
+    alpha = rgba[:, 3]                 # keep original transparency
+
+    # 3 ) RGB → HSV, desaturate, HSV → RGB
+    hsv  = colors.rgb_to_hsv(rgb)
+    hsv[:, 1] *= s                 # ← 0 = grey‑scale … 1 = original saturation
+    desat_rgb = colors.hsv_to_rgb(hsv)
+
+    # 4 ) re‑attach α and build the new map
+    desat_rgba = np.column_stack([desat_rgb, alpha])
+    cmap_hsv_desat = colors.ListedColormap(desat_rgba, name='hsv_desat')
+    cmap_hsv_desat.set_bad('black')    # NaNs will plot in black
+    return cmap_hsv_desat

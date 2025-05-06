@@ -8,38 +8,75 @@ from scipy import stats
 import matplotlib as mpl
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import pdb
+import scipy
 
 def plot_polar_tuning(ax, dataframe, channel_number, ylim = None, cmap = 'crest'):
-    
-    channel_data = dataframe.loc[dataframe['channel'] == channel_number].copy()
+    if(channel_number == -1):
+        if ylim is not None:
+            ax.set_ylim(ylim[0], ylim[1])
+        #ax.set_title(f'Tuning Wheel', va='bottom', pad=20)
+    else:
+        channel_data = dataframe.loc[dataframe['channel'] == channel_number].copy()
 
-    channel_data['date'] = pd.to_datetime(channel_data['date'])
-    time_normalized = (channel_data['date'] - channel_data['date'].min()) / (channel_data['date'].max() - channel_data['date'].min())
+        channel_data['date'] = pd.to_datetime(channel_data['date'])
+        time_normalized = (channel_data['date'] - channel_data['date'].min()) / (channel_data['date'].max() - channel_data['date'].min())
 
-    if ax.name != 'polar':
-        fig = ax.figure
-        pos = ax.get_position()
-        ax.remove()
-        ax = fig.add_axes(pos, projection='polar')
+        cmap = sns.color_palette(cmap, as_cmap=True).reversed()
 
-    cmap = sns.color_palette(cmap, as_cmap=True).reversed()
+        scatter = ax.scatter(
+            np.radians(channel_data['angle']),
+            channel_data['magnitude'],
+            c=time_normalized,
+            cmap=cmap,
+            alpha=0.3
+        )
+        if ylim is not None:
+            ax.set_ylim(ylim[0], ylim[1])
 
-    scatter = ax.scatter(
-        np.radians(channel_data['angle']),
-        channel_data['magnitude'],
-        c=time_normalized,
-        cmap=cmap,
-        alpha=0.6
-    )
-    if ylim is not None:
-        ax.set_ylim(ylim[0], ylim[1])
+        #cbar = fig.colorbar(scatter, ax=ax, orientation='horizontal', pad=0.1)
+        #cbar.set_label('Time')
+        #cbar.set_ticks([0, 1])
+        #cbar.set_ticklabels([channel_data['date'].min().strftime('%Y-%m-%d'), channel_data['date'].max().strftime('%Y-%m-%d')])
+        #ax.set_title(f'Tuning Direction and Magnitude over Time for Channel {channel_number}', va='bottom', pad=50)
+        ax.set_title(f'Channel {channel_number}', va='bottom', pad=20)
 
-    #cbar = fig.colorbar(scatter, ax=ax, orientation='horizontal', pad=0.1)
-    #cbar.set_label('Time')
-    #cbar.set_ticks([0, 1])
-    #cbar.set_ticklabels([channel_data['date'].min().strftime('%Y-%m-%d'), channel_data['date'].max().strftime('%Y-%m-%d')])
-    #ax.set_title(f'Tuning Direction and Magnitude over Time for Channel {channel_number}', va='bottom', pad=50)
-    ax.set_title(f'Channel {channel_number}', va='bottom', pad=20)
+
+def plot_polar_tuning_fit(ax, dataframe, channel_number, ylim = None, cmap = 'crest'):
+    if(channel_number == -1):
+        if ylim is not None:
+            ax.set_ylim(ylim[0], ylim[1])
+        #ax.set_title(f'Tuning Wheel', va='bottom', pad=20)
+    else:
+        channel_data = dataframe.loc[dataframe['channel'] == channel_number].copy()
+
+        channel_data['date'] = pd.to_datetime(channel_data['date'])
+        time_normalized = (channel_data['date'] - channel_data['date'].min()) / (channel_data['date'].max() - channel_data['date'].min())
+
+        cmap = sns.color_palette(cmap, as_cmap=True).reversed()
+
+        scatter = ax.scatter(
+            np.radians(channel_data['angle']),
+            channel_data['magnitude'],
+            c=time_normalized,
+            cmap=cmap,
+            alpha=0.3
+        )
+        if ylim is not None:
+            ax.set_ylim(ylim[0], ylim[1])
+
+        channel_data['time_numeric'] = (channel_data['date'] - channel_data['date'].min()).dt.total_seconds()
+        
+        angle_coeffs = np.polyfit(channel_data['time_numeric'], channel_data['angle'], 1)
+        angle_fit = np.polyval(angle_coeffs, channel_data['time_numeric'])
+        angle_smooth = savgol_filter(angle_fit, window_length=11, polyorder=2)
+        ax.plot(np.radians(channel_data['angle']), angle_smooth, label='Angle Fit', color='red', alpha=0.7)
+
+        magnitude_coeffs = np.polyfit(channel_data['time_numeric'], channel_data['magnitude'], 1)
+        magnitude_fit = np.polyval(magnitude_coeffs, channel_data['time_numeric'])
+        magnitude_smooth = savgol_filter(magnitude_fit, window_length=11, polyorder=2)
+        ax.plot(np.radians(channel_data['angle']), magnitude_smooth, label='Magnitude Fit', color='blue', alpha=0.7)
+
+        ax.set_title(f'Channel {channel_number}', va='bottom', pad=20)
 
 def plot_heat_map(ax, dataframe, choice = 'original', type = 'magnitude', cmap = 'coolwarm'):
     matrix = dataframe.pivot(index='channel', columns='date', values=type)
@@ -121,16 +158,16 @@ def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type 
         data      = matrix.diff(axis=1).diff(axis=1)
         cbar_label = 'Second Derivative'
     sns.heatmap(data, ax=ax, cmap=cmapn, vmin=lower, vmax=upper, cbar=False if is_circle_cbar else True, cbar_kws={'label': cbar_label})
-
+    ax.set_aspect('auto', adjustable='box')
     if(plot_xlabel):
-        ax.set(title=f'Heatmap of {choice.capitalize()} {type.capitalize()} Tuning', xlabel='Date', ylabel='Channel')
+        ax.set(title=f'Heatmap of {choice.capitalize()} Tuning {type.capitalize()}', xlabel='Date', ylabel='Channel')
         xticks = [i for i, date in enumerate(all_dates) if date.month in [3, 9] and date.day == 1]
         ax.set_xticks(xticks)
         ax.set_yticks([0 , 32, 64, 95])
         ax.set_yticklabels([f'Ch {i}' for i in ax.get_yticks()])
         ax.set_xticklabels(pd.to_datetime(all_dates[xticks]).strftime('%Y-%m-%d'), rotation = 0)
     else:
-        ax.set(title=f'Heatmap of {choice.capitalize()} {type.capitalize()} Tuning', ylabel='Channel')
+        ax.set(title=f'Heatmap of {choice.capitalize()} Tuning {type.capitalize()}', ylabel='Channel')
         xticks = [i for i, date in enumerate(all_dates) if date.month in [3, 9] and date.day == 1]
         ax.set_xticks(xticks)
         ax.set_yticks([0 , 32, 64, 95])
@@ -148,11 +185,6 @@ def plot_heat_map_uniform_Experimental(ax, dataframe, choice = 'original', type 
 #     cbar.set_label('Magnitude')
 
 def draw_angle_wheel(ax, cmap):
-    if ax.name != 'polar':
-        fig = ax.figure
-        pos = ax.get_position()
-        ax.remove()
-        ax = fig.add_axes(pos, projection='polar')
     inner_radius = 40
     outer_radius = 100
     azimuths = np.arange(-180, 181, 1)
@@ -232,7 +264,7 @@ def plot_heat_map_HSV(ax, df, q_clip=(0.01, 0.99), sat=1.0):
 #     ax.set_xticks(np.linspace(0, len(all_dates) - 1, 10))
 #     ax.set_xticklabels(pd.to_datetime(all_dates[np.linspace(0, len(all_dates) - 1, 10, dtype=int)]).strftime('%Y-%m-%d'), rotation=45)
 
-def plot_time_graph(ax, dataframe, choice = 'original', type='magnitude', channels=None, apply_smoothing=False, smoothing_params=None):
+def plot_time_graph(ax, dataframe, derivative = 'original', type='magnitude', channels=None, apply_smoothing=False, smoothing_params=None):
     #todo: choice change to derivative
     '''
     type can be 'magnitude' or 'angle'
@@ -265,7 +297,7 @@ def plot_time_graph(ax, dataframe, choice = 'original', type='magnitude', channe
     lower_bound = matrix.quantile(0.01).min()
     upper_bound = matrix.quantile(0.99).max()
     clipped_matrix = matrix.clip(lower=lower_bound, upper=upper_bound)
-    if choice == 'original':
+    if derivative == 'original':
         if isinstance(channels, int):
             ax.plot(selected_data['date'], selected_data[type], label=f'Channel {channels}')
         elif isinstance(channels, list):
@@ -273,7 +305,7 @@ def plot_time_graph(ax, dataframe, choice = 'original', type='magnitude', channe
             end_channel = channels[-1]
             ax.plot(selected_data['date'], selected_data[type], label=f'Channels {start_channel}-{end_channel}')
         ax.set_title(f'Time Graph of {type.capitalize()} ({title_suffix})')
-    elif choice == 'first_derivative':
+    elif derivative == 'first_derivative':
         selected_data['first_derivative'] = selected_data[type].diff()
         if isinstance(channels, int):
             ax.plot(selected_data['date'], selected_data['first_derivative'], label=f'First Derivative (Channel {channels})')
@@ -282,7 +314,7 @@ def plot_time_graph(ax, dataframe, choice = 'original', type='magnitude', channe
             end_channel = channels[-1]
             ax.plot(selected_data['date'], selected_data['first_derivative'], label=f'First Derivative (Channels {start_channel}-{end_channel})')
         ax.set_title(f'Time Graph of First Derivative of {type.capitalize()} ({title_suffix})')
-    elif choice == 'second_derivative':
+    elif derivative == 'second_derivative':
         selected_data['second_derivative'] = selected_data[type].diff().diff()
         if isinstance(channels, int):
             ax.plot(selected_data['date'], selected_data['second_derivative'], label=f'Second Derivative (Channel {channels})')
@@ -296,21 +328,34 @@ def plot_time_graph(ax, dataframe, choice = 'original', type='magnitude', channe
     ax.set_ylabel(type.capitalize())
     ax.legend()
 
-def plot_tuning_variance_histogram(ax, dataframe, type='angle', bins = 10, metric = 'variance'):
+def plot_tuning_variance_histogram(ax, dataframe, type='angle', bins = 10, metric = 'variance', colour = 'blue'):
     '''
-    metric can be 'variance', 'mean'
+    metric can be 'variance', 'mean', or 'std'
     '''
     if metric == 'variance':
         values = dataframe.groupby('channel')[type].var()
-        ax.hist(values, bins=bins)
-        ax.set_title(f'Variance of Tuning {type.capitalize()} Across Channels')
+        ax.hist(values, bins=bins, color = colour)
+        ax.set_title(f'Variance of {type.capitalize()}')
         ax.set_xlabel(f'Tuning {type.capitalize()} Variance')
         ax.set_ylabel('Number of Channels')
     elif metric == 'mean':
         values = dataframe.groupby('channel')[type].mean()
-        ax.hist(values, bins=bins)
-        ax.set_title(f'Mean of Tuning {type.capitalize()} Across Channels')
+        ax.hist(values, bins=bins, color = colour)
+        ax.set_title(f'Mean of {type.capitalize()}')
         ax.set_xlabel(f'Tuning {type.capitalize()} Mean')
+        ax.set_ylabel('Number of Channels')
+    elif metric == 'std':
+        values = dataframe.groupby('channel')[type].std()
+        ax.hist(values, bins=bins, color = colour)
+        ax.set_title(f'Std of {type.capitalize()}')
+        ax.set_xlabel(f'Tuning {type.capitalize()} Standard Deviation')
+        ax.set_ylabel('Number of Channels')
+    elif metric == 'circstd':
+        values = dataframe.groupby('channel')[type].apply(lambda x: stats.circstd(np.radians(x), high=np.pi, low=-np.pi))
+        values = np.degrees(values)
+        ax.hist(values, bins=bins, color = colour)
+        ax.set_title(f'Circular Std of {type.capitalize()}')
+        ax.set_xlabel(f'Tuning {type.capitalize()} Circular Standard Deviation')
         ax.set_ylabel('Number of Channels')
     else:
         raise ValueError("Invalid metric")
@@ -322,6 +367,10 @@ def plot_daily_spatial_tuning(ax,dataframe,date_choice,mapping_dir,correspondenc
     spatial_magnitude = np.zeros((8,8,2))
     spatial_angles = np.zeros((8,8,2))
     array_correspondence = np.zeros((8,8,2))
+    cmapv = sns.color_palette('viridis', as_cmap=True).copy()
+    cmapv.set_bad('gainsboro')
+    cmaph = sns.color_palette('hsv', as_cmap=True).copy()
+    cmaph.set_bad('gainsboro')
     for ch in daily_tuning['channel']:
         row = mapping[mapping['Channel']== ch+1]['Array Row'].values[0]
         col = mapping[mapping['Channel']== ch+1]['Array Column'].values[0]
@@ -329,17 +378,19 @@ def plot_daily_spatial_tuning(ax,dataframe,date_choice,mapping_dir,correspondenc
         spatial_magnitude[row-1,col-1,array_name-1] = daily_tuning[daily_tuning['channel'] == ch]['magnitude'].values[0]
         spatial_angles[row-1,col-1,array_name-1] = daily_tuning[daily_tuning['channel'] == ch]['angle'].values[0]
         array_correspondence[row-1,col-1,array_name-1] = ch+1
+    spatial_magnitude[:,4:,1] = np.nan
+    spatial_angles[:,4:,1] = np.nan
     if(not correspondence):
-        sns.heatmap(spatial_magnitude[:, :, 0], ax=ax[0, 0], cmap='viridis', cbar=True, vmin=0.000828924594908148, vmax=0.05302147033920138)
+        sns.heatmap(spatial_magnitude[:, :, 0], ax=ax[0, 0], cmap=cmapv, cbar=True, vmin=0.000828924594908148, vmax=0.05302147033920138)
         ax[0, 0].set_title('Spatial Magnitude (Array 1)')
 
-        sns.heatmap(spatial_magnitude[:, :, 1], ax=ax[0, 1], cmap='viridis', cbar=True, vmin=0.000828924594908148, vmax=0.05302147033920138)
+        sns.heatmap(spatial_magnitude[:, :, 1], ax=ax[0, 1], cmap=cmapv, cbar=True, vmin=0.000828924594908148, vmax=0.05302147033920138)
         ax[0, 1].set_title('Spatial Magnitude (Array 2)')
 
-        sns.heatmap(spatial_angles[:, :, 0], ax=ax[1, 0], cmap='hsv', cbar=True, vmin=-180, vmax=180)
+        sns.heatmap(spatial_angles[:, :, 0], ax=ax[1, 0], cmap=cmaph, cbar=True, vmin=-180, vmax=180)
         ax[1, 0].set_title('Spatial Angles (Array 1)')
 
-        sns.heatmap(spatial_angles[:, :, 1], ax=ax[1, 1], cmap='hsv', cbar=True, vmin=-180, vmax=180)
+        sns.heatmap(spatial_angles[:, :, 1], ax=ax[1, 1], cmap=cmaph, cbar=True, vmin=-180, vmax=180)
         ax[1, 1].set_title('Spatial Angles (Array 2)')
     else:
         sns.heatmap(array_correspondence[:, :, 0], annot=True, fmt=".0f", cmap=None, cbar=False, ax=ax[0])
