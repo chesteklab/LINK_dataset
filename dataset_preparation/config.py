@@ -9,7 +9,7 @@ server_dir = "/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.
 #pybmipath = 'C:\Repos\pybmi'
 pybmipath = '/home/chesteklab/Repos/pybmi'
 datapath = os.path.join(server_dir, 'Data', 'Monkeys')
-outputdir = os.path.join(server_dir, 'Student Folders', 'Hisham_Temmar', 'big_dataset')
+outputdir = os.path.join(server_dir, 'Student Folders', 'Nina_Gill', 'data')
 
 firstpassdir = os.path.join(outputdir, "1_notes_data_pruning")
 notesdir = os.path.join(firstpassdir,'joker_notes_firstpass')
@@ -18,10 +18,11 @@ sheetpath = os.path.join(firstpassdir, 'firstpass_datesruns.csv')
 dfpath = os.path.join(firstpassdir, 'firstpass_datesruns.pkl')
 # dfpath = os.path.join(firstpassdir, 'sfn_datasets.pkl')
 
-preprocessingdir = os.path.join(server_dir, 'Student Folders', 'Nina_Gill', 'data', 'adjusted_times')
+preprocessingdir = os.path.join(outputdir, 'adjusted_times')
+good_daysdir = os.path.join(outputdir, 'only_good_days')
 
-datareviewdir = "Z:\Student Folders\Hisham_Temmar\\big_dataset\\3_data_review_results"
-reviewpath = os.path.join(datareviewdir, 'review_results_test.csv')
+datareviewdir = os.path.join(outputdir, 'datareview' )
+reviewpath = os.path.join(datareviewdir, 'review_results_ht.csv')
 savestatepath = os.path.join(datareviewdir, 'savestate.pkl')
 
 #data review config and params
