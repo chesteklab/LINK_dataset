@@ -13,7 +13,7 @@ def prep_data(resume=True):
     bad_days = []
     days = np.arange(len(datesruns))
     if resume:
-        resumeidx = np.argwhere(datesruns['Date'].to_numpy() == '2020-10-21')[0,0]
+        resumeidx = np.argwhere(datesruns['Date'].to_numpy() == '2020-08-22')[0,0]
     else:
         resumeidx = 0
     idxs = np.arange(resumeidx, len(datesruns))
@@ -102,7 +102,7 @@ def load_run(date, run):
     runstr = 'Run-' + str(run).zfill(3)
     fpath = os.path.join(config.datapath, config.data_params['monkey'], date, runstr)
     z = ZTools.ZStructTranslator(fpath, use_py=False).asdataframe()
-
+    pdb.set_trace()
 
     # filters based on the most common style AND if it's 29 or 34, so we don't have one 29 in a mix of 34 
     # remove closed loop and unsuccessful trials
@@ -113,7 +113,7 @@ def load_run(date, run):
           & (z['ClosedLoop'] == 0) 
           & (z['TrialSuccess'] == 1)
           & (z['TargetHoldTime'] == 750)]
-          
+    pdb.set_trace()
 
     if style_mode == 34.0:
         target_style = 'CO'
@@ -181,4 +181,4 @@ def preprocessing(data, run, target_style):
     return processed_run
 
 if __name__=="__main__":
-    prep_data(resume=False)
+    prep_data(resume=True)

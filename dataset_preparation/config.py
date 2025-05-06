@@ -11,18 +11,18 @@ sheetpath = os.path.join(firstpassdir, 'firstpass_datesruns.csv')
 dfpath = os.path.join(firstpassdir, 'firstpass_datesruns.pkl')
 # dfpath = os.path.join(firstpassdir, 'sfn_datasets.pkl')
 
-preprocessingdir = os.path.join("Z:\Student Folders\Hisham_Temmar\\big_dataset\\2_autotrimming_and_preprocessing","preprocessing_092024_no7822nofalcon")
+preprocessingdir = os.path.join("Z:\Student Folders\\Nina_Gill\data\preprocessing")
 # preprocessingpath = os.path.join("Z:\Student Folders\Hisham_Temmar\\big_dataset\\sfn_round_2")
 
 datareviewdir = "Z:\Student Folders\Hisham_Temmar\\big_dataset\\3_data_review_results"
-reviewpath = os.path.join(datareviewdir, 'review_results.csv')
+reviewpath = os.path.join(datareviewdir, 'review_results_test.csv')
 savestatepath = os.path.join(datareviewdir, 'savestate.pkl')
 
 characterizationdir = os.path.join(outputdir, "dataset_characterization")
 
 
 #data review config and params
-dataset_version = "0.3"
+dataset_version = "1.0"
 data_params = {
     'monkey':'Joker',
     'binsize':20,

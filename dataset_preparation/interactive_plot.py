@@ -39,7 +39,7 @@ class neural_plot(widgets.VBox):
         self.results_df = pd.DataFrame(columns=['Date','Status','Note'])
 
         with self.figoutput:
-            self.fig, self.ax = plt.subplots(4, 1, figsize= (12,12), constrained_layout=True)
+            self.fig, self.ax = plt.subplots(4, 1, figsize= (8,8), constrained_layout=True)
 
             self.ax[0].set_title('Neural (Unsmoothed, red trace = average over chans)')
             self.ax[0].set_ylabel('Normalized Binned SBP')
