@@ -181,6 +181,36 @@ def plot_average_mutual_information(pkl_file_path):
     plt.savefig(output_path, dpi=300)
     plt.close()
 
+def plot_top_channel_mi_histograms(characterizationdir):
+
+    mi_df = pd.read_pickle(os.path.join(characterizationdir, "mutual_information_df.pkl"))
+
+    # Remove the first day's data
+    first_date = mi_df['date'].min()
+    mi_df = mi_df[mi_df['date'] != first_date]
+
+    # Compute average MI per channel
+    avg_mi_per_channel = mi_df.groupby('channel')['mutual_information'].mean()
+
+    # Get top 3 channels by average MI
+    top_channels = avg_mi_per_channel.sort_values(ascending=False).head(3).index.tolist()
+
+
+    plt.figure(figsize=(15, 4))
+    for i, ch in enumerate(top_channels, 1):
+        plt.subplot(1, 3, i)
+        sns.histplot(mi_df[mi_df['channel'] == ch]['mutual_information'], bins=20, kde=True)
+        plt.title(f"Channel {ch} MI Histogram")
+        plt.xlabel("Mutual Information")
+        plt.ylabel("Frequency")
+
+    plt.tight_layout()
+    save_path = os.path.join(characterizationdir, "top3_channel_mi_histograms.png")
+    plt.savefig(save_path)
+    plt.close()
+
+    print(f"Saved histogram figure to: {save_path}")
+
 def plot_mutual_information_heatmap(pkl_file_path):
 
     mi_df = pd.read_pickle(pkl_file_path)
