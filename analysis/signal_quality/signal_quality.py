@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from datetime import datetime
+from tqdm import tqdm
 #import config
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -12,6 +13,7 @@ import sys
 import glob
 import re
 import signal_utils
+
 
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score, mutual_info_score
@@ -108,7 +110,8 @@ def create_avg_sbp_plot(ax):
 def calc_mutual_information(dates, characterizationdir):
     mi_dict = {'date': [], 'channel': [], 'mutual_information': []}
     first_signal = None
-    for date in dates:
+
+    for date in tqdm(dates, desc="Calculating Mutual Information", file=sys.stdout):
         
         data_CO, data_RD = signal_utils.load_day(date)
 
@@ -145,6 +148,66 @@ def calc_mutual_information(dates, characterizationdir):
     mi_df = pd.DataFrame.from_dict(mi_dict)
     mi_df.to_pickle(os.path.join(characterizationdir, "mutual_information_df.pkl"))
     mi_df.to_csv(os.path.join(characterizationdir, "mutual_information.csv"), index=False)
+
+
+def plot_average_mutual_information(pkl_file_path):
+
+    mi_df = pd.read_pickle(pkl_file_path)
+
+    # Convert dates to datetime for sorting and grouping
+    mi_df['date'] = pd.to_datetime(mi_df['date'])
+
+    mi_df = mi_df.sort_values('date')
+
+    # Get the first date to exclude
+    first_date = mi_df['date'].min()
+
+    # Filter out the first date
+    mi_df = mi_df[mi_df['date'] != first_date]
+
+    # Group by date and compute average MI
+    avg_mi_per_day = mi_df.groupby('date')['mutual_information'].mean()
+
+    plt.figure(figsize=(12, 6))
+    avg_mi_per_day.plot(marker='o')
+    plt.xlabel("Date")
+    plt.ylabel("Average Mutual Information")
+    plt.title("Average Mutual Information Across Channels Over Time (excluding first day)")
+    plt.grid(True)
+    plt.tight_layout()
+
+    output_dir = os.path.dirname(pkl_file_path)
+    output_path = os.path.join(output_dir, "avg_mutual_information_over_time.png")
+    plt.savefig(output_path, dpi=300)
+    plt.close()
+
+def plot_mutual_information_heatmap(pkl_file_path):
+
+    mi_df = pd.read_pickle(pkl_file_path)
+
+    # Convert date column to datetime
+    mi_df['date'] = pd.to_datetime(mi_df['date'])
+
+    mi_df = mi_df.sort_values('date')
+
+    # Exclude the first date
+    first_date = mi_df['date'].min()
+    mi_df = mi_df[mi_df['date'] != first_date]
+
+    # Pivot table to create a 2D matrix of shape (date x channel)
+    heatmap_data = mi_df.pivot_table(index='date', columns='channel', values='mutual_information')
+
+    plt.figure(figsize=(16, 8))
+    sns.heatmap(heatmap_data, cmap='viridis', cbar_kws={'label': 'Mutual Information'}, xticklabels=8, yticklabels=False)
+    plt.title("Channel-wise Mutual Information Over Time (Excluding First Day)")
+    plt.xlabel("Channel")
+    plt.ylabel("Date")
+    plt.tight_layout()
+
+    output_dir = os.path.dirname(pkl_file_path)
+    output_path = os.path.join(output_dir, "mutual_information_heatmap.png")
+    plt.savefig(output_path, dpi=300)
+    plt.close()
 
 
 def sbp_distributions(ds,channels,preprocessingdir,characterizationdir):
