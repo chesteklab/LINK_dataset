@@ -328,38 +328,134 @@ def plot_time_graph(ax, dataframe, derivative = 'original', type='magnitude', ch
     ax.set_ylabel(type.capitalize())
     ax.legend()
 
-def plot_tuning_variance_histogram(ax, dataframe, type='angle', bins = 10, metric = 'variance', colour = 'blue'):
+def plot_tuning_variance_histogram(ax, dataframe, save_dir = None, type='angle', bins = 10, metric = 'variance', colour = 'blue', banks = [(0, 32), (32, 64), (64, 96)]):
     '''
-    metric can be 'variance', 'mean', or 'std'
+    metric can be 'variance', 'mean', 'std', 'circstd', or 'circmean'
     '''
-    if metric == 'variance':
-        values = dataframe.groupby('channel')[type].var()
-        ax.hist(values, bins=bins, color = colour)
-        ax.set_title(f'Variance of {type.capitalize()}')
-        ax.set_xlabel(f'Tuning {type.capitalize()} Variance')
-        ax.set_ylabel('Number of Channels')
-    elif metric == 'mean':
-        values = dataframe.groupby('channel')[type].mean()
-        ax.hist(values, bins=bins, color = colour)
-        ax.set_title(f'Mean of {type.capitalize()}')
-        ax.set_xlabel(f'Tuning {type.capitalize()} Mean')
-        ax.set_ylabel('Number of Channels')
-    elif metric == 'std':
-        values = dataframe.groupby('channel')[type].std()
-        ax.hist(values, bins=bins, color = colour)
-        ax.set_title(f'Std of {type.capitalize()}')
-        ax.set_xlabel(f'Tuning {type.capitalize()} Standard Deviation')
-        ax.set_ylabel('Number of Channels')
-    elif metric == 'circstd':
-        values = dataframe.groupby('channel')[type].apply(lambda x: stats.circstd(np.radians(x), high=np.pi, low=-np.pi))
-        values = np.degrees(values)
-        ax.hist(values, bins=bins, color = colour)
-        ax.set_title(f'Circular Std of {type.capitalize()}')
-        ax.set_xlabel(f'Tuning {type.capitalize()} Circular Standard Deviation')
-        ax.set_ylabel('Number of Channels')
-    else:
-        raise ValueError("Invalid metric")
-
+    if(banks == None):
+        if metric == 'variance':
+            values = dataframe.groupby('channel')[type].var()
+            if save_dir is not None:
+                values.to_csv(save_dir + f'/{type}_{metric}.csv')
+            ax.hist(values, bins=bins, color = colour)
+            ax.set_title(f'Variance of {type.capitalize()}')
+            ax.set_xlabel(f'Tuning {type.capitalize()} Variance')
+            ax.set_ylabel('Number of Channels')
+            return values.mean()
+        elif metric == 'mean':
+            values = dataframe.groupby('channel')[type].mean()
+            if save_dir is not None:
+                values.to_csv(save_dir + f'/{type}_{metric}.csv')
+            ax.hist(values, bins=bins, color = colour)
+            ax.set_title(f'Mean of {type.capitalize()}')
+            ax.set_xlabel(f'Tuning {type.capitalize()} Mean')
+            ax.set_ylabel('Number of Channels')
+            return values.mean()
+        elif metric == 'std':
+            values = dataframe.groupby('channel')[type].std()
+            if save_dir is not None:
+                values.to_csv(save_dir + f'/{type}_{metric}.csv')
+            ax.hist(values, bins=bins, color = colour)
+            ax.set_title(f'Std of {type.capitalize()}')
+            ax.set_xlabel(f'Tuning {type.capitalize()} Standard Deviation')
+            ax.set_ylabel('Number of Channels')
+            return values.mean()
+        elif metric == 'circstd':
+            values = dataframe.groupby('channel')[type].apply(lambda x: stats.circstd(np.radians(x), high=np.pi, low=-np.pi))
+            values = np.degrees(values)
+            if save_dir is not None:
+                values.to_csv(save_dir + f'/{type}_{metric}.csv')
+            ax.hist(values, bins=bins, color = colour)
+            ax.set_title(f'Circular Std of {type.capitalize()}')
+            ax.set_xlabel(f'Tuning {type.capitalize()} Circular Standard Deviation')
+            ax.set_ylabel('Number of Channels')
+            return values.mean()
+        elif metric == 'circmean':
+            values = dataframe.groupby('channel')[type].apply(lambda x: stats.circmean(np.radians(x), high=np.pi, low=-np.pi))
+            values = np.degrees(values)
+            if save_dir is not None:
+                values.to_csv(save_dir + f'/{type}_{metric}.csv')
+            ax.hist(values, bins=bins, color = colour)
+            ax.set_title(f'Circular Mean of {type.capitalize()}')
+            ax.set_xlabel(f'Tuning {type.capitalize()} Circular Mean')
+            ax.set_ylabel('Number of Channels')
+            return values.mean()
+        else:
+            raise ValueError("Invalid metric")
+    else: #horrible code, but it works
+        if metric == 'variance':
+            values = dataframe.groupby('channel')[type].var()
+            for bank in banks:
+                bank_values = dataframe[(dataframe['channel'] >= bank[0]) & (dataframe['channel'] < bank[1])].groupby('channel')[type].var()
+                ax.hist(bank_values, bins=bins, alpha = 0.7, label=f'Channels {bank[0]}-{bank[1]-1}')
+            if save_dir is not None:
+                values.to_csv(save_dir + f'/{type}_{metric}.csv')
+            
+            ax.set_title(f'Variance of {type.capitalize()}')
+            ax.set_xlabel(f'Tuning {type.capitalize()} Variance')
+            ax.set_ylabel('Number of Channels')
+            ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
+            ax.legend()
+            return values.mean()
+        elif metric == 'mean':
+            values = dataframe.groupby('channel')[type].mean()
+            for bank in banks:
+                bank_values = dataframe[(dataframe['channel'] >= bank[0]) & (dataframe['channel'] < bank[1])].groupby('channel')[type].mean()
+                ax.hist(bank_values, bins=bins, alpha = 0.7, label=f'Channels {bank[0]}-{bank[1]-1}')
+            if save_dir is not None:
+                values.to_csv(save_dir + f'/{type}_{metric}.csv')
+            ax.set_title(f'Mean of {type.capitalize()}')
+            ax.set_xlabel(f'Tuning {type.capitalize()} Mean')
+            ax.set_ylabel('Number of Channels')
+            ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
+            ax.legend()
+            return values.mean()
+        elif metric == 'std':
+            values = dataframe.groupby('channel')[type].std()
+            for bank in banks:
+                bank_values = dataframe[(dataframe['channel'] >= bank[0]) & (dataframe['channel'] < bank[1])].groupby('channel')[type].std()
+                ax.hist(bank_values, bins=bins, alpha = 0.7, label=f'Channels {bank[0]}-{bank[1]-1}')
+            if save_dir is not None:
+                values.to_csv(save_dir + f'/{type}_{metric}.csv')
+            ax.set_title(f'Std of {type.capitalize()}')
+            ax.set_xlabel(f'Tuning {type.capitalize()} Standard Deviation')
+            ax.set_ylabel('Number of Channels')
+            ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
+            ax.legend()
+            return values.mean()
+        elif metric == 'circstd':
+            values = dataframe.groupby('channel')[type].apply(lambda x: stats.circstd(np.radians(x), high=np.pi, low=-np.pi))
+            values = np.degrees(values)
+            for bank in banks:
+                bank_values = dataframe[(dataframe['channel'] >= bank[0]) & (dataframe['channel'] < bank[1])].groupby('channel')[type].apply(lambda x: stats.circstd(np.radians(x), high=np.pi, low=-np.pi))
+                bank_values = np.degrees(bank_values)
+                ax.hist(bank_values, bins=bins, alpha = 0.7, label=f'Channels {bank[0]}-{bank[1]-1}')
+            if save_dir is not None:
+                values.to_csv(save_dir + f'/{type}_{metric}.csv')
+            ax.set_title(f'Circular Std of {type.capitalize()}')
+            ax.set_xlabel(f'Tuning {type.capitalize()} Circular Standard Deviation')
+            ax.set_ylabel('Number of Channels')
+            ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
+            ax.legend()
+            return values.mean()
+        elif metric == 'circmean':
+            values = dataframe.groupby('channel')[type].apply(lambda x: stats.circmean(np.radians(x), high=np.pi, low=-np.pi))
+            values = np.degrees(values)
+            for bank in banks:
+                bank_values = dataframe[(dataframe['channel'] >= bank[0]) & (dataframe['channel'] < bank[1])].groupby('channel')[type].apply(lambda x: stats.circmean(np.radians(x), high=np.pi, low=-np.pi))
+                bank_values = np.degrees(bank_values)
+                ax.hist(bank_values, bins=bins, alpha = 0.7, label=f'Channels {bank[0]}-{bank[1]-1}')
+            if save_dir is not None:
+                values.to_csv(save_dir + f'/{type}_{metric}.csv')
+            ax.set_title(f'Circular Mean of {type.capitalize()}')
+            ax.set_xlabel(f'Tuning {type.capitalize()} Circular Mean')
+            ax.set_ylabel('Number of Channels')
+            ax.yaxis.set_major_locator(plt.MaxNLocator(integer=True))
+            ax.legend()
+            return values.mean()
+        else:
+            raise ValueError("Invalid metric")
+        
 def plot_daily_spatial_tuning(ax,dataframe,date_choice,mapping_dir,correspondence = False):
     mapping = pd.read_csv(mapping_dir)
     day_choice = date_choice
