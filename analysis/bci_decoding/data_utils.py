@@ -3,30 +3,21 @@ import torch
 
 def add_history(neural_data, seq_len):
     """
-    Add history to the neural data using torch.unfold.
+    Add history to the neural data.
     neural_data is of shape (n_samples, n_channels)
     the output is of shape (n_samples, seq_len, n_channels)
     """
-    # Convert to torch tensor
-    data_tensor = torch.from_numpy(neural_data).float()
-    n_samples, n_channels = data_tensor.shape
-    
-    # Pad the tensor with zeros at the beginning for missing history
-    padding = torch.zeros((seq_len-1, n_channels))
-    padded_data = torch.cat([padding, data_tensor], dim=0)
-    
-    # Use unfold to create sliding windows
-    # Unfold along dimension 0 (time), with window size=seq_len, step=1
-    windows = padded_data.unfold(0, seq_len, 1)
-    
-    # windows will have shape [n_samples, n_channels, seq_len]
-    # but need to remove extra samples from padding
-    windows = windows[:n_samples]
-    
-    # Permute the dimensions to get the desired shape [n_samples, seq_len, n_channels]
-    windows = windows.permute(0, 2, 1)
-    
-    return windows.numpy()
+    Xtrain1 = torch.zeros((int(neural_data.shape[0]), int(neural_data.shape[1]), seq_len))
+    Xtrain1[:, :, 0] = torch.from_numpy(neural_data)
+    for k1 in range(seq_len - 1):
+        k = k1 + 1
+        Xtrain1[k:, :, k] = torch.from_numpy(neural_data[0:-k, :])
+
+    # for RNNs, we want the last timestep to be the most recent data
+    Xtrain1 = torch.flip(Xtrain1, (2,))
+
+    # reorder from (n_samples, n_channels, seq_len) to (n_samples, seq_len, n_channels)
+    return Xtrain1.permute(0, 2, 1).numpy()
 
 
 def prep_data_and_split(data_dict, seq_len, num_train_trials, should_add_history=True, verbose=False):

@@ -86,30 +86,79 @@ def create_optimizer_and_scheduler(model, lr=0.001, weight_decay=0, final_lr=Non
     return optimizer, scheduler
 
 
-def train_model(model, dataloader, optimizer, scheduler, num_iterations, 
-               loss_fn=nn.MSELoss(), device='cuda'):
+def evaluate_model(model, dataloader, loss_fn=nn.MSELoss(), device='cuda'):
     """
-    Simple training loop for a PyTorch model.
+    Evaluate model on a dataset.
     
     Args:
         model: PyTorch model
         dataloader: PyTorch dataloader
+        loss_fn: Loss function
+        device: Device to run evaluation on ('cuda' or 'cpu')
+        
+    Returns:
+        float: Average loss on the dataset
+    """
+    model.eval()
+    total_loss = 0.0
+    num_batches = 0
+    
+    with torch.no_grad():
+        for inputs, targets in dataloader:
+            inputs = inputs.to(device).float()
+            targets = targets.to(device).float()
+            
+            outputs = model(inputs)
+            loss = loss_fn(outputs, targets)
+            
+            total_loss += loss.item()
+            num_batches += 1
+    
+    # Calculate average loss
+    avg_loss = total_loss / num_batches if num_batches > 0 else float('inf')
+    
+    return avg_loss
+
+
+def train_model(model, dataloader, optimizer, scheduler, num_iterations, 
+               loss_fn=nn.MSELoss(), device='cuda', val_dataloader=None, val_interval=100,
+               noise_neural_std=None, noise_bias_std=None):
+    """
+    Training loop for a PyTorch model with optional validation evaluation.
+    
+    Args:
+        model: PyTorch model
+        dataloader: PyTorch dataloader for training
         optimizer: PyTorch optimizer
         scheduler: PyTorch learning rate scheduler
         num_iterations: Number of training iterations
         loss_fn: Loss function
         device: Device to run training on ('cuda' or 'cpu')
+        val_dataloader: PyTorch dataloader for validation (optional, set to None to skip validation)
+        val_interval: Number of iterations between validation evaluations
+        noise_neural_std: std of white noise to add to neural data
+        noise_bias_std: std of bias noise to add to neural data
         
     Returns:
         model: Trained model
-        losses: List of training losses
+        dict: Training history with losses and validation losses (if validation was used)
     """
     model.to(device)
     model.train()
-    losses = []
+    
+    # Initialize history dictionary
+    history = {
+        'train_losses': [],
+        'iterations': []
+    }
+    
+    # Add validation losses list only if validation is enabled
+    if val_dataloader is not None:
+        history['val_losses'] = []
     
     iteration = 0
     pbar = tqdm(total=num_iterations, desc="Training")
+    
     while iteration < num_iterations:
         for inputs, targets in dataloader:
             if iteration >= num_iterations:
@@ -117,11 +166,15 @@ def train_model(model, dataloader, optimizer, scheduler, num_iterations,
                 
             inputs = inputs.to(device).float()
             targets = targets.to(device).float()
-            
+
+            if noise_neural_std or noise_bias_std:
+                inputs = add_training_noise(inputs, noise_neural_std, noise_bias_std, device=device)
+                
             # Zero gradients
             optimizer.zero_grad()
             
             # Forward pass
+            model.train()
             outputs = model(inputs)
             loss = loss_fn(outputs, targets)
             
@@ -130,18 +183,74 @@ def train_model(model, dataloader, optimizer, scheduler, num_iterations,
             optimizer.step()
             
             # Record loss
-            losses.append(loss.item())
+            history['train_losses'].append(loss.item())
+            history['iterations'].append(iteration)
             
             # Update learning rate
             scheduler.step()
             
+            # Validation
+            if val_dataloader is not None and iteration % val_interval == 0:
+                val_loss = evaluate_model(model, val_dataloader, loss_fn, device)
+                history['val_losses'].append(val_loss)
+                
+                # Log validation performance
+                pbar.set_postfix({
+                    "train_loss": f"{loss.item():.4f}",
+                    "val_loss": f"{val_loss:.4f}"
+                })
+            else:
+                pbar.set_postfix({"train_loss": f"{loss.item():.4f}"})
+            
             iteration += 1
             pbar.update(1)
-            pbar.set_postfix({"loss": f"{loss.item():.4f}"})
             
     pbar.close()
-    return model, losses
+    
+    return model, history
 
+def add_training_noise(x,
+                       bias_neural_std=None,
+                       noise_neural_std=None,
+                       noise_neural_walk_std=None,
+                       bias_allchans_neural_std=None,
+                       device='cpu'):
+    """Function to add different types of noise to training input data to make models more robust.
+       Identical to the methods in Willet 2021.
+    Args:
+        x (tensor):                     neural data of shape [batch_size x seq_len x num_chans]
+        bias_neural_std (float):        std of bias noise
+        noise_neural_std (float):       std of white noise
+        noise_neural_walk_std (float):  std of random walk noise
+        bias_allchans_neural_std (float): std of bias noise, bias is same across all channels
+        device (device):                torch device (cpu or cuda)
+    """
+    # Transpose x to [batch_size x num_chans x seq_len] to match original function's expectation
+    x = x.transpose(1, 2)
+    
+    if bias_neural_std:
+        # bias is constant across time (i.e. the 3 conv inputs), but different for each channel & batch
+        biases = torch.normal(torch.zeros(x.shape[:2]), bias_neural_std).unsqueeze(2).repeat(1, 1, x.shape[2])
+        x = x + biases.to(device=device)
 
+    if noise_neural_std:
+        # adds white noise to each channel and timepoint (independent)
+        noise = torch.normal(torch.zeros_like(x), noise_neural_std)
+        x = x + noise.to(device=device)
+
+    if noise_neural_walk_std:
+        # adds a random walk to each channel (noise is summed across time)
+        noise = torch.normal(torch.zeros_like(x), noise_neural_walk_std).cumsum(dim=2)
+        x = x + noise.to(device=device)
+
+    if bias_allchans_neural_std:
+        # bias is constant across time (i.e. the 3 conv inputs), and same for each channel
+        biases = torch.normal(torch.zeros((x.shape[0], 1, 1)), bias_allchans_neural_std).repeat(1, x.shape[1], x.shape[2])
+        x = x + biases.to(device=device)
+
+    # Transpose back to [batch_size x seq_len x num_chans]
+    x = x.transpose(1, 2)
+    
+    return x
 
 
