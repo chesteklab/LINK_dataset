@@ -20,7 +20,6 @@ savestatepath = os.path.join(datareviewdir, 'savestate.pkl')
 
 characterizationdir = os.path.join(outputdir, "dataset_characterization")
 
-
 #data review config and params
 dataset_version = "0.3"
 data_params = {

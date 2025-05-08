@@ -39,6 +39,9 @@ def calc_avg_sbps(dates):
     sbp_avgs = pd.DataFrame(np.zeros((len(dates), 96), dtype=float), index=dates)
     sbp_avgs.index = pd.to_datetime(sbp_avgs.index)
 
+    sbp_stds = pd.DataFrame(np.zeros((len(dates), 96), dtype=float), index=dates)
+    sbp_stds.index = pd.to_datetime(sbp_stds.index)
+
     for date in tqdm(dates):
         data_CO, data_RD = load_day(date)
         
@@ -50,9 +53,11 @@ def calc_avg_sbps(dates):
             sbp = data_CO['sbp']
 
         sbp_avgs.loc[date] = np.mean(sbp, axis=0)
+        sbp_stds.loc[date] = np.std(sbp, axis=0)
 
     #pdb.set_trace()
     sbp_avgs.to_csv(os.path.join(output_path, "sbp_avgs.csv"))
+    sbp_stds.to_csv(os.path.join(output_path, "sbp_stds.csv"))
 
 
 def calc_pr_all_days(dates):
@@ -97,5 +102,26 @@ def participation_ratio(dx_flat):
     pr = np.sum(S)**2/np.sum(S**2)
     return pr
 
+def calc_sbp_heatmaps(dates):
+    n_bins = 30
+    bin_range = (0,30)
+    bin_edges = np.linspace(bin_range[0], bin_range[1], n_bins + 1)
+    bin_edges = np.concatenate([[-np.inf], bin_edges, [np.inf]])
 
+    sbp_heatmaps = np.zeros((len(dates), n_bins+2, 96))
 
+    for i, date in enumerate(tqdm(dates)):
+        data_CO, data_RD = load_day(date)
+        if data_CO and data_RD:
+            sbp = np.concatenate((data_CO['sbp'], data_RD['sbp']),axis=0)
+        elif data_RD:
+            sbp = data_RD['sbp']
+        else:
+            sbp = data_CO['sbp']
+        if np.any(np.isnan(sbp)):
+            print('found nans')
+        for j in range(sbp.shape[1]):
+            sbp_heatmaps[i, :, j], _ = np.histogram(sbp[:,j], bins=bin_edges, range=bin_range, density=True)
+    
+    with open(os.path.join(output_path, 'sbp_heatmaps.pkl'), 'wb') as f:
+        pickle.dump(sbp_heatmaps, f)

@@ -14,7 +14,6 @@ import glob
 import re
 import signal_utils
 
-
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score, mutual_info_score
 from sklearn.feature_selection import mutual_info_regression
@@ -34,15 +33,17 @@ def create_signal_quality_figure():
     # plt.show()
 
     #show example channel heatmap over time
-    channel = 0
-    
+    calc_sbp_heatmaps = False
+    if calc_sbp_heatmaps:
+        signal_utils.calc_sbp_heatmaps(dates)
+
+    create_channel_heatmaps(dates, channel = 0)
 
     #average sbp figure
-    calc_avg_sbp = False
+    calc_avg_sbp = True
     if calc_avg_sbp:
         signal_utils.calc_avg_sbps(dates)
-    
-    create_avg_sbp_plot(ax[0])
+    create_avg_sbp_plot(ax[0,0])
     
     # calculate participation ratio on each day
     calculate_pr = False
@@ -50,7 +51,7 @@ def create_signal_quality_figure():
         signal_utils.calc_pr_all_days(dates)
 
     # create pr figure
-    create_pr_plot(ax[1])
+    create_pr_plot(ax[0,1])
 
     plt.show()
     # per channel sbp distributions over time
@@ -97,7 +98,7 @@ def create_avg_sbp_plot(ax):
     slope, intercept, r, p_val, sterr = stats.linregress(x=sbp_long['days'], y=sbp_long['sbp'])
 
     per_day_mean = sbp_long.groupby('days')['sbp'].mean()
-    ax.plot(per_day_mean)
+    # ax.plot(per_day_mean)
     sns.regplot(data=sbp_long, x="days", y="sbp", marker='.', color='k', 
                 line_kws={'color':'r'}, scatter_kws={'alpha':0.5}, ax=ax, label="Per-channel, single day averages")
     
@@ -239,68 +240,18 @@ def plot_mutual_information_heatmap(pkl_file_path):
     plt.savefig(output_path, dpi=300)
     plt.close()
 
-
-def sbp_distributions(ds,channels,preprocessingdir,characterizationdir):
-    if isinstance(channels, int):
-        ch_list = [channels]
-        label = f"channel_{channels}"
-    elif isinstance(channels, tuple) and len(channels) == 2:
-        ch_start, ch_end = channels
-        ch_list = list(range(ch_start, ch_end + 1))
-        label = f"channel_{ch_start}-{ch_end}"
-    elif isinstance(channels, list):
-        ch_list = channels
-        label = f"channel_{'_'.join(map(str, channels))}"
-
-    distributions = []
+def create_channel_heatmaps(dates, channel):
+    with open(os.path.join(signal_utils.output_path, 'sbp_heatmaps.pkl'), 'rb') as f:
+        sbp_heatmaps  = pickle.load(f)
     
-    for date in ds:
-        data_CO, data_RD = signal_utils.load_day(date)
-        
-        for ch in ch_list:
-            if data_CO and data_RD:
-                sbp = np.concatenate((data_CO['sbp'], data_RD['sbp']), axis=0)[:, ch]
-            elif data_RD:
-                sbp = data_RD['sbp'][:, ch]
-                
-            else:
-                sbp = data_CO['sbp'][:, ch]
-            
-            date_df = pd.DataFrame({
-                'date': pd.to_datetime(date),
-                'value': sbp.reshape(-1)
-            })
-            distributions.append(date_df)
-    
-    distributions_df = pd.concat(distributions, ignore_index=True)
-    
-    distributions_df.to_csv(os.path.join(characterizationdir, f"sbp_distributions_{label}.csv"), index=False)
-    
-    return distributions_df
+    channels = [0,1,2,3,4]
+    fig, ax = plt.subplots(5, 1)
+    for i in range(len(channels)):
+        sbp_heatmap = sbp_heatmaps[:,:,channels[i]]
+        ax[i].imshow(sbp_heatmap.T, origin='lower')
 
-def sbp_distributions_per_ch(dates, ch, preprocessingdir, characterizationdir):
-    distributions = []
-    for date in ds:
-        file = os.path.join(preprocessingdir,f'{date}_preprocess.pkl')
+    pdb.set_trace()
 
-        with open(file, 'rb') as f:
-            data_CO, data_RD = pickle.load(f)
-        
-        if data_CO and data_RD:
-            sbp = np.concatenate((data_CO['sbp'], data_RD['sbp']),axis=0)[:,ch]
-        elif data_RD:
-            sbp = data_RD['sbp'][:,ch]
-        else:
-            sbp = data_CO['sbp'][:,ch]
-        date_df = pd.DataFrame({
-            'date': pd.to_datetime(date),
-            'value': sbp
-        })
-        distributions.append(date_df)
-    distributions_df = pd.concat(distributions, ignore_index=True)
-
-    distributions_df.to_csv(os.path.join(characterizationdir, f"sbp_distributions_channel_{ch}.csv"), index=False)
-    
 def signal_distribution_per_ch(dates, ax, ch, preprocessingdir, characterizationdir, n_bins=10, display_mean = True, display_median = True, show_trend=True,crunch=False,robust=True, percentile_range=(0.3,99.7)):
 
     file_path = os.path.join(characterizationdir, f"sbp_distributions_channel_{ch}.csv")
