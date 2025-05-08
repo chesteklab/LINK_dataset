@@ -143,7 +143,7 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
 
             # Iterate over arrays in electrode table
             groups = {}
-            for array in CHANNEL_MAP["Array Name"].unique():
+            for array in CHANNEL_MAP["Array location"].unique():
                 dev = nwbfile.create_device(name=array)
                 grp = nwbfile.create_electrode_group(
                     name=array,
@@ -179,8 +179,8 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
                     id=ch_id,
                     location="Hand area of M1",
                     filtering="",
-                    group=groups[ch["Array Name"]],
-                    array_name=ch["Array Name"],
+                    group=groups[ch["Array location"]],
+                    array_name=ch["Array location"],
                     bank=ch["Bank"],
                     pin=int(ch["Pin"]),
                     row=row,
