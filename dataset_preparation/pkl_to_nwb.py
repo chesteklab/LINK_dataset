@@ -465,5 +465,8 @@ if __name__ == "__main__":
         os.path.join(os.path.dirname(__file__), "../channel_map.csv"),
         end_dir=config.nwbdir,
     )
-    # dicts = dicts_from_nwb(f"{data_dir}/2021-10-15_preprocess.pkl")
+    # dicts = dicts_from_pickle(
+    #     f"{config.good_daysdir}/2020-01-27_CO.nwb",
+    #     config.nwbdir,
+    # )
     # print(dicts)
