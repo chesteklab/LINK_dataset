@@ -5,22 +5,24 @@ import pickle
 import config
 import pdb
 import sys
+from tqdm import tqdm
 sys.path.append(config.pybmipath)
+print(config.pybmipath)
 from pybmi.utils import ZTools # type: ignore
+
 
 def prep_data(resume=True):
     datesruns = load_sheet()
     bad_days = []
     days = np.arange(len(datesruns))
     if resume:
-        resumeidx = np.argwhere(datesruns['Date'].to_numpy() == '2020-08-22')[0,0]
+        resumeidx = np.argwhere(datesruns['Date'].to_numpy() == '2020-10-21')[0,0]
     else:
         resumeidx = 0
     idxs = np.arange(resumeidx, len(datesruns))
     extra_bad_days = ['2022-06-09','2023-05-05','2024-01-29'] # first and second, notes file is wrong, third pickling went wrong, can't import.
-    
 
-    for i in idxs:
+    for i in tqdm(idxs):
         date = datesruns['Date'].iloc[i]
         runs = datesruns['Runs'].iloc[i]
         print(f'{date} with runs {runs}')
@@ -34,10 +36,10 @@ def prep_data(resume=True):
             bad_days.append(f'{date}')
         else:
             filename = f'{date}_preprocess.pkl'
-            with open(os.path.join(config.preprocessingpath,filename),'wb') as f:
+            with open(os.path.join(config.preprocessingdir,filename),'wb') as f:
                 pickle.dump((data_CO, data_RD), f)
 
-        with open(os.path.join(config.preprocessingpath,'bad_days.txt'), 'a') as f:
+        with open(os.path.join(config.preprocessingdir,'bad_days.txt'), 'a') as f:
             for day in bad_days:
                 f.write(f"{day}\n")
 
@@ -102,7 +104,7 @@ def load_run(date, run):
     runstr = 'Run-' + str(run).zfill(3)
     fpath = os.path.join(config.datapath, config.data_params['monkey'], date, runstr)
     z = ZTools.ZStructTranslator(fpath, use_py=False).asdataframe()
-    pdb.set_trace()
+
 
     # filters based on the most common style AND if it's 29 or 34, so we don't have one 29 in a mix of 34 
     # remove closed loop and unsuccessful trials
@@ -113,7 +115,7 @@ def load_run(date, run):
           & (z['ClosedLoop'] == 0) 
           & (z['TrialSuccess'] == 1)
           & (z['TargetHoldTime'] == 750)]
-    pdb.set_trace()
+          
 
     if style_mode == 34.0:
         target_style = 'CO'
@@ -164,7 +166,7 @@ def preprocessing(data, run, target_style):
     TrialNumber, TrialIndex, TrialCount = np.unique(feats["TrialNumber"], return_index = True, return_counts = True)
 
     sbp = np.abs(feats['NeuralFeature'])
-    sbp = (sbp - np.mean(sbp, axis=0)) / np.std(sbp, axis=0)
+    # sbp = (sbp - np.mean(sbp, axis=0)) / np.std(sbp, axis=0)
 
     # putting things together. I'm doing the adjust index thing here
     processed_run['target_style'] = target_style
@@ -181,4 +183,4 @@ def preprocessing(data, run, target_style):
     return processed_run
 
 if __name__=="__main__":
-    prep_data(resume=True)
+    prep_data(resume=False)
