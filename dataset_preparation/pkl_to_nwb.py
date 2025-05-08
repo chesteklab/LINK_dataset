@@ -5,14 +5,17 @@ from tqdm import tqdm
 import numpy as np
 from datetime import datetime, timezone
 from pynwb import NWBFile, TimeSeries, NWBHDF5IO
+from pynwb.ecephys import ElectricalSeries
 from pynwb.file import Subject
 from typing import Tuple, Optional
 import config
 
-def convert_pkl_to_nwb(data_dir, end_dir=None):
+
+def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
     if end_dir is None:
         end_dir = data_dir
-
+    CHANNEL_MAP = pd.read_csv(electrode_table_csv_path)
+    CHANNEL_MAP.sort_values("Channel", inplace=True)
     trial_fields = [
         "trial_number",
         "trial_count",
@@ -132,30 +135,56 @@ def convert_pkl_to_nwb(data_dir, end_dir=None):
                 description="Monkey N",
                 species="Macaca mulatta",
                 sex="M",
-                date_of_birth=datetime.strptime("2012-05-26", "%Y-%m-%d").replace(tzinfo=timezone.utc),
+                date_of_birth=datetime.strptime("2012-05-26", "%Y-%m-%d").replace(
+                    tzinfo=timezone.utc
+                ),
             )
             nwbfile.subject = subject
 
-            # Create a device named 'Utah Array'
-            device = nwbfile.create_device(
-                name="Utah Array", description="96-electrode Utah array"
-            )
+            # Iterate over arrays in electrode table
+            groups = {}
+            for array in CHANNEL_MAP["Array Name"].unique():
+                dev = nwbfile.create_device(name=array)
+                grp = nwbfile.create_electrode_group(
+                    name=array,
+                    description=f"{array} | Utah Array",
+                    location="Hand area of M1",
+                    device=dev,
+                )
+                groups[array] = grp
 
-            # Create an electrode group named 'Utah Array'
-            electrode_group = nwbfile.create_electrode_group(
-                name="Utah Array",
-                description="Utah Array electrode group",
-                location="Hand area of primary motor cortex",
-                device=device,
-            )
+            for name, descr in {
+                "array_name": "Name of the array this contact belongs to",
+                "bank": "Headstage bank (A-C)",
+                "pin": "Headstage bank pin number (1-32)",
+                "row": "Row index in the 8×8 grid (0-7)",
+                "col": "Column index in the 8×8 grid (0-7)",
+            }.items():
+                nwbfile.add_electrode_column(name, descr)
 
-            # Add electrodes to the electrode table
-            for idx in range(96):
+            # # Add electrodes to the electrode table
+            # for idx in range(96):
+            #     nwbfile.add_electrode(
+            #         id=idx,
+            #         location="Hand area of primary motor cortex",
+            #         filtering="",
+            #         group=electrode_group,
+            #     )
+            for _, ch in CHANNEL_MAP.iterrows():
+                ch_id = int(ch["Channel"]) - 1  # 0-based to match sbp_channel_0 …
+                row = int(ch["Array Row"]) - 1  # make rows/cols 0-based
+                col = int(ch["Array Column"]) - 1
+
                 nwbfile.add_electrode(
-                    id=idx,
-                    location="Hand area of primary motor cortex",
+                    id=ch_id,
+                    location="Hand area of M1",
                     filtering="",
-                    group=electrode_group,
+                    group=groups[ch["Array Name"]],
+                    array_name=ch["Array Name"],
+                    bank=ch["Bank"],
+                    pin=int(ch["Pin"]),
+                    row=row,
+                    col=col,
                 )
 
             # Extract kinematic data
@@ -242,27 +271,29 @@ def convert_pkl_to_nwb(data_dir, end_dir=None):
             # ecephys_module = nwbfile.create_processing_module(
             #     name="ecephys", description="Binned (20ms) and processed neural data"
             # )
+            elec_region = nwbfile.create_electrode_table_region(  # :contentReference[oaicite:1]{index=1}
+                region=list(range(sbp_data.shape[1])),  # [0 … 95] in sheet order
+                description="All recorded contacts",
+            )
 
             # Create TimeSeries for SpikingBandPower
-            sbp_timeseries = TimeSeries(
+            sbp_timeseries = ElectricalSeries(
                 name="SpikingBandPower",
                 data=sbp_data * 0.25,  # Scaling to convert to microvolts
-                unit="microvolts",
                 timestamps=times,
-                description="Spiking Band Power across time",
-                conversion=1.0,
+                conversion=1e-6,  # measured in microvolts
                 comments="Spiking Band Power in each 20ms bin",
+                electrodes=elec_region,
             )
 
             # Create TimeSeries for ThresholdCrossings
-            tcfr_timeseries = TimeSeries(
+            tcfr_timeseries = ElectricalSeries(
                 name="ThresholdCrossings",
                 data=tcfr_data,
-                unit="number of threshold crossings",
+                electrodes=elec_region,
                 timestamps=times,
                 description="Threshold crossings across time",
                 comments="Number of threshold crossings (threshold = -4.5RMS) per each 20ms bin",
-                conversion=1.0,
             )
             # Add sbp and tcfr to analysis
             nwbfile.add_analysis(sbp_timeseries)
@@ -334,7 +365,6 @@ def convert_pkl_to_nwb(data_dir, end_dir=None):
             )
 
 
-
 def dicts_from_pickle(
     pickle_path: str, nwb_dir: Optional[str] = None
 ) -> Tuple[Optional[dict], Optional[dict]]:
@@ -364,47 +394,55 @@ def dicts_from_pickle(
                 try:
                     return ana[name]
                 except KeyError as e:
-                    raise KeyError(f"TimeSeries '{name}' not in /analysis of '{fp}'") from e
+                    raise KeyError(
+                        f"TimeSeries '{name}' not in /analysis of '{fp}'"
+                    ) from e
 
             # --- time and kinematics ---
             t_sec = ts("index_position").timestamps[:]
             time_ms = (t_sec * 1000).astype(np.float32)
 
             finger_kinematics = np.column_stack(
-                [ts(n).data[:].ravel()
-                 for n in ("index_position", "mrp_position",
-                           "index_velocity", "mrp_velocity")]
+                [
+                    ts(n).data[:].ravel()
+                    for n in (
+                        "index_position",
+                        "mrp_position",
+                        "index_velocity",
+                        "mrp_velocity",
+                    )
+                ]
             ).astype(np.float32)
 
             # --- neural features ---
-            sbp  = (ts("SpikingBandPower").data[:] / 0.25).astype(np.float32)
-            tcfr =  ts("ThresholdCrossings").data[:].astype(np.int16)
+            sbp = (ts("SpikingBandPower").data[:] / 0.25).astype(np.float32)
+            tcfr = ts("ThresholdCrossings").data[:].astype(np.int16)
 
             # --- trial info ---
             tr = nwb.trials.to_dataframe()
-            trial_number     = tr["trial_number"].to_numpy()
-            trial_count      = tr["trial_count"].to_numpy()
-            target_positions = tr[["index_target_position",
-                                   "mrp_target_position"]].to_numpy()
-            run_id       = tr["run_id"].iloc[0]
+            trial_number = tr["trial_number"].to_numpy()
+            trial_count = tr["trial_count"].to_numpy()
+            target_positions = tr[
+                ["index_target_position", "mrp_target_position"]
+            ].to_numpy()
+            run_id = tr["run_id"].iloc[0]
             target_style = tr["target_style"]
 
-            trial_index = np.searchsorted(
-                t_sec, tr["start_time"].to_numpy()
-            ).astype(np.int32)
-
+            trial_index = np.searchsorted(t_sec, tr["start_time"].to_numpy()).astype(
+                np.int32
+            )
 
             return dict(
-                trial_number      = trial_number,
-                trial_count       = trial_count,
-                target_positions  = target_positions,
-                time              = time_ms,
-                finger_kinematics = finger_kinematics,
-                sbp               = sbp,
-                tcfr              = tcfr,
-                trial_index       = trial_index,
-                target_style      = target_style[0],
-                run_id            = np.full_like(trial_number, run_id),
+                trial_number=trial_number,
+                trial_count=trial_count,
+                target_positions=target_positions,
+                time=time_ms,
+                finger_kinematics=finger_kinematics,
+                sbp=sbp,
+                tcfr=tcfr,
+                trial_index=trial_index,
+                target_style=target_style[0],
+                run_id=np.full_like(trial_number, run_id),
             )
 
     date = os.path.basename(pickle_path).split(".")[0].split("_")[0]
@@ -422,6 +460,10 @@ def dicts_from_pickle(
 
 
 if __name__ == "__main__":
-    convert_pkl_to_nwb(config.good_daysdir, config.nwbdir)
+    convert_pkl_to_nwb(
+        config.good_daysdir,
+        os.path.join(os.path.dirname(__file__), "../channel_map.csv"),
+        end_dir=config.nwbdir,
+    )
     # dicts = dicts_from_nwb(f"{data_dir}/2021-10-15_preprocess.pkl")
     # print(dicts)
