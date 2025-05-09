@@ -2,6 +2,7 @@
 from shutil import copy
 from datetime import datetime, timedelta
 import os
+import re
 
 def copy_imp_files(start_date, end_date, data_path=r"Z:\Data\Monkeys\Joker", output_path=r"Z:\Student Folders\Nina_Gill\data\impedances"):
     '''
@@ -31,8 +32,27 @@ def copy_imp_files(start_date, end_date, data_path=r"Z:\Data\Monkeys\Joker", out
                     if "impedance" in filename or "Impedance" in filename:
                         # found impedance file
                         imp_path = os.path.join(folder_path, filename)
-                        copy(imp_path, output_path)
-                        print(f"Found impedance on {folder_name}: {filename}")
+                        # search the file for its real date
+                        name_date = None
+                        with open(imp_path, 'r') as file:
+                            for line in file:
+                                match = re.search(r'\* (\d{2} \w+ \d{4} \d{2}:\d{2}:\d{2})', line)
+                                # found the date line: save the date and break
+                                if match:
+                                    extracted_date = match.group(1)
+                                    name_date = datetime.strptime(extracted_date, "%d %B %Y %H:%M:%S")
+                                    break
+                        if name_date == None:
+                            # couldn't find date in the file, using folder date instead
+                            name_date = folder_date
+                        # rename file
+                        new_filename = filename.replace(filename[0:9], f"{name_date.strftime('%Y-%m-%d')}_")
+                        # add .txt if it's not on there
+                        if new_filename[-4:] != ".txt":
+                            new_filename = f"{new_filename}.txt"
+                        file_loc = os.path.join(output_path, new_filename)
+                        copy(imp_path, file_loc)
+                        print(f"Found impedance in folder {folder_name}: {new_filename}")
         except ValueError:
             # skip any folder with improper date formatting
             continue
@@ -90,7 +110,7 @@ def search_date(date, files):
     min_diff = timedelta.max
     nearest_file = None
     for imp_filename in files:
-        file_date = datetime.strptime(imp_filename[0:8], "%Y%m%d")
+        file_date = datetime.strptime(imp_filename[0:10], "%Y-%m-%d")
         diff = abs(file_date - date)
         if diff < min_diff: 
             min_diff = diff
