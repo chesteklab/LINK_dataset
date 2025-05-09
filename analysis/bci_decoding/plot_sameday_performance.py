@@ -8,13 +8,13 @@ from datetime import datetime
 ########################################################
 ########################################################
 # Set path to results folder
-# results_folder = '/home/joey/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/single_day_model_results'
-results_folder = '/Users/jcostello/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/single_day_model_results'
+results_folder = '/home/joey/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/single_day_model_results'
+# results_folder = '/Users/jcostello/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/single_day_model_results'
 
 # Load the evaluation results
-rr_df = pd.read_csv(f'{results_folder}/rr_evaluation_20250430-101208.csv')
-lstm_df = pd.read_csv(f'{results_folder}/lstm_evaluation_20250506-173349.csv')
-out_fname = 'sameday_performance_plots.png'
+rr_df = pd.read_csv(f'{results_folder}/rr_evaluation_20250507_gooddays.csv')
+lstm_df = pd.read_csv(f'{results_folder}/lstm_evaluation_20250507_gooddays.csv')
+out_fname_corr = 'sameday_performance_plots_corr.png'
 
 
 # Define DOF labels
@@ -105,7 +105,6 @@ def format_date_ticks(ax, date_range_days):
     ax.set_xlim(-padding, total_days + padding)
 
 # Create Correlation plots
-out_fname_corr = 'sameday_performance_plots_corr.png'
 fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(12, 15))
 
 # Plot 1: RR vs LSTM average Correlation

@@ -39,7 +39,8 @@ DEBUG = False
 # Parameters
 ########################################################
 
-data_folder = '/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Hisham_Temmar/big_dataset/2_autotrimming_and_preprocessing/preprocessing_092024_no7822nofalcon'
+# data_folder = '/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Hisham_Temmar/big_dataset/2_autotrimming_and_preprocessing/preprocessing_092024_no7822nofalcon'
+data_folder = '/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Nina_Gill/data/only_good_days'
 
 model_folder = '/home/joey/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/single_day_models'
 
@@ -159,9 +160,9 @@ def main():
 
     # get the list of dates and remove bad days
     dates = [f.split('_preprocess.pkl')[0] for f in os.listdir(data_folder) if f.endswith('_preprocess.pkl')]
-    with open(os.path.join(data_folder, 'bad_days.txt'), 'r') as f:
-        bad_days = [line.strip() for line in f.readlines()]
-    dates = [date for date in dates if date not in bad_days]
+    # with open(os.path.join(data_folder, 'bad_days.txt'), 'r') as f:
+    #     bad_days = [line.strip() for line in f.readlines()]
+    # dates = [date for date in dates if date not in bad_days]
     
     # Initialize separate results lists for LSTM and RR
     lstm_results = []

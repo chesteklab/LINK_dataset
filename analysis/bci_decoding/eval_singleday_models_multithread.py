@@ -39,10 +39,11 @@ Results are saved as a CSV file with the following columns:
 DO_EVAL_LSTM = True
 DO_EVAL_RR = True
 NUM_THREADS = 24  # Default number of threads
-DEBUG = False # (set to True to run a limited number of evaluations, only close days to the training day)
-DEBUG_NUM_CLOSE_DAYS = 10
+LIMIT_EVALS_TO_CLOSE_DAYS = True # (set to True to run a limited number of evaluations, only close days to the training day)
+MAX_NUM_CLOSE_DAYS = 100
 
-data_folder = '/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Hisham_Temmar/big_dataset/2_autotrimming_and_preprocessing/preprocessing_092024_no7822nofalcon'
+# data_folder = '/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Hisham_Temmar/big_dataset/2_autotrimming_and_preprocessing/preprocessing_092024_no7822nofalcon'
+data_folder = '/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Nina_Gill/data/only_good_days'
 
 # model_folder = '/home/joey/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/single_day_models'
 model_folder = '/home/joey/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/single_day_models_withnoise'
@@ -171,7 +172,7 @@ def evaluate_lstm_model_on_day(model_file, test_day, dates, device):
     # Calculate day difference
     day_diff = calculate_day_difference(train_day, test_day)
     
-    if DEBUG and np.abs(day_diff) > 5:
+    if LIMIT_EVALS_TO_CLOSE_DAYS and np.abs(day_diff) > MAX_NUM_CLOSE_DAYS:
         return results
     
     # Load the model
@@ -240,7 +241,7 @@ def evaluate_rr_model_on_day(model_file, test_day, dates):
     # Calculate day difference
     day_diff = calculate_day_difference(train_day, test_day)
     
-    if DEBUG and np.abs(day_diff) > DEBUG_NUM_CLOSE_DAYS:
+    if LIMIT_EVALS_TO_CLOSE_DAYS and np.abs(day_diff) > MAX_NUM_CLOSE_DAYS:
         return results
     
     # Load the model
@@ -290,9 +291,8 @@ def evaluate_rr_model_on_day(model_file, test_day, dates):
     return results
 
 def main(num_threads=NUM_THREADS):
-    # if debug, print out a warning in red
-    if DEBUG:
-        print('\n\033[91m!!! WARNING: DEBUG MODE IS ON !!!\033[0m\n')
+    if LIMIT_EVALS_TO_CLOSE_DAYS:
+        print('\n\033[91m!!! WARNING: EVALUATIONS LIMITED TO CLOSE DAYS !!!\033[0m\n')
     
     print(f"Using {num_threads} threads for evaluation")
     
@@ -302,9 +302,9 @@ def main(num_threads=NUM_THREADS):
     
     # get the list of dates and remove bad days
     dates = [f.split('_preprocess.pkl')[0] for f in os.listdir(data_folder) if f.endswith('_preprocess.pkl')]
-    with open(os.path.join(data_folder, 'bad_days.txt'), 'r') as f:
-        bad_days = [line.strip() for line in f.readlines()]
-    dates = [date for date in dates if date not in bad_days]
+    # with open(os.path.join(data_folder, 'bad_days.txt'), 'r') as f:
+    #     bad_days = [line.strip() for line in f.readlines()]
+    # dates = [date for date in dates if date not in bad_days]
     
     # Initialize separate results lists for LSTM and RR
     lstm_results = []
@@ -399,8 +399,6 @@ if __name__ == "__main__":
                         help='Evaluate LSTM models')
     parser.add_argument('--rr', action='store_true',
                         help='Evaluate Ridge Regression models')
-    parser.add_argument('--debug', action='store_true',
-                        help='Run in debug mode (limited evaluations)')
     
     args = parser.parse_args()
     
@@ -409,8 +407,6 @@ if __name__ == "__main__":
         DO_EVAL_LSTM = True
     if args.rr:
         DO_EVAL_RR = True
-    if args.debug:
-        DEBUG = True
     
     # If neither --lstm nor --rr is specified, use the default values
     if not args.lstm and not args.rr:

@@ -6,19 +6,19 @@ import numpy as np
 ########################################################
 
 # Load the evaluation results
-# results_folder = '/home/joey/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/single_day_model_results'
-results_folder = '/Users/jcostello/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/single_day_model_results'
+results_folder = '/home/joey/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/single_day_model_results'
+# results_folder = '/Users/jcostello/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/single_day_model_results'
 
 
 # full dataset, training with noise
-rr_df = pd.read_csv(f'{results_folder}/rr_evaluation_20250430-101208.csv')
-lstm_df = pd.read_csv(f'{results_folder}/lstm_evaluation_20250506-173349.csv')
-out_fname = 'model_performance_plots_withnoise.png'
+# rr_df = pd.read_csv(f'{results_folder}/rr_evaluation_20250507_gooddays.csv')
+# lstm_df = pd.read_csv(f'{results_folder}/lstm_evaluation_20250507_gooddays.csv')
+# out_fname = 'model_performance_plots_withnoise.png'
 
 # # updated norm, full dataset
-# rr_df = pd.read_csv(f'{results_folder}/rr_evaluation_updatednorm_20250505-113606.csv')
-# lstm_df = pd.read_csv(f'{results_folder}/lstm_evaluation_updatednorm_20250504-083102.csv')
-# out_fname = 'model_performance_plots_withnoise_updatenorm.png'
+rr_df = pd.read_csv(f'{results_folder}/rr_evaluation_updatednorm_20250508_gooddays.csv')
+lstm_df = pd.read_csv(f'{results_folder}/lstm_evaluation_updatednorm_20250507_gooddays.csv')
+out_fname = 'model_performance_plots_withnoise_updatenorm.png'
 
 
 XLIM_ONESIDE = 100
