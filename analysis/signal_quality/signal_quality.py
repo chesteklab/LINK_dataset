@@ -9,9 +9,12 @@ import pickle
 import pdb
 import os 
 import sys
+import glob
+import re
 
 from sklearn import linear_model
-from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, r2_score, mutual_info_score
+from sklearn.feature_selection import mutual_info_regression
 from sklearn.model_selection import train_test_split
 from scipy import stats
 
@@ -34,9 +37,70 @@ def create_signal_quality_figure():
     #maybe do this for all channels? find a way to combine
     
     # add mutual information calculations per day
+    dates = extract_dates_from_filenames(folder_path="/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Hisham_Temmar/big_dataset/2_autotrimming_and_preprocessing/preprocessing_092024_no7822nofalcon")
+    print(f"Found {len(dates)} dates")
+    calc_mutual_information(dates, preprocessingdir="/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Hisham_Temmar/big_dataset/2_autotrimming_and_preprocessing/preprocessing_092024_no7822nofalcon", characterizationdir="./output_dir")
 
     pass
 
+def extract_dates_from_filenames(folder_path):
+    # Find all matching .pkl files
+    pkl_files = glob.glob(os.path.join(folder_path, '*_preprocess.pkl'))
+
+    dates = []
+    for file_path in pkl_files:
+        filename = os.path.basename(file_path)
+        match = re.match(r'(\d{4}-\d{2}-\d{2})_preprocess\.pkl', filename)
+        if match:
+            dates.append(match.group(1))
+
+    return dates #sorted(dates) 
+
+def calc_mutual_information(dates, preprocessingdir, characterizationdir):
+    mi_dict = {'date': [], 'channel': [], 'mutual_information': []}
+
+    first_signal = None
+
+    for date in dates:
+
+        file = os.path.join(preprocessingdir, f'{date}_preprocess.pkl')
+
+        with open(file, 'rb') as f:
+            data_CO, data_RD = pickle.load(f)
+
+        if data_CO and data_RD:
+            sbp = np.concatenate((data_CO['sbp'], data_RD['sbp']), axis=0)
+        elif data_RD:
+            sbp = data_RD['sbp']
+        else:
+            sbp = data_CO['sbp']
+
+        if date == dates[0]:
+            first_signal = sbp.copy()
+
+        for ch in range(sbp.shape[1]):
+            signal = sbp[:, ch]
+
+            # Use the first day for "target"
+            original_signal = first_signal[:,ch]
+
+            min_length = min(len(signal), len(original_signal))
+
+            # Calculate mutual information between original and shifted signal
+            mi = mutual_info_regression(original_signal[:min_length].reshape(-1,1), signal[:min_length],  random_state=0)
+            mi_value = mi[0]
+            # mi_value = mutual_info_score(
+            #     pd.qcut(signal[:min_length], 10, duplicates='drop'),
+            #     pd.qcut(original_signal[:min_length], 10, duplicates='drop')
+            # )
+
+            mi_dict['date'].append(date)
+            mi_dict['channel'].append(ch)
+            mi_dict['mutual_information'].append(mi_value)
+
+    mi_df = pd.DataFrame.from_dict(mi_dict)
+    mi_df.to_pickle(os.path.join(characterizationdir, "mutual_information_df.pkl"))
+    mi_df.to_csv(os.path.join(characterizationdir, "mutual_information.csv"), index=False)
 
 def participation_ratio(dx_flat):
     # Dxflat is a 2D array of shape (n_features, n_samples)
@@ -358,3 +422,8 @@ def signal_distribution_all_ch(dates,preprocessingdir,characterizationdir):
         fig, ax = plt.subplots(1, 1, figsize = (19.5, 6), sharex=True)
         signal_distribution_per_ch(dates, ax,i,preprocessingdir,characterizationdir,100,display_mean=False,display_median=False, crunch=False)
         plt.savefig(os.path.join(characterizationdir, f"sbp_distributions_{i}_same.png"))
+
+
+
+if __name__ == "__main__":
+    create_signal_quality_figure()
