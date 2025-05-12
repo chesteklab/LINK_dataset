@@ -47,7 +47,7 @@ class neural_plot(widgets.VBox):
 
             self.ax[1].set_title('Threshold Crossings(TCFR)')
             self.ax[1].set_ylabel('TCFR')
-            self.ax[1].set_ylim([0, 10])
+            self.ax[1].set_ylim([-5,5])
 
             self.ax[2].set_title('Finger Position (blue = index, orange = MRL)')
             self.ax[2].set_ylabel('Proportion of Flexion')
@@ -73,8 +73,8 @@ class neural_plot(widgets.VBox):
         for i in range(96):
             line, = self.ax[1].plot(np.arange(100), np.zeros((100, 1)), linewidth=0.4, color=cmap(i))
             self.tcfr_data.append(line)
-        self.tcfr_avg_line, = self.ax[1].plot(np.arange(100), np.zeros((100,1)), linewidth=1.5,color='red')
-        self.ax[1].set(xlabel='Time (seconds)', ylabel='TCFR', title='Threshold Crossings (TCFR)', ylim=(0, 10))
+        self.tcfr_avg_line, = self.ax[1].plot(np.arange(100), np.zeros((100,1)), linewidth=0.4,color=cmap(i))
+        self.ax[1].set(xlabel='Time (seconds)', ylabel='TCFR', title='Threshold Crossings (TCFR)', ylim=(-5,5))
         
         # Init Finger lines
         self.finger_positions = []
@@ -253,7 +253,7 @@ class neural_plot(widgets.VBox):
         time_slice = slice(self.plot_start_index, self.end_index)
         exp_time = self.Data['time'][time_slice] / 1000 # put in sec
         time_lims = (exp_time[0],exp_time[-1])
-        
+
         # update neural data
         for i, line in enumerate(self.neural_data):
             line.set_data(exp_time,self.Data['sbp'][time_slice,i])
@@ -264,7 +264,7 @@ class neural_plot(widgets.VBox):
         for i, line in enumerate(self.tcfr_data):
             line.set_data(exp_time, self.Data['tcfr'][time_slice, i])
         self.tcfr_avg_line.set_data(exp_time, np.mean(self.Data['tcfr'],axis=1)[time_slice])
-        self.ax[1].set(xlabel=None, ylabel='TCFR', title='Threshold Crossings (TCFR)', xlim=time_lims, ylim=(0, 10))
+        self.ax[1].set(xlabel=None, ylabel='TCFR', title='Threshold Crossings (TCFR)', xlim=time_lims, ylim=(-5,5))
 
         # update finger positions
         for i, line_pos in enumerate(self.finger_positions):
@@ -294,7 +294,7 @@ class neural_plot(widgets.VBox):
         
         # draw new trial start lines
         for index in trial_indexes_in_range:
-            x_value = self.Data['time'][index] /1000
+            x_value = self.Data['time'][index] / 1000
             position = np.where(trial_indexes == index)[0][0]
             actual_trial = trial_numbers[position]
 
