@@ -13,6 +13,7 @@ import sys
 import glob
 import re
 import signal_utils
+import ast
 
 
 from sklearn import linear_model
@@ -67,6 +68,34 @@ def create_signal_quality_figure():
     # add mutual information calculations per day
 
     # calc_mutual_information(dates, characterizationdir="./output_dir")
+
+
+
+def active_channels_plot(path_to_pr_calcs, save_path):
+
+    df = pd.read_csv(path_to_pr_calcs)
+    
+    # Convert string representation of lists into actual lists
+    df['chan_mask'] = df['chan_mask'].apply(signal_utils.clean_chan_mask)
+
+    # Count num of active channels
+    df['num_active_channels'] = df['chan_mask'].apply(len)
+
+    # convert and sort dates
+    df['date'] = pd.to_datetime(df['date'])
+    df = df.sort_values('date')
+
+    plt.figure(figsize=(12, 6))
+    plt.plot(df['date'], df['num_active_channels'], marker='o')
+    plt.title('Number of Active Channels per Day')
+    plt.xlabel('Date')
+    plt.ylabel('Active Channels')
+    plt.grid(True)
+    plt.tight_layout()
+
+    plt.savefig(save_path)
+    plt.close()
+
 
 def create_pr_plot(ax):
     pr_df = pd.read_csv(os.path.join(signal_utils.output_path,"participation_ratios.csv"))

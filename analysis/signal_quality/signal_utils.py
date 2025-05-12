@@ -6,6 +6,7 @@ import glob
 import re
 from tqdm import tqdm
 from datetime import datetime
+import ast
 
 # server_dir = "/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/"
 # data_path = os.path.join(server_dir, 'Student Folders','Nina_Gill','data','only_good_days')
@@ -98,4 +99,12 @@ def participation_ratio(dx_flat):
     return pr
 
 
-
+def clean_chan_mask(s):
+    try:
+        s = s.strip("[]")              
+        s = s.lstrip(',')         
+        new_s = [int(x) for x in s.split(' ') if x.strip().isdigit()]
+        return new_s
+    except Exception as e:
+        print(f"Failed to parse {s}: {e}")
+        return []
