@@ -9,6 +9,7 @@ from pynwb.ecephys import ElectricalSeries
 from pynwb.file import Subject
 from typing import Tuple, Optional
 import config
+from find_impedances import get_impedances
 
 
 def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
@@ -170,10 +171,17 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
             #         filtering="",
             #         group=electrode_group,
             #     )
+            impedances = get_impedances(date)
+            if impedances is None:
+                print(f"No impedances found for date {date}")
             for _, ch in CHANNEL_MAP.iterrows():
                 ch_id = int(ch["Channel"]) - 1  # 0-based to match sbp_channel_0 …
                 row = int(ch["Array Row"]) - 1  # make rows/cols 0-based
                 col = int(ch["Array Column"]) - 1
+                # Convert impedances from kOhm to Ohm
+                imp = (
+                    impedances[ch["Channel"]] * 1e3 if impedances is not None else None
+                )
 
                 nwbfile.add_electrode(
                     id=ch_id,
@@ -185,6 +193,7 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
                     pin=int(ch["Pin"]),
                     row=row,
                     col=col,
+                    imp=imp,
                 )
 
             # Extract kinematic data
