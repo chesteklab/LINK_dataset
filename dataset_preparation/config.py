@@ -1,8 +1,15 @@
 import os
 
+# get cwd for making the folders - so that all the data should generate/get saved into the right places
+cwd = os.getcwd()
+
+#server_dir = "/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/"
+server_dir = "Z:\\"
+
 pybmipath = 'C:\Repos\pybmi'
-datapath = 'Z:\Data\Monkeys'
-outputdir = "Z:\Student Folders\Hisham_Temmar\\big_dataset"
+# pybmipath = '/home/chesteklab/Repos/pybmi'
+datapath = os.path.join(server_dir, 'Data', 'Monkeys')
+outputdir = os.path.join(server_dir, 'Student Folders', 'Nina_Gill', 'data')
 
 firstpassdir = os.path.join(outputdir, "1_notes_data_pruning")
 notesdir = os.path.join(firstpassdir,'joker_notes_firstpass')
@@ -11,18 +18,15 @@ sheetpath = os.path.join(firstpassdir, 'firstpass_datesruns.csv')
 dfpath = os.path.join(firstpassdir, 'firstpass_datesruns.pkl')
 # dfpath = os.path.join(firstpassdir, 'sfn_datasets.pkl')
 
-preprocessingdir = os.path.join("Z:\Student Folders\\Nina_Gill\data\preprocessing")
-# preprocessingpath = os.path.join("Z:\Student Folders\Hisham_Temmar\\big_dataset\\sfn_round_2")
+preprocessingdir = os.path.join(outputdir, 'adjusted_times')
+good_daysdir = os.path.join(outputdir, 'only_good_days')
+nwbdir = os.path.join(outputdir, 'nwb_out')
 
-datareviewdir = "Z:\Student Folders\Hisham_Temmar\\big_dataset\\3_data_review_results"
-reviewpath = os.path.join(datareviewdir, 'review_results_test.csv')
+datareviewdir = os.path.join(outputdir, 'datareview' )
+reviewpath = os.path.join(datareviewdir, 'review_results_ht.csv')
 savestatepath = os.path.join(datareviewdir, 'savestate.pkl')
 
-characterizationdir = os.path.join(outputdir, "dataset_characterization")
-
-
 #data review config and params
-dataset_version = "1.0"
 data_params = {
     'monkey':'Joker',
     'binsize':20,

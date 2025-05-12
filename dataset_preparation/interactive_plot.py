@@ -253,7 +253,7 @@ class neural_plot(widgets.VBox):
         time_slice = slice(self.plot_start_index, self.end_index)
         exp_time = self.Data['time'][time_slice] / 1000 # put in sec
         time_lims = (exp_time[0],exp_time[-1])
-        
+
         # update neural data
         for i, line in enumerate(self.neural_data):
             line.set_data(exp_time,self.Data['sbp'][time_slice,i])
