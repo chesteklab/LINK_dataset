@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import numpy as np
 from datetime import datetime
+from datetime import date
 from tqdm import tqdm
 #import config
 import matplotlib.pyplot as plt
@@ -13,6 +14,20 @@ import sys
 import glob
 import re
 import signal_utils
+import matplotlib as mpl
+#some basic text parameters for figures
+mpl.rcParams['font.family'] = "Atkinson Hyperlegible" # if installed but not showing up, rebuild mpl cache
+mpl.rcParams['font.size'] = 10
+mpl.rcParams['savefig.format'] = 'pdf'
+mpl.rcParams['axes.unicode_minus'] = False
+# mpl.rcParams['axes.titlesize'] = 14
+# mpl.rcParams['axes.labelsize'] = 12
+mpl.rcParams['axes.titlelocation'] = 'center'
+mpl.rcParams['axes.titleweight'] = 'bold'
+mpl.rcParams['figure.constrained_layout.use'] = True
+# mpl.rcParams['figure.titlesize'] = 14
+mpl.rcParams['figure.titleweight'] = 'bold'
+mpl.rcParams['pdf.fonttype'] = 42
 
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score, mutual_info_score
@@ -26,24 +41,24 @@ def create_signal_quality_figure():
     dates = signal_utils.extract_dates_from_filenames()
     print(f"Found {len(dates)} dates")
     
-    fig, ax = plt.subplots(2,2)
+    fig, ax = plt.subplots(2,1, sharex=True)
     # data_CO, data_RD = signal_utils.load_day(dates[0])
     # for i in range(96):
     #     plt.hist(data_CO['sbp'][:,i])
     # plt.show()
 
     #show example channel heatmap over time
-    calc_sbp_heatmaps = False
-    if calc_sbp_heatmaps:
-        signal_utils.calc_sbp_heatmaps(dates)
+    # calc_sbp_heatmaps = False
+    # if calc_sbp_heatmaps:
+    #     signal_utils.calc_sbp_heatmaps(dates)
 
-    create_channel_heatmaps(dates, channel = 0)
+    # create_channel_heatmaps(dates, channel = 0)
 
     #average sbp figure
-    calc_avg_sbp = True
+    calc_avg_sbp = False
     if calc_avg_sbp:
         signal_utils.calc_avg_sbps(dates)
-    create_avg_sbp_plot(ax[0,0])
+    create_avg_sbp_plot(ax[0])
     
     # calculate participation ratio on each day
     calculate_pr = False
@@ -51,7 +66,7 @@ def create_signal_quality_figure():
         signal_utils.calc_pr_all_days(dates)
 
     # create pr figure
-    create_pr_plot(ax[0,1])
+    create_pr_plot(ax[1])
 
     plt.show()
     # per channel sbp distributions over time
@@ -74,15 +89,16 @@ def create_pr_plot(ax):
     pr_df.set_index(['date'], inplace=True)
     pr_df.index = pd.to_datetime(pr_df.index)
     pr_df['days'] = (pr_df.index - pr_df.index[0]).to_series().dt.days.to_numpy()
+    pr_df['date_ordinal'] = pr_df.index.to_series().apply(lambda date: date.toordinal())
 
-    p = sns.regplot(data=pr_df, x="days", y="participation_ratio_active", marker='.', color='k', 
+    p = sns.regplot(data=pr_df, x="date_ordinal", y="participation_ratio_active", marker='.', color='k', 
                 line_kws={'color':'r'}, scatter_kws={'alpha':0.6}, ax=ax, label="Single-day PR", ci=None)
     
     slope, intercept, r, p_val, sterr = stats.linregress(x=pr_df['days'], y=pr_df['participation_ratio_active'])
 
-    ax.annotate(f'slope: {slope:.3e} PR/day\nint: {intercept:.3f}\nr^2:{r**2:.3f},\np:{p_val:.3f}', (0, 10), ha='left')
+    ax.annotate(f'slope: {slope:.3e} PR/day\nint: {intercept:.3f}\nr^2:{r**2:.3f},\np:{p_val:.3f}', (pr_df['date_ordinal'].min(), 10), ha='left')
     ax.set(title='Participation ratio over time', ylabel='Participation Ratio (PR)*', 
-           xlabel="Day since first recording")
+           xlabel="Day since first recording", yticks=[0,5,10,15,20])
     ax.legend()
 
 def create_avg_sbp_plot(ax):
@@ -93,20 +109,32 @@ def create_avg_sbp_plot(ax):
 
     sbp_long = sbp_avgs.reset_index(names="date").melt(id_vars=["date",'days'], var_name='channel', value_name='sbp')
     sbp_long['sbp'] = sbp_long['sbp']*0.25
+    sbp_long['date_ordinal'] = sbp_long['date'].apply(lambda date: date.toordinal())
     
     # plot average
     slope, intercept, r, p_val, sterr = stats.linregress(x=sbp_long['days'], y=sbp_long['sbp'])
 
     per_day_mean = sbp_long.groupby('days')['sbp'].mean()
     # ax.plot(per_day_mean)
-    sns.regplot(data=sbp_long, x="days", y="sbp", marker='.', color='k', 
+    sns.regplot(data=sbp_long, x="date_ordinal", y="sbp", marker='.', color='k', 
                 line_kws={'color':'r'}, scatter_kws={'alpha':0.5}, ax=ax, label="Per-channel, single day averages")
     
-    ax.annotate(f'slope: {slope:.3e} PR/day\nint: {intercept:.3f}\nr^2:{r**2:.3f},\np:{p_val:.3f}', (0, 10), ha='left')
+    outliers = sbp_long.loc[sbp_long['sbp'] > 20]['date_ordinal']
+    dummy_points = np.zeros(len(outliers))
+    dummy_points = dummy_points + 19.9
 
-    ax.set(xlabel='Day since first recording',
+    ax.plot(outliers, dummy_points, 'x', ms=10)
+    ax.annotate(f'slope: {slope:.3e} PR/day\nint: {intercept:.3f}\nr^2:{r**2:.3f},\np:{p_val:.3f}', (sbp_long['date_ordinal'].min(), 10), ha='left')
+    # new_labels = [date.fromordinal(int(item)) for item in ax.get_xticks()]
+    ax.set(xlabel=None,
            ylabel='Mean SBP (uV)',
-           title='SBP across channels over time')
+           title='SBP across channels over time',
+           ylim=(0,20),
+           yticks=(0,5,10,15,20))
+    # Create tick positions
+    tick_labels = ['2020-01-01','2020-07-01','2021-01-01','2021-07-01','2022-01-01','2022-07-01','2023-01-01','2023-07-01']
+    tick_positions = [datetime.strptime(tick, '%Y-%m-%d').date().toordinal() for tick in tick_labels]
+    ax.set(xticks=tick_positions, xticklabels=tick_labels)
 
 def calc_mutual_information(dates, characterizationdir):
     mi_dict = {'date': [], 'channel': [], 'mutual_information': []}
@@ -249,8 +277,6 @@ def create_channel_heatmaps(dates, channel):
     for i in range(len(channels)):
         sbp_heatmap = sbp_heatmaps[:,:,channels[i]]
         ax[i].imshow(sbp_heatmap.T, origin='lower')
-
-    pdb.set_trace()
 
 def signal_distribution_per_ch(dates, ax, ch, preprocessingdir, characterizationdir, n_bins=10, display_mean = True, display_median = True, show_trend=True,crunch=False,robust=True, percentile_range=(0.3,99.7)):
 
