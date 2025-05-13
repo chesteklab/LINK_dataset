@@ -59,10 +59,17 @@ def create_single_channel_tuning_figure():
     tuning_strength_heatmap_ax.set(xlabel=None)
     #plot tuning spreads
     ta = tuning_utils.calc_tuning_avgs(tuning_df)
+    qt = tuning_utils.calc_circular_quartiles(tuning_df)
+    colours = ['blue', 'orange', 'green']
     for i in np.arange(3):
         a = i*32
         b = i*32 + 32
-        avg_tuning_ax[0].errorbar(np.radians(ta['ang_mean'])[a:b], ta['mag_mean'][a:b], xerr=np.radians(ta['ang_std'][a:b]), yerr=ta['mag_std'][a:b], fmt='.')
+        def angular_difference_rad(a, b):
+            diff = (a - b + np.pi) % (2 * np.pi) - np.pi
+            return np.abs(diff)
+        xerr = [angular_difference_rad(qt['lower_quartile'][a:b], np.radians(qt['median'])[a:b]), 
+                angular_difference_rad(qt['upper_quartile'][a:b], np.radians(qt['median'])[a:b])]
+        avg_tuning_ax[i].errorbar(np.radians(qt['median'])[a:b], ta['mag_mean'][a:b], xerr=xerr, yerr=ta['mag_std'][a:b], fmt='none', linestyle='none', elinewidth=0.5, marker=None, ecolor = colours[i])
     subfigs[2].suptitle("D. tuning spreads")
 
     plt.show()
