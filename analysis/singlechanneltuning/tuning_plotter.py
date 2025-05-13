@@ -40,21 +40,26 @@ def plot_polar_tuning(ax, dataframe, channel_number, params = {'ylim':None, 'cma
     channel_data = dataframe.loc[dataframe['channel'] == channel_number].copy()
 
     days = (channel_data['date'] - channel_data['date'].min()).dt.days
-    tuning_avgs = tuning_utils.calc_tuning_avgs(dataframe)
+    qt = tuning_utils.calc_medians_iqrs(dataframe)
     cmap = sns.color_palette(params['cmap'], as_cmap=True).reversed()
     
-
     scatter = ax.scatter(np.radians(channel_data['angle']), 
                          channel_data['magnitude'],
                          s=params['s'],
                          c=days, 
                          cmap=cmap, 
                          alpha=params['alpha'])
-    
-    ax.errorbar(np.radians(tuning_avgs['ang_mean'][channel_number]), 
-                tuning_avgs['mag_mean'][channel_number], 
-                xerr=np.radians(tuning_avgs['ang_std'][channel_number]), 
-                yerr=tuning_avgs['mag_std'][channel_number],
+    def angular_difference_rad(a, b):
+        diff = (a - b + np.pi) % (2 * np.pi) - np.pi
+        return np.abs(diff)
+
+    xerr = np.asarray([angular_difference_rad(np.radians(qt['ang_lower_quartile'][channel_number]), np.radians(qt['ang_median'][channel_number])), 
+            angular_difference_rad(np.radians(qt['ang_upper_quartile'][channel_number]), np.radians(qt['ang_median'][channel_number]))]).reshape(2,1)
+    yerr = np.asarray([qt['mag_lower_quartile'][channel_number], qt['mag_upper_quartile'][channel_number]]).reshape(2,1)
+    ax.errorbar(np.radians(qt['ang_median'][channel_number]), 
+                qt['mag_median'][channel_number], 
+                xerr=xerr, 
+                yerr=yerr,
                 fmt='k.',
                 elinewidth=3)
 

@@ -26,12 +26,12 @@ mpl.rcParams['figure.titlesize'] = 14
 mpl.rcParams['figure.titleweight'] = 'bold'
 mpl.rcParams['pdf.fonttype'] = 42
 
-# data_path = "Z:\Student Folders\\Nina_Gill\data\only_good_days"
-# output_path = 'Z:\Student Folders\Hisham_Temmar\\big_dataset\output\single_channel_tuning'
+data_path = "Z:\Student Folders\\Nina_Gill\data\only_good_days"
+output_path = 'Z:\Student Folders\Hisham_Temmar\\big_dataset\output\single_channel_tuning'
 
 # (for debugging stage) please dont remove these, comment them out would be fine. otherwise ill have to write the directories again which is annoying because windows hates single \
-data_path = "C:\\Files\\UM\\ND\\SFN\\only_good_days"
-output_path = 'C:\\Files\\UM\\ND\\github\\big_nhp_dataset_code\\outputs'
+# data_path = "C:\\Files\\UM\\ND\\SFN\\only_good_days"
+# output_path = 'C:\\Files\\UM\\ND\\github\\big_nhp_dataset_code\\outputs'
 
 def compute_channel_tuning(neural, full_behavior, velocity_tuning = False):
 
@@ -167,27 +167,44 @@ def circular_quantile_rad_signed(angles, probs):
 
     return wrap(lin_q + m)
 
-def calc_circular_quartiles(tuning_df):
+def calc_medians_iqrs(tuning_df):
     tuning_df_copy = tuning_df.copy()
+    clower_quartiles = []
+    cupper_quartiles = []
+    cmedians = []
+
     lower_quartiles = []
     upper_quartiles = []
     medians = []
     for channel, group in tuning_df.groupby('channel'):
         angles = np.radians(group['angle'].values)
-        lower_quartile, upper_quartile = circular_quantile_rad_signed(angles, [0.25, 0.75])
-        lower_quartiles.append(np.degrees(lower_quartile))
-        upper_quartiles.append(np.degrees(upper_quartile))
-        median, _ = circular_median_rad(angles)
-        medians.append(np.degrees(median))
+        mags = group['magnitude'].values
 
+        lower_quartile, upper_quartile = circular_quantile_rad_signed(angles, [0.25, 0.75])
+        clower_quartiles.append(np.degrees(lower_quartile))
+        cupper_quartiles.append(np.degrees(upper_quartile))
+        median, _ = circular_median_rad(angles)
+        cmedians.append(np.degrees(median))
+
+        lower_quartiles.append(group['magnitude'].quantile(0.25))
+        upper_quartiles.append(group['magnitude'].quantile(0.75))
+        medians.append(group['magnitude'].median())
+        
     quartiles_df = pd.DataFrame({
         'channel': tuning_df['channel'].unique(),
-        'lower_quartile': lower_quartiles,
-        'upper_quartile': upper_quartiles,
-        'median': medians
+        'ang_lower_quartile': clower_quartiles,
+        'ang_upper_quartile': cupper_quartiles,
+        'ang_median': cmedians,
+        'mag_lower_quartile':lower_quartiles,
+        'mag_upper_quartile':upper_quartiles,
+        'mag_median':medians
     })
     return quartiles_df
 
+def calc_tuning_iqrs(tuning_df):
+    tuning_df_copy = tuning_df.copy()
+    lower_q = []
+    upper_q = []
 def calc_tuning_avgs(tuning_df):
     tuning_df_copy = tuning_df.copy()
     mag_avg = tuning_df_copy.groupby('channel')['magnitude'].agg(('mean','std'))

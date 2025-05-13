@@ -16,6 +16,7 @@ import matplotlib.gridspec as gridspec
 #import config
 import tuning_utils
 import tuning_plotter
+import seaborn as sns
 
 def create_single_channel_tuning_figure():
     output_dir = os.path.join(tuning_utils.output_path,'channel_stability_tuning.csv')
@@ -43,7 +44,7 @@ def create_single_channel_tuning_figure():
     top_sfs[0].suptitle("A. Preferred Tuning ")
     tuning_plotter.plot_dummy_ax(dummy_ax)
 
-    params = {'ylim':(0, 0.05), 'cmap':'crest', 's':7, 'alpha':0.6}
+    params = {'ylim':(0, 0.06), 'cmap':'crest', 's':7, 'alpha':0.6}
     for i, channel in enumerate(selected_channels[1:]):
         im = tuning_plotter.plot_polar_tuning(example_channels_axs[i], tuning_df, channel, params=params)
     cb = top_sfs[1].colorbar(im, ax=example_channels_axs, label='days')
@@ -59,17 +60,22 @@ def create_single_channel_tuning_figure():
     tuning_strength_heatmap_ax.set(xlabel=None)
     #plot tuning spreads
     ta = tuning_utils.calc_tuning_avgs(tuning_df)
-    qt = tuning_utils.calc_circular_quartiles(tuning_df)
-    colours = ['blue', 'orange', 'green']
+    qt = tuning_utils.calc_medians_iqrs(tuning_df)
+    colours = sns.color_palette("colorblind",3)
     for i in np.arange(3):
         a = i*32
         b = i*32 + 32
         def angular_difference_rad(a, b):
             diff = (a - b + np.pi) % (2 * np.pi) - np.pi
             return np.abs(diff)
-        xerr = [angular_difference_rad(qt['lower_quartile'][a:b], np.radians(qt['median'])[a:b]), 
-                angular_difference_rad(qt['upper_quartile'][a:b], np.radians(qt['median'])[a:b])]
-        avg_tuning_ax[i].errorbar(np.radians(qt['median'])[a:b], ta['mag_mean'][a:b], xerr=xerr, yerr=ta['mag_std'][a:b], fmt='none', linestyle='none', elinewidth=0.5, marker=None, ecolor = colours[i])
+        xerr = [angular_difference_rad(np.radians(qt['ang_lower_quartile'][a:b]), np.radians(qt['ang_median'])[a:b]), 
+                angular_difference_rad(np.radians(qt['ang_upper_quartile'][a:b]), np.radians(qt['ang_median'])[a:b])]
+        # print(f'bank_{i} avg iqr: {np.mean(np.sum(xerr))}')
+        avg_tuning_ax[i].errorbar(np.radians(qt['ang_median'])[a:b], qt['mag_median'][a:b], 
+                                  xerr=xerr, 
+                                  yerr=[qt['mag_lower_quartile'][a:b], qt['mag_upper_quartile'][a:b]], 
+                                  fmt='none', linestyle='none', elinewidth=0.8, marker='o', ms=10, ecolor = colours[i])
+        
     subfigs[2].suptitle("D. tuning spreads")
 
     plt.show()
