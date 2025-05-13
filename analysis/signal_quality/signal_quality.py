@@ -41,7 +41,7 @@ def create_signal_quality_figure():
     dates = signal_utils.extract_dates_from_filenames()
     print(f"Found {len(dates)} dates")
     
-    fig, ax = plt.subplots(2,1, sharex=True)
+    fig, ax = plt.subplots(3,1, sharex=True)
     # data_CO, data_RD = signal_utils.load_day(dates[0])
     # for i in range(96):
     #     plt.hist(data_CO['sbp'][:,i])
@@ -66,8 +66,8 @@ def create_signal_quality_figure():
         signal_utils.calc_pr_all_days(dates)
 
     # create pr figure
-    create_pr_plot(ax[1])
-
+    create_pr_plot(ax[2])
+    active_channels_plot(ax[1],os.path.join(signal_utils.output_path,"participation_ratios.csv"))
     plt.show()
     # per channel sbp distributions over time
     # channels = 4
@@ -84,9 +84,7 @@ def create_signal_quality_figure():
 
     # calc_mutual_information(dates, characterizationdir="./output_dir")
 
-
-
-def active_channels_plot(path_to_pr_calcs, save_path):
+def active_channels_plot(ax, path_to_pr_calcs):
 
     df = pd.read_csv(path_to_pr_calcs)
     
@@ -97,19 +95,12 @@ def active_channels_plot(path_to_pr_calcs, save_path):
     df['num_active_channels'] = df['chan_mask'].apply(len)
 
     # convert and sort dates
-    df['date'] = pd.to_datetime(df['date'])
-    df = df.sort_values('date')
+    df['date_ordinal'] = pd.to_datetime(df['date']).apply(lambda date: date.toordinal())
+    df = df.sort_values('date_ordinal')
 
-    plt.figure(figsize=(12, 6))
-    plt.plot(df['date'], df['num_active_channels'], marker='o')
-    plt.title('Number of Active Channels per Day')
-    plt.xlabel('Date')
-    plt.ylabel('Active Channels')
-    plt.grid(True)
-    plt.tight_layout()
-
-    plt.savefig(save_path)
-    plt.close()
+    ax.plot(df['date_ordinal'], df['num_active_channels'], 'k.')
+    ax.set(title='Number of Active Channels per Day', xlabel='Date', ylabel="# of Active Channels")
+    ax.grid(True)
 
 
 def create_pr_plot(ax):
@@ -125,8 +116,7 @@ def create_pr_plot(ax):
     slope, intercept, r, p_val, sterr = stats.linregress(x=pr_df['days'], y=pr_df['participation_ratio_active'])
 
     ax.annotate(f'slope: {slope:.3e} PR/day\nint: {intercept:.3f}\nr^2:{r**2:.3f},\np:{p_val:.3f}', (pr_df['date_ordinal'].min(), 10), ha='left')
-    ax.set(title='Participation ratio over time', ylabel='Participation Ratio (PR)*', 
-           xlabel="Day since first recording", yticks=[0,5,10,15,20])
+    ax.set(title='Participation ratio over time (Active Channels)', ylabel='Participation Ratio (PR)', yticks=[0,5,10,15,20], xlabel=None)
     ax.legend()
 
 def create_avg_sbp_plot(ax):
