@@ -18,6 +18,7 @@ import tuning_utils
 import tuning_plotter
 import seaborn as sns
 
+TICK_OVERRIDE = True
 def create_single_channel_tuning_figure():
     output_dir = os.path.join(tuning_utils.output_path,'channel_stability_tuning.csv')
     calc_tunings = False
@@ -44,7 +45,7 @@ def create_single_channel_tuning_figure():
     top_sfs[0].suptitle("A. Preferred Tuning ")
     tuning_plotter.plot_dummy_ax(dummy_ax)
 
-    params = {'ylim':(0, 0.06), 'cmap':'crest', 's':7, 'alpha':0.6}
+    params = {'ylim':(0, 0.06), 'cmap':'crest', 's':7, 'alpha':0.6, 'tick_override':TICK_OVERRIDE}
     for i, channel in enumerate(selected_channels[1:]):
         im = tuning_plotter.plot_polar_tuning(example_channels_axs[i], tuning_df, channel, params=params)
     cb = top_sfs[1].colorbar(im, ax=example_channels_axs, label='days')
@@ -75,7 +76,8 @@ def create_single_channel_tuning_figure():
                                   xerr=xerr, 
                                   yerr=[qt['mag_lower_quartile'][a:b], qt['mag_upper_quartile'][a:b]], 
                                   fmt='none', linestyle='none', elinewidth=0.8, marker='o', ms=10, ecolor = colours[i])
-        
+        if(TICK_OVERRIDE):
+            avg_tuning_ax[i].set_xticklabels(['0°','45°', '90°','135°', '180°','-135°','-90°','-45°'])
     subfigs[2].suptitle("D. tuning spreads")
 
     plt.show()

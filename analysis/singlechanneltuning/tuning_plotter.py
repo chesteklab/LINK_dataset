@@ -36,7 +36,7 @@ def plot_dummy_ax(ax):
     
     ax.set_xticklabels([])
 
-def plot_polar_tuning(ax, dataframe, channel_number, params = {'ylim':None, 'cmap':'crest', 's':4, 'alpha':0.5}):
+def plot_polar_tuning(ax, dataframe, channel_number, params = {'ylim':None, 'cmap':'crest', 's':4, 'alpha':0.5, 'tick_override':False}):
     channel_data = dataframe.loc[dataframe['channel'] == channel_number].copy()
 
     days = (channel_data['date'] - channel_data['date'].min()).dt.days
@@ -62,7 +62,8 @@ def plot_polar_tuning(ax, dataframe, channel_number, params = {'ylim':None, 'cma
                 yerr=yerr,
                 fmt='k.',
                 elinewidth=3)
-
+    if params['tick_override']:
+        ax.set_xticklabels(['0°','45°', '90°','135°', '180°','-135°','-90°','-45°','-180°'])
     if params['ylim']:
         ax.set_ylim(params['ylim'][0], params['ylim'][1])
     # ax.set_title(f'Channel {channel_number}', va='bottom')
