@@ -76,7 +76,7 @@ def copy_imp_files(
 
 
 def find_nearest_imp(
-    date, imp_path=r"Z:\Student Folders\Nina_Gill\data\impedances", imp_type="Motor"
+    date, imp_path=r"Z:\Student Folders\\Nina_Gill\data\\impedances", imp_type="Motor"
 ):
     """
     Finds the nearest impedance recording to the date and returns its filename,
@@ -118,7 +118,7 @@ def find_nearest_imp(
         return nearest_motor, nearest_sensory
 
 
-def _read_impedances(file_path: str | Path) -> np.ndarray:
+def _read_impedances(file_path) -> np.ndarray:
     """
     Parse *AutoImpedance* text file and return a vector (index 0 → chan1)
     with impedances in kΩ.  Channels whose value is not reported in kΩ are

@@ -1,6 +1,7 @@
 import pickle
 import pandas as pd
 import os
+import pdb
 from tqdm import tqdm
 import numpy as np
 from datetime import datetime, timezone
@@ -57,7 +58,7 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
             # Rename target positions to index and MRS
             renaming_trials = {
                 "target_positions_0": "index_target_position",
-                "target_positions_1": "mrp_target_position",
+                "target_positions_1": "mrs_target_position",
             }
             # Apply renaming to trials DataFrame
             trials_df = trials_df.rename(columns=renaming_trials)
@@ -86,9 +87,9 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
             # Rename columns to channels
             renaming_ts = {
                 "finger_kinematics_0": "index_position",
-                "finger_kinematics_1": "mrp_position",
+                "finger_kinematics_1": "mrs_position",
                 "finger_kinematics_2": "index_velocity",
-                "finger_kinematics_3": "mrp_velocity",
+                "finger_kinematics_3": "mrs_velocity",
             }
             renaming_ts.update({f"sbp_{i}": f"sbp_channel_{i}" for i in range(96)})
             renaming_ts.update({f"tcfr_{i}": f"tcfr_channel_{i}" for i in range(96)})
@@ -115,6 +116,7 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
 
             # Adjust the timestamps to milliseconds
             times = ts_df["time"].values / 1000  # Convert to seconds
+            pdb.set_trace()
 
             # Create an NWB file with timezone-aware datetime objects
             nwbfile = NWBFile(
@@ -145,7 +147,7 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
             # Iterate over arrays in electrode table
             groups = {}
             for array in CHANNEL_MAP["Array location"].unique():
-                dev = nwbfile.create_device(name=array)
+                dev = nwbfile.create_device(name=array, description=f"{array} | Utah Array")
                 grp = nwbfile.create_electrode_group(
                     name=array,
                     description=f"{array} | Utah Array",
@@ -158,8 +160,8 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
                 "array_name": "Name of the array this contact belongs to",
                 "bank": "Headstage bank (A-C)",
                 "pin": "Headstage bank pin number (1-32)",
-                "row": "Row index in the 8×8 grid (0-7)",
-                "col": "Column index in the 8×8 grid (0-7)",
+                "row": "Row index in the 8x8 array grid (0-7)",
+                "col": "Column index in the 8x8 array grid (0-7)",
             }.items():
                 nwbfile.add_electrode_column(name, descr)
 
@@ -198,13 +200,13 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
 
             # Extract kinematic data
             index_position = ts_df["index_position"].values
-            mrp_position = ts_df["mrp_position"].values
+            mrs_position = ts_df["mrs_position"].values
 
             # Positions are in flexion units from 0 to 1
             # Velocities are the difference of positions per time bin (20 ms)
             # Velocities are provided in the data
             index_velocity = ts_df["index_velocity"].values
-            mrp_velocity = ts_df["mrp_velocity"].values
+            mrs_velocity = ts_df["mrs_velocity"].values
 
             # Create a processing module for behavior
             # behavior_module = nwbfile.create_processing_module(
@@ -220,9 +222,9 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
                 description="Index flexion position, from fully extended (0) to fully flexed (1)",
                 comments="Processed position data (averaged over 20 ms bins)",
             )
-            mrp_position_ts = TimeSeries(
-                name="mrp_position",
-                data=mrp_position[:, None],
+            mrs_position_ts = TimeSeries(
+                name="mrs_position",
+                data=mrs_position[:, None],
                 unit="flexion units",  # From 0 to 1
                 timestamps=times,
                 description="Middle-ring-pinky flexion position, from fully extended (0) to fully flexed (1)",
@@ -231,10 +233,10 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
 
             # Add positions to analysis
             nwbfile.add_analysis(index_position_ts)
-            nwbfile.add_analysis(mrp_position_ts)
+            nwbfile.add_analysis(mrs_position_ts)
             # Add positions to the behavior module
             # behavior_module.add_data_interface(index_position_ts)
-            # behavior_module.add_data_interface(mrp_position_ts)
+            # behavior_module.add_data_interface(mrs_position_ts)
 
             # Create TimeSeries objects for velocities
             index_velocity_ts = TimeSeries(
@@ -244,20 +246,20 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
                 timestamps=times,
                 description="Velocity of index flexion",
             )
-            mrp_velocity_ts = TimeSeries(
-                name="mrp_velocity",
-                data=mrp_velocity[:, None],
+            mrs_velocity_ts = TimeSeries(
+                name="mrs_velocity",
+                data=mrs_velocity[:, None],
                 unit="flexion units per time bin",  # Units per 20 ms
                 timestamps=times,
                 description="Velocity of middle-ring-pinky flexion",
             )
             # Add velocities to analysis
             nwbfile.add_analysis(index_velocity_ts)
-            nwbfile.add_analysis(mrp_velocity_ts)
+            nwbfile.add_analysis(mrs_velocity_ts)
 
             # Add velocities to the behavior module
             # behavior_module.add_data_interface(index_velocity_ts)
-            # behavior_module.add_data_interface(mrp_velocity_ts)
+            # behavior_module.add_data_interface(mrs_velocity_ts)
 
             # Process neural data
             # SBP channels
@@ -291,7 +293,7 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
                 data=sbp_data * 0.25,  # Scaling to convert to microvolts
                 timestamps=times,
                 conversion=1e-6,  # measured in microvolts
-                comments="Spiking Band Power in each 20ms bin",
+                description="Spiking Band Power across time, in 20ms bins",
                 electrodes=elec_region,
             )
 
@@ -301,8 +303,7 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
                 data=tcfr_data,
                 electrodes=elec_region,
                 timestamps=times,
-                description="Threshold crossings across time",
-                comments="Number of threshold crossings (threshold = -4.5RMS) per each 20ms bin",
+                description="Threshold crossings (threshold = -4.5RMS) across time, in 20ms bins"
             )
             # Add sbp and tcfr to analysis
             nwbfile.add_analysis(sbp_timeseries)
@@ -321,7 +322,7 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
                 name="index_target_position", description="Index target position"
             )
             nwbfile.add_trial_column(
-                name="mrp_target_position", description="MRP target position"
+                name="mrs_target_position", description="MRS target position"
             )
             nwbfile.add_trial_column(
                 name="target_style", description="Target style (CO or RD)"
@@ -351,13 +352,13 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
                     trial_count=trial_meta["trial_count"],
                     run_id=trial_meta["run_id"],
                     index_target_position=trial_meta["index_target_position"],
-                    mrp_target_position=trial_meta["mrp_target_position"],
+                    mrs_target_position=trial_meta["mrs_target_position"],
                     target_style=trial_meta["target_style"],
                     timeseries=[
                         index_position_ts,
-                        mrp_position_ts,
+                        mrs_position_ts,
                         index_velocity_ts,
-                        mrp_velocity_ts,
+                        mrs_velocity_ts,
                         sbp_timeseries,
                         tcfr_timeseries,
                     ],
@@ -409,22 +410,22 @@ def dicts_from_pickle(
 
             # --- time and kinematics ---
             t_sec = ts("index_position").timestamps[:]
-            time_ms = (t_sec * 1000).astype(np.float32)
+            time_ms = (np.round(t_sec * 1000)).astype(np.int32)
 
             finger_kinematics = np.column_stack(
                 [
                     ts(n).data[:].ravel()
                     for n in (
                         "index_position",
-                        "mrp_position",
+                        "mrs_position",
                         "index_velocity",
-                        "mrp_velocity",
+                        "mrs_velocity",
                     )
                 ]
-            ).astype(np.float32)
+            ).astype(np.float64)
 
             # --- neural features ---
-            sbp = (ts("SpikingBandPower").data[:] / 0.25).astype(np.float32)
+            sbp = (ts("SpikingBandPower").data[:] / 0.25).astype(np.float64)
             tcfr = ts("ThresholdCrossings").data[:].astype(np.int16)
 
             # --- trial info ---
@@ -432,7 +433,7 @@ def dicts_from_pickle(
             trial_number = tr["trial_number"].to_numpy()
             trial_count = tr["trial_count"].to_numpy()
             target_positions = tr[
-                ["index_target_position", "mrp_target_position"]
+                ["index_target_position", "mrs_target_position"]
             ].to_numpy()
             run_id = tr["run_id"].iloc[0]
             target_style = tr["target_style"]

@@ -11,14 +11,14 @@ pybmipath = 'C:\Repos\pybmi'
 datapath = os.path.join(server_dir, 'Data', 'Monkeys')
 outputdir = os.path.join(server_dir, 'Student Folders', 'Nina_Gill', 'data')
 
-firstpassdir = os.path.join(outputdir, "1_notes_data_pruning")
+firstpassdir = "Z:\Student Folders\Hisham_Temmar\\big_dataset\\1_notes_data_pruning"
 notesdir = os.path.join(firstpassdir,'joker_notes_firstpass')
 sheetpath = os.path.join(firstpassdir, 'firstpass_datesruns.csv')
 # sheetpath = os.path.join(firstpassdir, 'sfn_datasets.csv')
 dfpath = os.path.join(firstpassdir, 'firstpass_datesruns.pkl')
 # dfpath = os.path.join(firstpassdir, 'sfn_datasets.pkl')
 
-preprocessingdir = os.path.join(outputdir, 'adjusted_times')
+preprocessingdir = os.path.join(outputdir, 'added_timeouts')
 good_daysdir = os.path.join(outputdir, 'only_good_days')
 nwbdir = os.path.join(outputdir, 'nwb_out')
 
