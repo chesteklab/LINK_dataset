@@ -19,7 +19,7 @@ dfpath = os.path.join(firstpassdir, 'firstpass_datesruns.pkl')
 # dfpath = os.path.join(firstpassdir, 'sfn_datasets.pkl')
 
 preprocessingdir = os.path.join(outputdir, 'added_timeouts')
-good_daysdir = os.path.join(outputdir, 'only_good_days')
+good_daysdir = os.path.join(outputdir, 'only_good_days_timeouts')
 nwbdir = os.path.join(outputdir, 'nwb_out')
 
 datareviewdir = os.path.join(outputdir, 'datareview' )
