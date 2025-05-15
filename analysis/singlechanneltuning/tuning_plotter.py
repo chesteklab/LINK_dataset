@@ -41,13 +41,13 @@ def plot_polar_tuning(ax, dataframe, channel_number, params = {'ylim':None, 'cma
 
     days = (channel_data['date'] - channel_data['date'].min()).dt.days
     qt = tuning_utils.calc_medians_iqrs(dataframe)
-    cmap = sns.color_palette(params['cmap'], as_cmap=True).reversed()
+    cmap = sns.color_palette(params['cmap'], as_cmap=True)
     
     scatter = ax.scatter(np.radians(channel_data['angle']), 
                          channel_data['magnitude'],
                          s=params['s'],
                          c=days, 
-                         cmap=cmap, 
+                         cmap=params['cmap'], 
                          alpha=params['alpha'])
     def angular_difference_rad(a, b):
         diff = (a - b + np.pi) % (2 * np.pi) - np.pi
@@ -66,6 +66,12 @@ def plot_polar_tuning(ax, dataframe, channel_number, params = {'ylim':None, 'cma
         ax.set_xticklabels(['0°','45°', '90°','135°', '180°','-135°','-90°','-45°','-180°'])
     if params['ylim']:
         ax.set_ylim(params['ylim'][0], params['ylim'][1])
+
+    avg_avg_tcr = np.round(np.mean(channel_data['avg_tcr']), 2)
+    std_avg_tcr = np.round(np.std(channel_data['avg_tcr']), 2)
+    print(f'Ch. {channel_number} perday FR: {avg_avg_tcr} +/- {std_avg_tcr}')
+    
+    # pdb.set_trace()
     # ax.set_title(f'Channel {channel_number}', va='bottom')
     #ax.set_yticks((.05, .1))
     return scatter
@@ -86,6 +92,11 @@ def plot_tuning_heatmap(ax, dataframe, metric = 'magnitude', cmap = 'coolwarm'):
         upper_limit = 180
         cbar_kws = {'ticks':[-180,-90,0,90,180], 'label':'Tuning Angle'}
         title="Preferred Tuning Angles"
+    elif metric == 'avg_tcr':
+        lower_limit = 0
+        upper_limit = 10
+        cbar_kws = {'label':'Tuning Strength'}
+        title='Average TCR Per Day'
     else:
         Exception("Unsupported Metric")
 

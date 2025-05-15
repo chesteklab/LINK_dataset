@@ -45,7 +45,7 @@ def create_single_channel_tuning_figure():
     top_sfs[0].suptitle("A. Preferred Tuning ")
     tuning_plotter.plot_dummy_ax(dummy_ax)
 
-    params = {'ylim':(0, 0.06), 'cmap':'crest', 's':7, 'alpha':0.6, 'tick_override':TICK_OVERRIDE}
+    params = {'ylim':(0, 0.06), 'cmap':'mako', 's':5, 'alpha':0.8, 'tick_override':TICK_OVERRIDE}
     for i, channel in enumerate(selected_channels[1:]):
         im = tuning_plotter.plot_polar_tuning(example_channels_axs[i], tuning_df, channel, params=params)
     cb = top_sfs[1].colorbar(im, ax=example_channels_axs, label='days')
@@ -54,15 +54,16 @@ def create_single_channel_tuning_figure():
 
     #plot tuning angles
     # subfigs[1].suptitle("C. tuning heatmaps")
+    fig2, supp_tcr_ax = plt.subplots(1,1,figsize=(8,2.5), layout='constrained')
     cbar_kw = {'ticks':[-180, -90, 0, 90, 180]}
     tuning_plotter.plot_tuning_heatmap(tuning_angle_heatmap_ax, tuning_df, metric='angle', cmap='hsv')
     tuning_plotter.plot_tuning_heatmap(tuning_strength_heatmap_ax, tuning_df, metric='magnitude', cmap='plasma')
+    tuning_plotter.plot_tuning_heatmap(supp_tcr_ax, tuning_df, metric='avg_tcr', cmap='plasma')
     tuning_angle_heatmap_ax.set(xlabel=None)
     tuning_strength_heatmap_ax.set(xlabel=None)
     #plot tuning spreads
     ta = tuning_utils.calc_tuning_avgs(tuning_df)
     qt = tuning_utils.calc_medians_iqrs(tuning_df)
-    colours = sns.color_palette("colorblind",3)
     for i in np.arange(3):
         a = i*32
         b = i*32 + 32
@@ -75,10 +76,10 @@ def create_single_channel_tuning_figure():
         avg_tuning_ax[i].errorbar(np.radians(qt['ang_median'])[a:b], qt['mag_median'][a:b], 
                                   xerr=xerr, 
                                   yerr=[qt['mag_lower_quartile'][a:b], qt['mag_upper_quartile'][a:b]], 
-                                  fmt='none', linestyle='none', elinewidth=0.8, marker='o', ms=10, ecolor = colours[i])
+                                  fmt='none', linestyle='none', elinewidth=0.8, marker='o', ms=10, ecolor = 'k')
         if(TICK_OVERRIDE):
             avg_tuning_ax[i].set_xticklabels(['0°','45°', '90°','135°', '180°','-135°','-90°','-45°'])
-    subfigs[2].suptitle("D. tuning spreads")
+    subfigs[2].suptitle("E. tuning spreads")
 
     plt.show()
 

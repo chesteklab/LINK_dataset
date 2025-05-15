@@ -28,7 +28,7 @@ mpl.rcParams['pdf.fonttype'] = 42
 
 data_path = "Z:\Student Folders\\Nina_Gill\data\only_good_days"
 output_path = 'Z:\Student Folders\Hisham_Temmar\\big_dataset\output\single_channel_tuning'
-
+binsize = 20
 # (for debugging stage) please dont remove these, comment them out would be fine. otherwise ill have to write the directories again which is annoying because windows hates single \
 # data_path = "C:\\Files\\UM\\ND\\SFN\\only_good_days"
 # output_path = 'C:\\Files\\UM\\ND\\github\\big_nhp_dataset_code\\outputs'
@@ -113,15 +113,22 @@ def compute_tuning_data(save_dir = None):
         if data_CO and data_RD:
             sbp = np.concatenate((data_CO['sbp'], data_RD['sbp']), axis=0)
             beh = np.concatenate((data_CO['finger_kinematics'], data_RD['finger_kinematics']), axis=0)
+            tcr = np.concatenate((data_CO['tcfr'], data_RD['tcfr']), axis=0)
         elif data_RD:
             sbp = data_RD['sbp']
             beh = data_RD['finger_kinematics']
+            tcr = data_RD['tcfr']
         else:
             sbp = data_CO['sbp']
             beh = data_CO['finger_kinematics']
+            tcr = data_CO['tcfr']
+        
+        sbp = sbp * 0.25 # convert to uV
+        tcr = tcr * 1000 / binsize # convert from # spikes / bin to # spikes / second
         # Compute channel tuning
         channel_tuning = compute_channel_tuning(sbp, beh, velocity_tuning=False)
-
+        # also save the average TCR
+        channel_tuning['avg_tcr'] = np.mean(tcr, axis=0)
         channel_tuning['date'] = date
         df_list.append(channel_tuning)
     
