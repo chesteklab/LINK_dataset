@@ -443,6 +443,7 @@ def dicts_from_pickle(
             ].to_numpy()
             run_id = tr["run_id"].iloc[0]
             target_style = tr["target_style"]
+            trial_timeout = tr["trial_timeout"]
 
             trial_index = np.searchsorted(t_sec, tr["start_time"].to_numpy()).astype(
                 np.int32
@@ -452,6 +453,7 @@ def dicts_from_pickle(
                 trial_number=trial_number,
                 trial_count=trial_count,
                 target_positions=target_positions,
+                trial_timeout=trial_timeout,
                 time=time_ms,
                 finger_kinematics=finger_kinematics,
                 sbp=sbp,
