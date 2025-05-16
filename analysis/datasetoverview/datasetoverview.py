@@ -11,6 +11,7 @@ import pdb
 import os
 import re
 import sys
+import glob
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
@@ -52,12 +53,13 @@ def create_time_plot(ds, outputdir):
 def target_positions(dates, preprocessingdir, outputdir, isOneDay = False, dayIdx = None):
     targetpos_co = np.zeros((1,2))
     targetpos_rd = np.zeros((1,2))
-    for date in dates[0:]:
-        if(isOneDay):
-            selectedDateIdx = dayIdx
-            date = dates[selectedDateIdx]
-            file = os.path.join(preprocessingdir,f'{date}_preprocess.pkl')
-
+    if False:
+        a = 5
+    else:
+        cos = []
+        for date in dates:
+            file = os.path.join(data_path, f'{date.strftime("%Y-%m-%d")}_preprocess.pkl')
+            # fig, ax = plt.subplots(1,2, figsize=(4, 2), layout='constrained', sharex=True, sharey=True)
             with open(file, 'rb') as f:
                 data_CO, data_RD = pickle.load(f)
             pdb.set_trace()
