@@ -30,6 +30,7 @@ import copy
 import matplotlib.patheffects as pe
 from matplotlib.lines import Line2D
 from scipy.linalg import subspace_angles
+from matplotlib.ticker import MaxNLocator
 
 
 
@@ -353,7 +354,7 @@ def direction_map(directions='not_all'):
                       'SW':'MRP Extension, \nIndex Extension',
                       'SE':'MRP Flexion, \nIndex Flexion'
                     }
-        dir_list = ['N', 'W', 'E', 'S', 'NW', 'NE', 'SW', 'SE']
+        dir_list = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
         position_map = {
             (0.5, 0.7): 'N', (0.5, 0.9): 'N',
             (0.5, 0.1): 'S', (0.5, 0.3): 'S',
@@ -407,7 +408,7 @@ def direction_map(directions='not_all'):
             }
         
     elif directions == 'extreme':
-        dir_list = ['N', 'W', 'E', 'S', 'NW', 'NE', 'SW', 'SE']
+        dir_list = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
 
         position_map = {
             (0.5, 0.7): 'X', (0.5, 0.9): 'N',
@@ -437,7 +438,7 @@ def direction_map(directions='not_all'):
                 'SE':'MRP Flexion, \nIndex Flexion'
             }
     elif directions == 'small':
-        dir_list = ['N', 'W', 'E', 'S', 'NW', 'NE', 'SW', 'SE']
+        dir_list = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
 
         position_map = {
             (0.5, 0.7): 'N', (0.5, 0.9): 'X',
@@ -1051,22 +1052,22 @@ def plot_all_dirs_grouped_by_year(averaged_pca_results, time_periods, label, dir
     # fig.legend(handles=handles, loc='upper right', bbox_to_anchor=(0.95, 0.95))
 
     plt.tight_layout(rect=[0, 0.1, 1.01, .95])
-    make_dir_key(colors = colors)
+    # make_dir_key(colors = colors)
 
 
-def plot_trajectories(averaged_pca_results, time_periods, label, direction_key, dim_inds = [0, 1, 2], elev = 20, azim= -45):
-    dir_list, position_map, direction_key = direction_map(directions='ext_flex')
+def plot_trajectories(averaged_pca_results, time_periods, label,  direction_key, directions = 'ext_flex', dim_inds = [0, 1, 2], elev = 20, azim= -45):
+    dir_list, position_map, direction_key = direction_map(directions=directions)
 
     if label == 'Year':
-        cols = len(list(set([str(x)[:4] for x in time_periods])))
-        rows = 1
+        main_cols = len(list(set([str(x)[:4] for x in time_periods])))
+        main_rows = 1
         figsize = (18, 8)
     elif label == 'Quarter':
-        cols = len(list(set([str(x)[:4] for x in time_periods])))
-        rows = 4
+        main_cols = len(list(set([str(x)[:4] for x in time_periods])))
+        main_rows = 4
     elif label == 'Month':
-        cols = len(list(set([str(x)[:4] for x in time_periods])))*2
-        rows = 6
+        main_cols = len(list(set([str(x)[:4] for x in time_periods])))*2
+        main_rows = 6
     elif label == "Week":
         return
 
@@ -1075,21 +1076,31 @@ def plot_trajectories(averaged_pca_results, time_periods, label, direction_key, 
               'S': (0.9, 0.7, 0.0), 'SW': (0.9, 0.35, 0.1),  # S is Yellowish
               'W': (0.9, 0.0, 0.2), 'NW': (0.65, 0.0,  0.55)}  #E is Red
 
-    fig = plt.figure(figsize=(18, 7), constrained_layout=False)
+    fig = plt.figure(figsize=(12, 5), constrained_layout=True)
     fig.suptitle(f"Neural Trajectories by Reach Direction and {label}s (PCA)", fontsize=16)
+    fig.patch.set_facecolor('white') # Sets the figure (outer) background to white
 
-    # Define number of rows and columns for plots + 1 extra column for the legend
-    main_cols = len(list(set([str(x)[:4] for x in time_periods])))
-    main_rows = rows
-    gs = gridspec.GridSpec(main_rows, main_cols + 2, figure=fig, width_ratios=[1]*main_cols + [0.01, 0.7])
+    
+    subfigs = fig.subfigures(1, 2, width_ratios=[4.5, 1.5])
+
+    # === Left Subfigure: PCA Trajectories ===
+    # main_cols = len(list(set([str(x)[:4] for x in time_periods])))
+    axs = subfigs[0].subplots(main_rows, main_cols, subplot_kw={'projection': '3d'}, squeeze=False)
+
+    # gs = gridspec.GridSpec(main_rows, main_cols + 2, figure=fig, width_ratios=[1]*main_cols + [0.01, 0.7])
 
     # Add all PCA subplots
     for i, year in enumerate(time_periods):
+
         row = i // main_cols
         col = i % main_cols
-        ax = fig.add_subplot(gs[row, col], projection='3d')
+        
+        ax = axs[row][col]
         ax.set_box_aspect([1,1,1])
-        ax.grid(True)
+        
+        # ax = fig.add_subplot(gs[row, col], projection='3d')
+        # ax.set_box_aspect([1,1,1])
+        # ax.grid(True)
 
         for direction in sorted(averaged_pca_results[str(year)].keys()):
             if averaged_pca_results[str(year)][direction] is not None:
@@ -1101,23 +1112,51 @@ def plot_trajectories(averaged_pca_results, time_periods, label, direction_key, 
                         color=colors[direction], s=30, marker='o', edgecolor='black')
 
         print(year)
-        ax.set_xlabel("PC1")
-        ax.set_ylabel("PC2")
-        ax.set_zlabel("PC3")
+        ax.set_xlabel("  PC1")
+        ax.set_ylabel("  PC2")
+        ax.set_zlabel("  PC3  ")
         ax.set_title(f'{label} {str(year)}')
         if year == 2020:
-            ax.view_init(elev = 0, azim = -65)
+            if directions == 'not_all':
+                ax.view_init(elev = 0, azim = -70)
+            elif directions == 'ext_flex':
+                ax.view_init(elev = 0, azim = -65)
+            elif directions == 'small':
+                ax.view_init(elev = 0, azim = -70)
+            elif directions == 'extreme':
+                ax.view_init(elev = 0, azim = -70)
+
         elif year == 2021:
             ax.view_init(elev = 65, azim = -15)
         elif year == 2022:
-            ax.view_init(elev = 65, azim = -75)
+            if directions == 'not_all':
+                ax.view_init(elev = -155, azim = -65)
+            elif directions == 'ext_flex':
+                ax.view_init(elev = 65, azim = -75)
+            elif directions == 'small':
+                ax.view_init(elev = -160, azim = -70)
+            elif directions == 'extreme':
+                ax.view_init(elev = -130, azim = -83)
+            
         elif year == 2023:
-            ax.view_init(elev = 75, azim = -75)
+            ax.view_init(elev = -95, azim = -60)
         else:
             ax.view_init(elev=elev, azim=azim)
 
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=4))  # Set max 5 x-ticks
+        ax.yaxis.set_major_locator(MaxNLocator(nbins=4)) 
+        ax.zaxis.set_major_locator(MaxNLocator(nbins=4)) 
+        ax.grid(False)
+        ax.set_facecolor('white')
+        ax.xaxis.set_pane_color((1, 1, 1, 1))
+        ax.yaxis.set_pane_color((1, 1, 1, 1))
+        ax.zaxis.set_pane_color((1, 1, 1, 1))
+
+
+
+
     # === Add Direction Circle as Final Subplot ===
-    ax_circle = fig.add_subplot(gs[:, -1])  # Last column across all rows
+    ax_circle = subfigs[1].add_subplot()
     ax_circle.set_aspect('equal')
     ax_circle.axis('off')  # Optional
 
@@ -1135,10 +1174,10 @@ def plot_trajectories(averaged_pca_results, time_periods, label, direction_key, 
         ax_circle.add_patch(circle)
 
     # Labels
-    ax_circle.text(0, radius+.4, f"{direction_key['N']}", ha='center', va='bottom', fontsize=10)
-    ax_circle.text(0, -radius-.4, f"{direction_key['S']}", ha='center', va='top', fontsize=10)
-    ax_circle.text(-radius-.4, 0, f"{direction_key['W'][:5]}\n{direction_key['W'][6:]}", ha='right', va='center', fontsize=10)
-    ax_circle.text(radius+.4, 0, f"{direction_key['E'][:5]}\n{direction_key['E'][6:]}", ha='left', va='center', fontsize=10)
+    ax_circle.text(0, radius+.4, f"{direction_key['N']}", ha='center', va='bottom', fontsize=12)
+    ax_circle.text(0, -radius-.4, f"{direction_key['S']}", ha='center', va='top', fontsize=12)
+    ax_circle.text(-radius-.4, 0, f"{direction_key['W'][:5]}\n{direction_key['W'][6:]}", ha='right', va='center', fontsize=12)
+    ax_circle.text(radius+.4, 0, f"{direction_key['E'][:5]}\n{direction_key['E'][6:]}", ha='left', va='center', fontsize=12)
 
     # ax_circle.text(radius+.2, radius+.2, f"{direction_key['NE']}", ha='left', va='top', fontsize=10)
     # ax_circle.text(radius+.2, -radius-.4, f"{direction_key['SE']}", ha='left', va='bottom', fontsize=10)
@@ -1149,9 +1188,9 @@ def plot_trajectories(averaged_pca_results, time_periods, label, direction_key, 
     lim = radius + 1
     ax_circle.set_xlim(-lim, lim)
     ax_circle.set_ylim(-lim, lim)
-    fig.subplots_adjust(left=0.05, right=0.95, top=1, bottom=0.2, wspace=0.2)
+    # fig.subplots_adjust(top=.9)
     
-    plt.savefig("average_trajectories.svg")
+    plt.savefig(f"average_trajectories_{directions}")
 
     
 def plot_galaxy_and_trajs(averaged_pca_results, time_periods, label, dim_inds, color_dict, cmap, norm, direction_key):
@@ -1561,6 +1600,10 @@ def centroids_across_time(averaged_pca_results, time_periods, color_dict, label,
     centroids = []
 
     colors = []
+
+    xlim = [-6, 14]
+    ylim = [-3, 3]
+    zlim = [-3, 5]
     for year_idx, year in enumerate(time_periods):
 
         color = color_dict[str(year)]
@@ -1607,46 +1650,51 @@ def centroids_across_time(averaged_pca_results, time_periods, color_dict, label,
                                 # rstride=10, cstride=10,  # Skip grid points
                                 edgecolor='none',
                                 color=color, alpha=0.07, linewidth=0, antialiased=True, zorder = 1)
-            # elif radius == 'cov':
-            #     cov = np.cov(pts, rowvar=False)
-            #     eigvals, eigvecs = eig(cov)
-
-            #     # Scale ellipsoid to desired confidence level (chi-square)
-            #     chi2_val = chi2.ppf(.5, df=3)
-            #     radii = np.sqrt(eigvals * chi2_val)
-
-            #     # Build sphere
-            #     u = np.linspace(0, 2 * np.pi, 30)
-            #     v = np.linspace(0, np.pi, 30)
-            #     x = np.outer(np.cos(u), np.sin(v))
-            #     y = np.outer(np.sin(u), np.sin(v))
-            #     z = np.outer(np.ones_like(u), np.cos(v))
-            #     sphere = np.stack((x, y, z), axis=-1)
-
-            #     # Transform sphere into ellipsoid
-            #     for i in range(len(u)):
-            #         for j in range(len(v)):
-            #             point = sphere[i, j, :]
-            #             sphere[i, j, :] = eigvecs @ (point * radii) + centroid
-
-            #     ax.plot_surface(
-            #         sphere[:, :, 0], sphere[:, :, 1], sphere[:, :, 2],
-            #         color=color, alpha=.07, edgecolor='none', zorder = 1
-            #     )
-            # else:
+            else:          
                 pass
             
             if day_centroids is not None: 
                 # print(f"N days in {year}: {len(day_centroids[str(year)])}")
                 d_centroids = np.vstack(day_centroids[str(year)])
+                mask = (
+                    (d_centroids[:, 0] >= xlim[0]) & (d_centroids[:, 0] <= xlim[1]) &
+                    (d_centroids[:, 1] >= ylim[0]) & (d_centroids[:, 1] <= ylim[1]) &
+                    (d_centroids[:, 2] >= zlim[0]) & (d_centroids[:, 2] <= zlim[1])
+                )
                 
-                ax.scatter(d_centroids[:, 0], 
-                            d_centroids[:, 1], 
-                            d_centroids[:, 2],
+                d_centroids_in_bounds = d_centroids[mask]
+
+                ax.scatter(d_centroids_in_bounds[:, 0], 
+                            d_centroids_in_bounds[:, 1], 
+                            d_centroids_in_bounds[:, 2],
                             color=color,
                             s=20,
                             marker='o',
                             edgecolor=None, zorder = 2)
+                
+                clamped = d_centroids.copy()
+                was_clipped = np.zeros(clamped.shape[0], dtype=bool)
+                for i, lims in enumerate([xlim, ylim, zlim]):
+                    lower_mask = clamped[:, i] < lims[0]
+                    upper_mask = clamped[:, i] > lims[1]
+
+                    was_clipped |= lower_mask | upper_mask  # Track if any coordinate was clipped
+                    clamped[lower_mask, i] = lims[0]
+                    clamped[upper_mask, i] = lims[1]
+
+                # Only plot points that were clipped
+                out_of_bounds_points = clamped[was_clipped]
+
+                ax.scatter(out_of_bounds_points[:, 0],
+                        out_of_bounds_points[:, 1],
+                        out_of_bounds_points[:, 2],
+                        color=color,
+                        s=20,
+                        marker='x',
+                        edgecolor=None,
+                        zorder=2)
+
+
                 
             ax.scatter(centroid[0], centroid[1], centroid[2],
                     color='black',
@@ -1677,8 +1725,13 @@ def centroids_across_time(averaged_pca_results, time_periods, color_dict, label,
     ax.set_ylabel(f"PC{dim_inds[1]+1}", labelpad=10)
     ax.set_zlabel(f"PC{dim_inds[2]+1}", labelpad=10)
     
-    ax.set_xlim([-5, 10])
-    ax.set_zlim([-3, 7])
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+    ax.set_zlim(zlim)
+            
+    ax.xaxis.set_major_locator(MaxNLocator(nbins=5))  # Set max 5 x-ticks
+    ax.yaxis.set_major_locator(MaxNLocator(nbins=5)) 
+    ax.zaxis.set_major_locator(MaxNLocator(nbins=5)) 
 
     if legend:
         ax.legend(handles=legend_handles,
@@ -1695,9 +1748,9 @@ def centroids_across_time(averaged_pca_results, time_periods, color_dict, label,
         years.sort()
         # c_ticks = cbar.get_ticks()
         # ticks = np.linspace(0, int(norm.vmax), len(time_periods))
-        ticks = [1.5, 5.5, 9.5, 12.5]
+        ticks = [0, 4, 8, 12]
 
-        labels = years
+        labels = [f"Jan {year}" for year in years]
         cbar.set_ticks(ticks)
         cbar.set_ticklabels(labels)
     fig.subplots_adjust(left=0.1, right=1.1, top=0.9, bottom=0.1)
@@ -1706,10 +1759,10 @@ def centroids_across_time(averaged_pca_results, time_periods, color_dict, label,
     # if label == "Week":
     #     ax.view_init(elev=40, azim=-45)
     # else: 
-    ax.view_init(elev=30, azim=-45)
+    ax.view_init(elev=20, azim=80)
     
     # plt.tight_layout()
-    plt.savefig("pca_centroids_across_time.svg")
+    plt.savefig("pca_centroids_across_time")
 
     # plt.show()
 
@@ -1871,8 +1924,6 @@ def principal_angle(traj_1, traj_2):
     # print(angles_deg.shape)
 
     return angles_deg.max()
-
-
 
 
 ## PCA and data processing 
@@ -2308,67 +2359,7 @@ def split_and_pca_all_trials(df_time, time_periods, type_of_data, position_map, 
                     neural_data_for_direction[str(year)][target_pos].append((channel_pca_sbps, trial_kinematics))
     
     return neural_data_for_direction, centroids
-    
-# def get_targ(targ_pos, last, boundary = 45):
-#     direction_vectors = {
-#         0: [1, 0],
-#         1: [1, 1],
-#         2: [0, 1],
-#         3: [-1, 1],
-#         4: [-1, 0],
-#         5: [-1, -1],
-#         6: [0, -1],
-#         7: [1, -1]
-#     }
-    
-#     angles = {
-#         0: 0,
-#         1: 45,
-#         2: 90,
-#         3: 135,
-#         4: 180,
-#         5: 225,
-#         6: 270,
-#         7: 315,
-#     }
-
-#     diff = np.array(targ_pos) - np.array(last)
-#     if np.allclose(diff, 0):
-#         return np.array([0, 0])
-
-#     angle = np.degrees(np.arctan2(diff[1], diff[0])) % 360
-
-#     for direction, ref_angle in angles.items():
-#         lower = (ref_angle - boundary/2) % 360
-#         upper = (ref_angle + boundary/2) % 360
-
-#         if lower < upper:
-#             if lower <= angle <= upper:
-#                 return np.array(direction_vectors[direction])
-#         else:
-#             # Wraparound case (e.g., 350° to 10°)
-#             if angle >= lower or angle <= upper:
-#                 return np.array(direction_vectors[direction])
-
-#     return np.array([0, 0])
-#     diff = np.array(targ_pos) - np.array(last)
-#     if (diff == 0).all():
-#         return np.array([0, 0])
-
-#     # Compute angle in radians from x-axis
-#     angle = np.arctan2(diff[1], diff[0])  # Returns [-π, π]
-
-#     # Convert to degrees and shift to [0, 360)
-#     angle_deg = (np.degrees(angle) + 360) % 360
-
-#     # Bin into 8 directions (0 to 7), each 45°
-#     # 0 = 0° to 45°, 1 = 45° to 90°, ..., 7 = 315° to 360°
-#     direction = int(np.floor((angle_deg + 22.5) / 45)) % 8
-    
-#     # print(f"diff: {diff}, targ: {targ}")
-
-#     return np.array(direction_vectors[direction])
-
+  
 def get_targ(targ_pos, last, class_span=45):
     # Fixed 8 directions (45° apart)
     direction_angles = [0, 45, 90, 135, 180, 225, 270, 315]  # Centers of the bins
@@ -2614,7 +2605,7 @@ def plot_avg_trajectories(df_tuning, type_of_data, group_by = "year", display_al
 
     averaged_pca_results, averaged_kin_results = average_trial_PCA_data(dir_list=dir_list, kinematics=kinematics_data, processed_neural_data_for_direction=processed_neural_data_for_direction)
 
-    plot_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods, direction_key = direction_key, label = label, elev = 15, azim = -45)
+    plot_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods, direction_key = direction_key, directions = directions, label = label, elev = 15, azim = -45)
 
 
 def plot_principal_angles(df_tuning, type_of_data, group_by = "year", display_alignment = False, directions = 'ext_flex', trim_method = trim_neural_data_at_movement_onset_std_and_smooth, trim_pt = movement_onset, years_to_skip = [], sigma = 0, remove_RT = False, normalization_method = 'day', pca_all = True):
