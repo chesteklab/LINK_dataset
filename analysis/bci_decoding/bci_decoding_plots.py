@@ -6,6 +6,7 @@ import matplotlib as mpl
 import seaborn as sns
 from matplotlib.gridspec import GridSpec
 from datetime import datetime
+import os
 #some basic text parameters for figures
 mpl.rcParams['font.family'] = "Atkinson Hyperlegible" # if installed but not showing up, rebuild mpl cache
 mpl.rcParams['font.size'] = 10
@@ -59,6 +60,13 @@ def create_decoding_figure(norm=False):
     ax.get_legend().remove()
     out_fname = 'model_performance_plots_withnoise_updatenorm.png' if norm else 'model_performance_plots_withnoise.png'
 
+    rr_df['abs_day_diff'] = rr_df['Day_diff'].abs()
+    lstm_df['abs_day_diff'] = lstm_df['Day_diff'].abs()
+    grouped_rr = rr_df.groupby('abs_day_diff')['R2'].agg(('mean', 'std'))
+    grouped_lstm = lstm_df.groupby('abs_day_diff')['R2'].agg(('mean', 'std'))
+    grouped_rr.to_csv(os.path.join(results_folder, 'rr_avg.csv'))
+    grouped_lstm.to_csv(os.path.join(results_folder, 'lstm_avg.csv'))
+
 def load_eval_results(norm=True):
     if norm:
         rr_df = pd.read_csv(f'{results_folder}/rr_evaluation_updatednorm_20250508_gooddays.csv')
@@ -69,11 +77,11 @@ def load_eval_results(norm=True):
         lstm_df = pd.read_csv(f'{results_folder}/lstm_evaluation_20250507_gooddays.csv')
         out_fname = 'model_performance_plots_withnoise.png'
     
-    print("Data loaded, RR shape:", rr_df.shape, "LSTM shape:", lstm_df.shape)
-    print("\nFirst few rows of RR data:")
-    print(rr_df.head())
-    print("\nFirst few rows of LSTM data:")
-    print(lstm_df.head())
+    # print("Data loaded, RR shape:", rr_df.shape, "LSTM shape:", lstm_df.shape)
+    # print("\nFirst few rows of RR data:")
+    # print(rr_df.head())
+    # print("\nFirst few rows of LSTM data:")
+    # print(lstm_df.head())
     return rr_df, lstm_df
 
 def plot_sameday_performance(rr_df, lstm_df, ax1, ax2, ax3):
