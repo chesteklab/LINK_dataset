@@ -51,10 +51,8 @@ def create_decoding_figure(norm=False):
     (rr_performance_ax, lstm_performance_ax) = subfigs[1].subplots(2,1, sharex=True, sharey=True)
 
     plot_sameday_performance(rr_df, lstm_df, overall_performance_ax, lstm_performance_ax, rr_performance_ax)
-    lstm_performance_ax.get_legend().remove()
-    lstm_performance_ax.set(ylabel=None)
-    # overall_performance_ax.set(yticks=[0,.2,.4,.6,.8,1])
-    # rr_performance_ax.set(yticks=[0,.2,.4,.6,.8,1])
+    rr_performance_ax.get_legend().remove()
+
     ax = subfigs[2].subplots(1,1)
     plot_performance_across_days(rr_df, lstm_df, 'R2', ax)
     subfigs[2].suptitle('Performance on days before/after training (±Standard Error)')
@@ -123,32 +121,34 @@ def plot_sameday_performance(rr_df, lstm_df, ax1, ax2, ax3):
     # Create Correlation plots
     met = 'R2'
     # Plot 1: RR vs LSTM average Correlation
-    ax1.plot(rr_sameday['days_since_start'], rr_sameday[met], color=rr_color, linewidth=1, alpha=0.3)
-    ax1.plot(lstm_sameday['days_since_start'], lstm_sameday[met], color=lstm_color, linewidth=1, alpha=0.3)
+    ax1.scatter(rr_sameday['days_since_start'], rr_sameday[met], color=rr_color, s=3, alpha=0.4)
+    ax1.scatter(lstm_sameday['days_since_start'], lstm_sameday[met], color=lstm_color, s=3, alpha=0.4)
     ax1.plot(rr_sameday['days_since_start'], rr_sameday[f'{met}_smooth'], color=rr_color, linewidth=1.5, label='Ridge Regression')
     ax1.plot(lstm_sameday['days_since_start'], lstm_sameday[f'{met}_smooth'], color=lstm_color, linewidth=1.5, label='LSTM')
 
     ax1.set_ylabel(f'Predicted Accuracy ({met})')
     ax1.set_title('Same-Day Performance: RR vs LSTM (Averaged across DOFs)')
+    ax1.set_yticks([0, 0.2, 0.4, 0.6, 0.8])
     ax1.grid(True, alpha=0.3)
     ax1.legend()
     format_date_ticks(ax1, days_since_start_values, unique_dates)
     
     colors = sns.color_palette('colorblind',4)
-    def same_day_by_dof(sameday, ax):
+    def same_day_by_dof(sameday, title, ax):
         for i in range(4):
-            ax.plot(lstm_sameday['days_since_start'], lstm_sameday[f'{met}_DOF{i}'], 
-                    color=colors[i], linewidth=1, alpha=0.3)
-            ax.plot(lstm_sameday['days_since_start'], lstm_sameday[f'{met}_DOF{i}_smooth'], 
+            ax.scatter(sameday['days_since_start'], sameday[f'{met}_DOF{i}'], 
+                    color=colors[i], s=2, alpha=0.4)
+            ax.plot(sameday['days_since_start'], sameday[f'{met}_DOF{i}_smooth'], 
                     color=colors[i], linewidth=1.5, label=f'{dof_labels[i]}')
             ax.set_ylabel(met)
-            ax.set_title('Same-Day LSTM Performance by DOF')
+            ax.set_title(f'Same-Day {title} Performance by DOF')
+            ax.set_yticks([0,0.4,0.8])
             ax.grid(True, alpha=0.3)
             ax.legend()
             format_date_ticks(ax, days_since_start_values, unique_dates)
     
-    same_day_by_dof(lstm_sameday, ax2) # Plot 2: LSTM Correlation by DOF
-    same_day_by_dof(rr_sameday, ax3) # Plot 3: RR Correlation by DOF
+    same_day_by_dof(lstm_sameday, 'lstm', ax2) # Plot 2: LSTM Correlation by DOF
+    same_day_by_dof(rr_sameday, 'rr', ax3) # Plot 3: RR Correlation by DOF
 
 def plot_performance_across_days(rr_df, lstm_df, metric, ax):
     # Pre-aggregate the data
@@ -204,7 +204,7 @@ def plot_performance_across_days(rr_df, lstm_df, metric, ax):
     elif metric == 'Correlation':
         ax.set_ylim(0, 0.9)
     elif metric == 'R2':
-        ax.set_ylim(-0.25, 1)
+        ax.set_ylim(-0.1, 0.7)
     
     # Add grid
     ax.grid(True, alpha=0.3)
