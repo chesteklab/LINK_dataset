@@ -105,7 +105,6 @@ def load_run(date, run):
     fpath = os.path.join(config.datapath, config.data_params['monkey'], date, runstr)
     z = ZTools.ZStructTranslator(fpath, use_py=False).asdataframe()
 
-
     # filters based on the most common style AND if it's 29 or 34, so we don't have one 29 in a mix of 34 
     # remove closed loop and unsuccessful trials
     z = z[5:] #trim first 5
@@ -160,11 +159,14 @@ def preprocessing(data, run, target_style):
                                        'TrialNumber',
                                        'TargetPos',
                                        'ExperimentTime',
-                                       'Channel'))
+                                       'Channel',
+                                       'TrialTimeoutms'))
     
     FingerAngles = feats["FingerAnglesTIMRL"][:, (1, 3, 6, 8)]  #selecting only position and velocity
     TrialNumber, TrialIndex, TrialCount = np.unique(feats["TrialNumber"], return_index = True, return_counts = True)
-
+    trial_timeouts = data['TrialTimeoutms'].to_numpy()
+    assert(len(trial_timeouts == len(TrialNumber)))
+    pdb.set_trace()
     sbp = np.abs(feats['NeuralFeature'])
     # sbp = (sbp - np.mean(sbp, axis=0)) / np.std(sbp, axis=0)
 
@@ -174,6 +176,7 @@ def preprocessing(data, run, target_style):
     processed_run['trial_index'] = TrialIndex
     processed_run['trial_count'] = TrialCount
     processed_run['run_id'] = run
+    processed_run['trial_timeout'] = trial_timeouts
     processed_run['target_positions'] = feats["TargetPos"][TrialIndex][:, [1, 3]]
     processed_run['time'] = feats['ExperimentTime']
     processed_run['finger_kinematics'] = FingerAngles
