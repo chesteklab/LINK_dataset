@@ -102,7 +102,7 @@ def plot_tuning_heatmap(ax, dataframe, metric = 'magnitude', cmap = 'coolwarm'):
 
     if isinstance(cmap, str):
         cmapn = sns.color_palette(cmap, as_cmap=True).copy()
-        cmapn.set_bad('black')
+        cmapn.set_bad('gray')
     else:
         cmapn = cmap
     
