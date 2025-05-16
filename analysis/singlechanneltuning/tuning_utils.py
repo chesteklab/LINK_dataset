@@ -28,6 +28,10 @@ mpl.rcParams['pdf.fonttype'] = 42
 
 data_path = "Z:\Student Folders\\Nina_Gill\data\only_good_days"
 output_path = 'Z:\Student Folders\Hisham_Temmar\\big_dataset\output\single_channel_tuning'
+binsize = 20
+# (for debugging stage) please dont remove these, comment them out would be fine. otherwise ill have to write the directories again which is annoying because windows hates single \
+# data_path = "C:\\Files\\UM\\ND\\SFN\\only_good_days"
+# output_path = 'C:\\Files\\UM\\ND\\github\\big_nhp_dataset_code\\outputs'
 
 def compute_channel_tuning(neural, full_behavior, velocity_tuning = False):
 
@@ -109,15 +113,22 @@ def compute_tuning_data(save_dir = None):
         if data_CO and data_RD:
             sbp = np.concatenate((data_CO['sbp'], data_RD['sbp']), axis=0)
             beh = np.concatenate((data_CO['finger_kinematics'], data_RD['finger_kinematics']), axis=0)
+            tcr = np.concatenate((data_CO['tcfr'], data_RD['tcfr']), axis=0)
         elif data_RD:
             sbp = data_RD['sbp']
             beh = data_RD['finger_kinematics']
+            tcr = data_RD['tcfr']
         else:
             sbp = data_CO['sbp']
             beh = data_CO['finger_kinematics']
+            tcr = data_CO['tcfr']
+        
+        sbp = sbp * 0.25 # convert to uV
+        tcr = tcr * 1000 / binsize # convert from # spikes / bin to # spikes / second
         # Compute channel tuning
-        channel_tuning = compute_channel_tuning(sbp, beh, velocity_tuning=True)
-
+        channel_tuning = compute_channel_tuning(sbp, beh, velocity_tuning=False)
+        # also save the average TCR
+        channel_tuning['avg_tcr'] = np.mean(tcr, axis=0)
         channel_tuning['date'] = date
         df_list.append(channel_tuning)
     
@@ -140,11 +151,73 @@ def load_tuning_data(dir, overwrite=False):
     df['date'] = pd.to_datetime(df['date'])
     return df
 
+def wrap(x):
+    return (x + np.pi) % (2.0*np.pi) - np.pi
+
+def circular_median_rad(a, tol=1e-12):
+    a = np.asarray(a, dtype=float)
+    diff = wrap(a[:, None] - a)
+    loss = np.sum(np.abs(diff), axis=1)
+    med = a[np.argmin(loss)]
+    ties = a[np.abs(loss - loss.min()) < tol]
+    return med, ties
+
+def circular_quantile_rad_signed(angles, probs):
+    a = angles
+    p = probs
+
+    m, _ = circular_median_rad(a)
+
+    tx = wrap(a - m)
+
+    lin_q = np.quantile(tx, p, method="linear")
+
+    return wrap(lin_q + m)
+
+def calc_medians_iqrs(tuning_df):
+    tuning_df_copy = tuning_df.copy()
+    clower_quartiles = []
+    cupper_quartiles = []
+    cmedians = []
+
+    lower_quartiles = []
+    upper_quartiles = []
+    medians = []
+    for channel, group in tuning_df.groupby('channel'):
+        angles = np.radians(group['angle'].values)
+        mags = group['magnitude'].values
+
+        lower_quartile, upper_quartile = circular_quantile_rad_signed(angles, [0.25, 0.75])
+        clower_quartiles.append(np.degrees(lower_quartile))
+        cupper_quartiles.append(np.degrees(upper_quartile))
+        median, _ = circular_median_rad(angles)
+        cmedians.append(np.degrees(median))
+
+        lower_quartiles.append(group['magnitude'].quantile(0.25))
+        upper_quartiles.append(group['magnitude'].quantile(0.75))
+        medians.append(group['magnitude'].median())
+        
+    quartiles_df = pd.DataFrame({
+        'channel': tuning_df['channel'].unique(),
+        'ang_lower_quartile': clower_quartiles,
+        'ang_upper_quartile': cupper_quartiles,
+        'ang_median': cmedians,
+        'mag_lower_quartile':lower_quartiles,
+        'mag_upper_quartile':upper_quartiles,
+        'mag_median':medians
+    })
+    return quartiles_df
+
+def calc_tuning_iqrs(tuning_df):
+    tuning_df_copy = tuning_df.copy()
+    lower_q = []
+    upper_q = []
 def calc_tuning_avgs(tuning_df):
-    mag_avg = tuning_df.groupby('channel')['magnitude'].agg(('mean','std'))
+    tuning_df_copy = tuning_df.copy()
+    mag_avg = tuning_df_copy.groupby('channel')['magnitude'].agg(('mean','std'))
     mag_avg = mag_avg.rename(columns={'mean':'mag_mean','std':'mag_std'}) 
 
-    ang_avg = tuning_df.groupby('channel')['angle'].agg((lambda x: np.degrees(stats.circmean(np.radians(x), high=np.pi, low=-1*np.pi)), 
+    ang_avg = tuning_df_copy.groupby('channel')['angle'].agg((lambda x: np.degrees(stats.circmean(np.radians(x), high=np.pi, low=-1*np.pi)), 
                                                          lambda x: np.degrees(stats.circstd(np.radians(x), high=np.pi, low=-1*np.pi))))
     ang_avg = ang_avg.rename(columns={'<lambda_0>':'ang_mean', '<lambda_1>':'ang_std'})
 
@@ -222,8 +295,6 @@ def compute_channel_mutual_information(data):
             # channel_mi[ch, dof] = mi_value
 
     return channel_mi
-
-
 
 def create_channelwise_mutual_information_matrix(preprocessingdir, outputdir):
     # Path to the folder containing pkl files

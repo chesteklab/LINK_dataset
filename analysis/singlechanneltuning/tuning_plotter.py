@@ -36,30 +36,42 @@ def plot_dummy_ax(ax):
     
     ax.set_xticklabels([])
 
-def plot_polar_tuning(ax, dataframe, channel_number, params = {'ylim':None, 'cmap':'crest', 's':4, 'alpha':0.5}):
+def plot_polar_tuning(ax, dataframe, channel_number, params = {'ylim':None, 'cmap':'crest', 's':4, 'alpha':0.5, 'tick_override':False}):
     channel_data = dataframe.loc[dataframe['channel'] == channel_number].copy()
 
     days = (channel_data['date'] - channel_data['date'].min()).dt.days
-    tuning_avgs = tuning_utils.calc_tuning_avgs(dataframe)
-    cmap = sns.color_palette(params['cmap'], as_cmap=True).reversed()
+    qt = tuning_utils.calc_medians_iqrs(dataframe)
+    cmap = sns.color_palette(params['cmap'], as_cmap=True)
     
-
     scatter = ax.scatter(np.radians(channel_data['angle']), 
                          channel_data['magnitude'],
                          s=params['s'],
                          c=days, 
-                         cmap=cmap, 
+                         cmap=params['cmap'], 
                          alpha=params['alpha'])
-    
-    ax.errorbar(np.radians(tuning_avgs['ang_mean'][channel_number]), 
-                tuning_avgs['mag_mean'][channel_number], 
-                xerr=np.radians(tuning_avgs['ang_std'][channel_number]), 
-                yerr=tuning_avgs['mag_std'][channel_number],
+    def angular_difference_rad(a, b):
+        diff = (a - b + np.pi) % (2 * np.pi) - np.pi
+        return np.abs(diff)
+
+    xerr = np.asarray([angular_difference_rad(np.radians(qt['ang_lower_quartile'][channel_number]), np.radians(qt['ang_median'][channel_number])), 
+            angular_difference_rad(np.radians(qt['ang_upper_quartile'][channel_number]), np.radians(qt['ang_median'][channel_number]))]).reshape(2,1)
+    yerr = np.asarray([qt['mag_lower_quartile'][channel_number], qt['mag_upper_quartile'][channel_number]]).reshape(2,1)
+    ax.errorbar(np.radians(qt['ang_median'][channel_number]), 
+                qt['mag_median'][channel_number], 
+                xerr=xerr, 
+                yerr=yerr,
                 fmt='k.',
                 elinewidth=3)
-
+    if params['tick_override']:
+        ax.set_xticklabels(['0°','45°', '90°','135°', '180°','-135°','-90°','-45°','-180°'])
     if params['ylim']:
         ax.set_ylim(params['ylim'][0], params['ylim'][1])
+
+    avg_avg_tcr = np.round(np.mean(channel_data['avg_tcr']), 2)
+    std_avg_tcr = np.round(np.std(channel_data['avg_tcr']), 2)
+    print(f'Ch. {channel_number} perday FR: {avg_avg_tcr} +/- {std_avg_tcr}')
+    
+    # pdb.set_trace()
     # ax.set_title(f'Channel {channel_number}', va='bottom')
     #ax.set_yticks((.05, .1))
     return scatter
@@ -80,12 +92,17 @@ def plot_tuning_heatmap(ax, dataframe, metric = 'magnitude', cmap = 'coolwarm'):
         upper_limit = 180
         cbar_kws = {'ticks':[-180,-90,0,90,180], 'label':'Tuning Angle'}
         title="Preferred Tuning Angles"
+    elif metric == 'avg_tcr':
+        lower_limit = 0
+        upper_limit = 10
+        cbar_kws = {'label':'Tuning Strength'}
+        title='Average TCR Per Day'
     else:
         Exception("Unsupported Metric")
 
     if isinstance(cmap, str):
         cmapn = sns.color_palette(cmap, as_cmap=True).copy()
-        cmapn.set_bad('black')
+        cmapn.set_bad('gray')
     else:
         cmapn = cmap
     
