@@ -10,7 +10,6 @@ This saves the models as a .pkl file in the specified directory. If both CO and 
 
 > Note that "with noise" means the LSTM was trained with neural noise, which bumps up performance on the order of 1-2%. Noise is not added during eval.
 
-
 ## 2. Eval models on every day
 
 This step takes a long time since we eval ~400 models on about ~400 days each. This took about 2 days to run everything (1 day for lstms and 1 day for RRs).
@@ -44,9 +43,6 @@ Verify the parameters are correct at the top of the script `eval_singleday_model
 
 ## 4. Make plots
 
-`plot_same_day_performance.py` makes a plot of the performance of the models on the same day. Make sure to choose the correct results file to plot.
-
-`plot_performance_over_time.py` plots the average performance of models relative to the training day.
-
+`bci_decoding_plots.py` creates the plot seen in the publication. Make sure to choose the correct results file to plot.
 
 
