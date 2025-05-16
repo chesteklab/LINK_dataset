@@ -1,7 +1,6 @@
 import pickle
 import pandas as pd
 import os
-import pdb
 from tqdm import tqdm
 import numpy as np
 from datetime import datetime, timezone
@@ -54,6 +53,8 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
             trials_df = pd.concat(trial_dfs, axis=1)
             # Add target style
             trials_df["target_style"] = data_dict["target_style"]
+            # Add trial timeout
+            trials_df["trial_timeout"] = data_dict["trial_timeout"]
             trials_df["run_id"] = data_dict["run_id"]
             # Rename target positions to index and MRS
             renaming_trials = {
@@ -116,7 +117,6 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
 
             # Adjust the timestamps to milliseconds
             times = ts_df["time"].values / 1000  # Convert to seconds
-            pdb.set_trace()
 
             # Create an NWB file with timezone-aware datetime objects
             nwbfile = NWBFile(
@@ -147,7 +147,9 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
             # Iterate over arrays in electrode table
             groups = {}
             for array in CHANNEL_MAP["Array location"].unique():
-                dev = nwbfile.create_device(name=array, description=f"{array} | Utah Array")
+                dev = nwbfile.create_device(
+                    name=array, description=f"{array} | Utah Array"
+                )
                 grp = nwbfile.create_electrode_group(
                     name=array,
                     description=f"{array} | Utah Array",
@@ -303,7 +305,7 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
                 data=tcfr_data,
                 electrodes=elec_region,
                 timestamps=times,
-                description="Threshold crossings (threshold = -4.5RMS) across time, in 20ms bins"
+                description="Threshold crossings (threshold = -4.5RMS) across time, in 20ms bins",
             )
             # Add sbp and tcfr to analysis
             nwbfile.add_analysis(sbp_timeseries)
@@ -326,6 +328,9 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
             )
             nwbfile.add_trial_column(
                 name="target_style", description="Target style (CO or RD)"
+            )
+            nwbfile.add_trial_column(
+                name="trial_timeout", description="Trial timeout (milliseconds)"
             )
 
             unique_trial_numbers = trials_df["trial_number"].unique()
@@ -354,6 +359,7 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
                     index_target_position=trial_meta["index_target_position"],
                     mrs_target_position=trial_meta["mrs_target_position"],
                     target_style=trial_meta["target_style"],
+                    trial_timeout=trial_meta["trial_timeout"],
                     timeseries=[
                         index_position_ts,
                         mrs_position_ts,
