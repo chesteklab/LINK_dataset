@@ -7,18 +7,23 @@ The repository is split into two sections, for dataset preparation and analysis.
 ## Getting the Data
 1. Clone this repository
 2. Create a conda environment using the requirement.txt file, and also install pytorch
-3. Install the dandi-cli tool using: `pip install dandi`
+3. Install the dandi-cli tool using: `pip install dandi`, if not already installed.
 4. Download the dataset with `dandi download DANDI:001201`
-5. Then, adjusting filepaths, run the script `convert_dandi_nwb_to_pkl.py`
+
+## Accessing the data
+Data can be accessed aas an nwb file, or converted to dictionaries (with sligtly less information) using the script `convert_dandi_nwb_to_pkl.py` in the `dataset_preparation` folder.
+
+## Visualizing the data
+For a quick way to look at the timeseries data, use the script above to convert the data to dictionaries, then specify the location of the new .pkl files in `dataset_preparation\config.py`, then run the cell in `3_data_review_tool.ipynb`. You may also want to set an output directory in the config file or the tool may break when terminating plotting. Use the `+500` and `-500` buttons to scrub through the data. If two target styles are present on a day, you can use the `Change Target Style` button to view one or the other. You can ignore the rest of the UI, this was for manual data review.
 
 ## Reproducing figures
-Once the data is prepared, you can recreate the figures in the paper by running the following scripts:
+To recreate the figures in the paper, first convert the data to dictionaries using the script mentioned above. Once the data is prepared, you can recreate the figures in the paper by running the following scripts in the analysis folder. You will also need to download the font Atkinson Hyperlegible (available [here](https://www.brailleinstitute.org/freefont/)) adn rebuild your mpl cache, or change the font in the rcparams of the scripts:
 
-To recreate the target position and data distribution plots in figure 1, please run the script `datasetoverview.py`
-To recreate the subfigures a,b and c in the neural signals over time figure, run the script `signal_changes.py`, making sure to set filepath in `signal_utils.py` and if running for the first time, set the calc_avg_sbp and calc_pr parameters to true.
-To recreate the subfigures d and e in the neural signals over time figure, run `dimensionality_across_days_analysis.ipynb`
-To recreate the tuning figure, run the script `single_channel_tuning.py`, making sure to update the filepaths in `tuning_utils.py` and setting the calc_tunings flag to true.
-To recreate the decoding figure, refer to the readme in the bci_decoding folder.
+To recreate the target position and data distribution plots in Figure 1, please run the script `dataset_overview.py` in the dataset_overview folder
+To recreate Figure 2A-C, run the script `signal_changes.py` in the signal_changes folder, making sure to set filepath in `signal_utils.py` and if running for the first time, set the calc_avg_sbp and calc_pr parameters to true.
+To recreate Figure 2D-E, run `dimensionality_across_days_analysis.ipynb` in the pop_level_analyses folder.
+To recreate Figure 3, run the script `single_channel_tuning.py` in the single_channel_tuning folder, making sure to update the filepaths in `tuning_utils.py` and setting the calc_tunings flag to true.
+To recreate Figure 4, refer to the readme in the bci_decoding folder.
 
 ## Info for NWB files
 For a NWBHDF5IO object named nwb:
@@ -36,7 +41,7 @@ This format does not contain descriptions and as much detail about the subject, 
 ### How to open:
 `data_CO, data_RD = pickle.load(filepath)`
 
-## SESSION FILE CONTENTS
+### Preprocessed file contents
 Each 'YYYY-MM-DD_plotpreprocess.pkl' file contains a dictionary with the following keys:
 
 **METADATA:**
@@ -48,10 +53,10 @@ Each 'YYYY-MM-DD_plotpreprocess.pkl' file contains a dictionary with the followi
 **TIMESERIES DATA:**
 'sbp', 'finger_kinematics', 'time'
 
-## METADATA
+### metadata
 * **'target_style' (str)**: indicates how targets were presented, either CO (center-out) or RD (random targets)
 
-## TRIAL DATA
+## trial data
 * **'trial_number' (int64 np.ndarray)**: Mx1 array, M = # of trials included for a particular target style on this day, usually 400. Contains trial id’s of included trials (not necessarily continuous – some trials maybe be removed). If multiple runs are concatinated together from the same day, the first processed run has 1-3 digit trial numbers, the second processed run has trial numbers 1xxx where xxxx indicate the trial id's within that specific run, the third processed run has trial numbers 2xxx, etc.
 * **'trial_index' (int64 np.ndarray)**: Mx1 array. Contains start indices of each trial in timeseries data
 * **'trial_count' (int64 np.ndarray)**: Mx1 array. Contains length of each trial in the timeseries data
@@ -59,7 +64,7 @@ Each 'YYYY-MM-DD_plotpreprocess.pkl' file contains a dictionary with the followi
 * **'run_id' (int64 np.ndarray)**: Mx1 array. Contains the run id of each trial
 * **'trial_timeouts' (int64 np.ndarray)**: Mx1 array. Contains the trial timeout in ms before trials were considered failures. Longer timeouts are more forgiving
 
-## TIMESERIES DATA
+## timeseries data
 * **'sbp' (float64 np.ndarray)**: Nx96 array, N = # of 32ms bins across all trials included for a particular target style on this day. Spiking band power averaged into 32ms bins for all 96 channels
 * **'finger_kinematics' (float64 np.ndarray)**: Nx4 array. Finger kinematics averaged into 32ms bins, each row contains: [index_position, MRP_position, index_velocity, MRP_velocity]
 * **'time' (float64 np.ndarray)**: Nx1 array. Experiment time averaged into 32ms bins
