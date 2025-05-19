@@ -1085,8 +1085,11 @@ def split(df_time, time_periods, position_map, type_of_data, jpca=False, kinemat
                 trial_length = yearly_data['trial_counts'][i]
 
                 target_pos_coords = tuple(yearly_data['target_positions'][i])
+                print(type(yearly_data['target_positions']))
+                print(yearly_data['target_positions'][i])
+                print(target_pos_coords)
                 target_pos_coords = (round(float(target_pos_coords[0]), 1), round(float(target_pos_coords[1]), 1))
-                if target_pos_coords in position_map: # skips (0.5, 0.5)
+                if target_pos_coords in position_map: # skips (0.5, 0.5)    
 
                     target_pos = position_map[target_pos_coords]
 
