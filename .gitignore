@@ -1,5 +1,8 @@
+__pycache__
 <<<<<<< HEAD
-__pycache__
 =======
-__pycache__
->>>>>>> dev
+*.svg
+*.pdf
+test.py
+*.png
+>>>>>>> 51784b6cb6841909a587cbb7a40d23fb64005748
