@@ -18,20 +18,20 @@ from sklearn.model_selection import train_test_split
 from scipy import stats
 from collections import defaultdict
 
-data_path = "Z:\Student Folders\\Nina_Gill\data\only_good_days_timeouts"
-output_dir = "D:\\University of Michigan Dropbox\Hisham Temmar\Science Communication\Papers\LINK_dataset\experimental setup"
+# data_path = "Z:\Student Folders\\Nina_Gill\data\only_good_days_timeouts"
+# output_dir = "D:\\University of Michigan Dropbox\Hisham Temmar\Science Communication\Papers\LINK_dataset\experimental setup"
 
-def create_dataset_overview_figure():
+def create_dataset_overview_figure(data_path, output_dir):
     # load in data, call create time plot - maybe dont need create time plot and dataset count over time?
     # load in one day with center out and random, make plots of target positions
-    dates = extract_dates_from_filenames()
-    create_time_plot(dates, output_dir)
+    dates = extract_dates_from_filenames(data_path)
+    create_time_plot(dates, data_path, output_dir)
     pass
 
-def create_time_plot(ds, outputdir):
+def create_time_plot(ds, data_path, outputdir):
     n_sessions = []
     for date in ds:
-        data_CO, data_RD = load_day(date)
+        data_CO, data_RD = load_day(date,data_path)
         num_sessions = 0
         if data_CO:
             num_sessions += len(data_CO['trial_count'])
@@ -50,7 +50,7 @@ def create_time_plot(ds, outputdir):
     ax.grid(axis="y",zorder=10)
     fig.savefig(os.path.join(outputdir,f'dataset_timeline_v03.pdf'))
 
-def target_positions(dates, preprocessingdir, outputdir, isOneDay = False, dayIdx = None):
+def target_positions(dates, data_path, isOneDay = False, dayIdx = None):
     targetpos_co = np.zeros((1,2))
     targetpos_rd = np.zeros((1,2))
     if False:
@@ -77,7 +77,7 @@ def target_positions(dates, preprocessingdir, outputdir, isOneDay = False, dayId
         plt.show()
 
 
-def extract_dates_from_filenames():
+def extract_dates_from_filenames(data_path):
     # Find all matching .pkl files
     pkl_files = glob.glob(os.path.join(data_path, '*_preprocess.pkl'))
 
@@ -91,7 +91,7 @@ def extract_dates_from_filenames():
     dates = np.asarray([datetime.strptime(date, '%Y-%m-%d') for date in dates])
     return dates #sorted(dates) 
 
-def load_day(date):
+def load_day(date, data_path):
         file = os.path.join(data_path, f'{date.strftime("%Y-%m-%d")}_preprocess.pkl')
 
         with open(file, 'rb') as f:

@@ -9,7 +9,7 @@ import matplotlib as mpl
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import pdb
 import scipy
-import tuning_utils
+from . import tuning_utils
 
 def plot_dummy_ax(ax):
     norm = mpl.colors.Normalize(-1*np.pi, np.pi)

@@ -14,16 +14,17 @@ import pdb
 #from dataset_characterization import dataset_characterization
 import matplotlib.gridspec as gridspec
 #import config
-import tuning_utils
-import tuning_plotter
+
+from . import tuning_utils
+from . import tuning_plotter
 import seaborn as sns
 
 TICK_OVERRIDE = True
-def create_single_channel_tuning_figure():
-    output_dir = os.path.join(tuning_utils.output_path,'channel_stability_tuning.csv')
+def create_single_channel_tuning_figure(data_path, output_path):
+    output_dir = os.path.join(output_path,'channel_stability_tuning.csv')
     calc_tunings = False
     if calc_tunings:
-        tuning_utils.compute_tuning_data(output_dir)
+        tuning_utils.compute_tuning_data(data_path, output_dir)
     
     tuning_df = tuning_utils.load_tuning_data(output_dir)
     selected_channels = [-1,7,32]

@@ -8,13 +8,16 @@ from tqdm import tqdm
 from datetime import datetime
 import ast
 
-# server_dir = "/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/"
-# data_path = os.path.join(server_dir, 'Student Folders','Nina_Gill','data','only_good_days')
-data_path = "Z:\Student Folders\\Nina_Gill\data\only_good_days"
-output_path = "Z:\Student Folders\Hisham_Temmar\\big_dataset\output\signal_quality"
-binsize = 20
+# # server_dir = "/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/"
+# # data_path = os.path.join(server_dir, 'Student Folders','Nina_Gill','data','only_good_days')
+# data_path = "Z:\Student Folders\\Nina_Gill\data\only_good_days"
+# output_path = "Z:\Student Folders\Hisham_Temmar\\big_dataset\output\signal_quality"
 
-def extract_dates_from_filenames():
+
+# data_path = "C:\\Files\\UM\\ND\\SFN\\only_good_days"
+# output_path = 'C:\\Files\\UM\\ND\\github\\big_nhp_dataset_code\\outputs'
+binsize = 20
+def extract_dates_from_filenames(data_path):
     # Find all matching .pkl files
     pkl_files = glob.glob(os.path.join(data_path, '*_preprocess.pkl'))
 
@@ -28,7 +31,7 @@ def extract_dates_from_filenames():
     dates = np.asarray([datetime.strptime(date, '%Y-%m-%d') for date in dates])
     return dates #sorted(dates) 
 
-def load_day(date):
+def load_day(date, data_path):
         file = os.path.join(data_path, f'{date.strftime("%Y-%m-%d")}_preprocess.pkl')
 
         with open(file, 'rb') as f:
@@ -36,7 +39,7 @@ def load_day(date):
         
         return data_CO, data_RD
 
-def calc_avg_sbps(dates):
+def calc_avg_sbps(dates, data_path, output_path):
     sbp_avgs = pd.DataFrame(np.zeros((len(dates), 96), dtype=float), index=dates)
     sbp_avgs.index = pd.to_datetime(sbp_avgs.index)
 
@@ -44,7 +47,7 @@ def calc_avg_sbps(dates):
     sbp_stds.index = pd.to_datetime(sbp_stds.index)
 
     for date in tqdm(dates):
-        data_CO, data_RD = load_day(date)
+        data_CO, data_RD = load_day(date, data_path)
         
         if data_CO and data_RD:
             sbp = np.concatenate((data_CO['sbp'], data_RD['sbp']),axis=0)
@@ -61,7 +64,7 @@ def calc_avg_sbps(dates):
     sbp_stds.to_csv(os.path.join(output_path, "sbp_stds.csv"))
 
 
-def calc_pr_all_days(dates):
+def calc_pr_all_days(dates, data_path, output_path):
     pr_dict = {'date': [],
                'chan_mask': [],
                'participation_ratio':[],
@@ -70,7 +73,7 @@ def calc_pr_all_days(dates):
                }
     
     for date in tqdm(dates):
-        data_CO, data_RD = load_day(date)
+        data_CO, data_RD = load_day(date, data_path)
         # use CO if its there
         feat = data_CO if data_CO else data_RD
         target_style = 'CO' if data_CO else 'RD'
@@ -103,7 +106,7 @@ def participation_ratio(dx_flat):
     pr = np.sum(S)**2/np.sum(S**2)
     return pr
 
-def calc_sbp_heatmaps(dates):
+def calc_sbp_heatmaps(dates, data_path, output_path):
     n_bins = 30
     bin_range = (0,30)
     bin_edges = np.linspace(bin_range[0], bin_range[1], n_bins + 1)
@@ -112,7 +115,7 @@ def calc_sbp_heatmaps(dates):
     sbp_heatmaps = np.zeros((len(dates), n_bins+2, 96))
 
     for i, date in enumerate(tqdm(dates)):
-        data_CO, data_RD = load_day(date)
+        data_CO, data_RD = load_day(date, data_path)
         if data_CO and data_RD:
             sbp = np.concatenate((data_CO['sbp'], data_RD['sbp']),axis=0)
         elif data_RD:

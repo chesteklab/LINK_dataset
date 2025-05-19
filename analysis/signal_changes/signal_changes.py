@@ -13,22 +13,22 @@ import os
 import sys
 import glob
 import re
-import signal_utils
+from . import signal_utils
 import matplotlib as mpl
-#some basic text parameters for figures
-mpl.rcParams['font.family'] = "Atkinson Hyperlegible" # if installed but not showing up, rebuild mpl cache
-mpl.rcParams['font.size'] = 10
-mpl.rcParams['savefig.format'] = 'pdf'
-mpl.rcParams['axes.unicode_minus'] = False
-# mpl.rcParams['axes.titlesize'] = 14
-# mpl.rcParams['axes.labelsize'] = 12
-mpl.rcParams['axes.titlelocation'] = 'center'
-mpl.rcParams['axes.titleweight'] = 'bold'
-mpl.rcParams['figure.constrained_layout.use'] = True
-# mpl.rcParams['figure.titlesize'] = 14
-mpl.rcParams['figure.titleweight'] = 'bold'
-mpl.rcParams['pdf.fonttype'] = 42
-
+# #some basic text parameters for figures
+# mpl.rcParams['font.family'] = "Atkinson Hyperlegible" # if installed but not showing up, rebuild mpl cache
+# mpl.rcParams['font.size'] = 10
+# mpl.rcParams['savefig.format'] = 'pdf'
+# mpl.rcParams['axes.unicode_minus'] = False
+# # mpl.rcParams['axes.titlesize'] = 14
+# # mpl.rcParams['axes.labelsize'] = 12
+# mpl.rcParams['axes.titlelocation'] = 'center'
+# mpl.rcParams['axes.titleweight'] = 'bold'
+# mpl.rcParams['figure.constrained_layout.use'] = True
+# # mpl.rcParams['figure.titlesize'] = 14
+# mpl.rcParams['figure.titleweight'] = 'bold'
+# mpl.rcParams['pdf.fonttype'] = 42
+from analysis.config import mpl_config
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score, mutual_info_score
 from sklearn.feature_selection import mutual_info_regression
@@ -37,8 +37,8 @@ from scipy import stats
 
 from collections import defaultdict
 
-def create_signal_quality_figure():
-    dates = signal_utils.extract_dates_from_filenames()
+def create_signal_quality_figure(data_path, output_path, calc_avg_sbp = False, calculate_pr = False):
+    dates = signal_utils.extract_dates_from_filenames(data_path)
     print(f"Found {len(dates)} dates")
     
     fig, ax = plt.subplots(3,1, sharex=True)
@@ -50,24 +50,24 @@ def create_signal_quality_figure():
     #show example channel heatmap over time
     # calc_sbp_heatmaps = False
     # if calc_sbp_heatmaps:
-    #     signal_utils.calc_sbp_heatmaps(dates)
+    #     signal_utils.calc_sbp_heatmaps(dates, data_path, output_path)
 
-    # create_channel_heatmaps(dates, channel = 0)
+    # create_channel_heatmaps(dates, channel = 0, output_path)
 
     #average sbp figure
-    calc_avg_sbp = False
+    # calc_avg_sbp = False
     if calc_avg_sbp:
-        signal_utils.calc_avg_sbps(dates)
-    create_avg_sbp_plot(ax[0])
+        signal_utils.calc_avg_sbps(dates, data_path, output_path)
+    create_avg_sbp_plot(ax[0], output_path)
     
     # calculate participation ratio on each day
-    calculate_pr = False
+    # calculate_pr = False
     if calculate_pr:
-        signal_utils.calc_pr_all_days(dates)
+        signal_utils.calc_pr_all_days(dates, data_path, output_path)
 
     # create pr figure
-    create_pr_plot(ax[2])
-    active_channels_plot(ax[1],os.path.join(signal_utils.output_path,"participation_ratios.csv"))
+    create_pr_plot(ax[2], output_path)
+    active_channels_plot(ax[1],os.path.join(output_path,"participation_ratios.csv"))
     plt.show()
     # per channel sbp distributions over time
     # channels = 4
@@ -103,8 +103,8 @@ def active_channels_plot(ax, path_to_pr_calcs):
     ax.grid(True)
 
 
-def create_pr_plot(ax):
-    pr_df = pd.read_csv(os.path.join(signal_utils.output_path,"participation_ratios.csv"))
+def create_pr_plot(ax, output_path):
+    pr_df = pd.read_csv(os.path.join(output_path,"participation_ratios.csv"))
     pr_df.set_index(['date'], inplace=True)
     pr_df.index = pd.to_datetime(pr_df.index)
     pr_df['days'] = (pr_df.index - pr_df.index[0]).to_series().dt.days.to_numpy()
@@ -119,8 +119,8 @@ def create_pr_plot(ax):
     ax.set(title='Participation ratio over time (Active Channels)', ylabel='Participation Ratio (PR)', yticks=[0,5,10,15,20], xlabel=None)
     ax.legend()
 
-def create_avg_sbp_plot(ax):
-    sbp_avgs = pd.read_csv(os.path.join(signal_utils.output_path, "sbp_avgs.csv"), index_col=0)
+def create_avg_sbp_plot(ax, output_path):
+    sbp_avgs = pd.read_csv(os.path.join(output_path, "sbp_avgs.csv"), index_col=0)
     sbp_avgs.index = pd.to_datetime(sbp_avgs.index)
 
     sbp_avgs['days'] = (sbp_avgs.index - sbp_avgs.index[0]).to_series().dt.days.to_numpy()
@@ -286,8 +286,8 @@ def plot_mutual_information_heatmap(pkl_file_path):
     plt.savefig(output_path, dpi=300)
     plt.close()
 
-def create_channel_heatmaps(dates, channel):
-    with open(os.path.join(signal_utils.output_path, 'sbp_heatmaps.pkl'), 'rb') as f:
+def create_channel_heatmaps(dates, channel, output_path):
+    with open(os.path.join(output_path, 'sbp_heatmaps.pkl'), 'rb') as f:
         sbp_heatmaps  = pickle.load(f)
     
     channels = [0,1,2,3,4]
