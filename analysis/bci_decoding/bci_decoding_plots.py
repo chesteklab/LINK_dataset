@@ -24,7 +24,7 @@ mpl.rcParams['pdf.fonttype'] = 42
 ########################################################
 
 # Load the evaluation results
-results_folder = "C:\Repos\\big_nhp_dataset_code\\analysis\\bci_decoding\single_day_model_results"
+results_folder = "C./analysis/bci_decoding/single_day_model_results"
 
 # results_folder = '/Users/jcostello/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/single_day_model_results'
 XLIM_ONESIDE = 100
