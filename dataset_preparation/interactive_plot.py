@@ -18,7 +18,7 @@ class neural_plot(widgets.VBox):
         super().__init__()
         self.datapath = config.preprocessingdir
         self.filenames = [f for f in os.listdir(self.datapath) if not f.startswith('.')] #in case there are any hidden files
-        self.filenames.remove('bad_days.txt')
+        #self.filenames.remove('bad_days.txt')
         self.filenames.sort() #for some reason the files weren't in chronological order if left unsorted, maybe a macOS problem?
         self.fileidx = 0
 
