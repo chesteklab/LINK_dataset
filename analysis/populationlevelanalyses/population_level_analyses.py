@@ -472,7 +472,6 @@ def direction_map(directions='not_all'):
     return dir_list, position_map, label_list
      
 ## Data Processing ##
-
 def get_all_trial_classes(df, plot_targs = False, class_span = 45):
     df_out = copy.deepcopy(df)
     del df_out['target_positions']
@@ -506,18 +505,12 @@ def get_all_trial_classes(df, plot_targs = False, class_span = 45):
                     targs.append(targ)
                     diffs.append(np.array(target_pos) - np.array(last))
 
-                    
-                # M = np.sign(diff[0])
-                # I = np.sign(diff[1])
-                
-                # targ = np.array([M, I])
                 classes.append(targ)
                 last = target_pos  # Update for next iteration
 
         # Add the classes to the DataFrame
         index = day.name  # Get the actual index label from `df.iterrows()`
         df_out.loc[index, 'target_positions'] = [np.array(classes)]
-            
 
     if plot_targs:
         plt.figure()
@@ -1079,12 +1072,17 @@ def split(df_time, time_periods, position_map, type_of_data, jpca=False, kinemat
             if only_CO:
                 if yearly_data["target_styles"] != "CO": # only include it if its CO data
                     continue
-
-            for i in range(0, len(yearly_data['target_positions'])):
+            
+            targ_coords = np.asarray(yearly_data['target_positions'])
+            if len(targ_coords.shape) > 2 and targ_coords.shape[0] ==1:
+                ## Handles difference between old and new pandas versions, which extract series differently 
+                targ_coords = targ_coords[0, :, :]
+           
+            for i in range(0, targ_coords.shape[0]):
                 trial_index_start = yearly_data["trial_indices"][i]
                 trial_length = yearly_data['trial_counts'][i]
 
-                target_pos_coords = tuple(yearly_data['target_positions'][i])
+                target_pos_coords = targ_coords[i, :]
                 target_pos_coords = (round(float(target_pos_coords[0]), 1), round(float(target_pos_coords[1]), 1))
                 if target_pos_coords in position_map: # skips (0.5, 0.5)
 
@@ -1100,7 +1098,8 @@ def split(df_time, time_periods, position_map, type_of_data, jpca=False, kinemat
                         neural_data_for_direction[str(year)][target_pos] = [(neural_data, trial_kinematics)]
                     else:
                         neural_data_for_direction[str(year)][target_pos].append((neural_data, trial_kinematics))
-    
+
+
     return neural_data_for_direction, None
 
 def get_grouped_data(df_tuning, group_by = 'year', years_to_skip = ['2023', '2024']):
@@ -1199,14 +1198,19 @@ def split_and_pca_all_trials(df_time, time_periods, type_of_data, position_map, 
                 
             centroids[str(year)].append(day_pca_results.mean(axis = 0))
 
-            for i in range(0, len(yearly_data['target_positions'])):
+            targ_coords = np.asarray(yearly_data['target_positions'])
+            if len(targ_coords.shape) > 2 and targ_coords.shape[0] ==1:
+                ## Handles difference between old and new pandas versions, which extract series differently 
+                targ_coords = targ_coords[0, :, :]
+
+            for i in range(0, targ_coords.shape[0]):
                 trial_index_start = yearly_data["trial_indices"][i]
                 trial_length = yearly_data['trial_counts'][i]
+
+                target_pos_coords = targ_coords[i, :]
+                target_pos_coords = (round(float(target_pos_coords[0]), 1), round(float(target_pos_coords[1]), 1))
                 channel_pca_sbps = day_pca_results[trial_index_start:trial_index_start+trial_length] 
 
-                target_pos_coords = tuple(yearly_data['target_positions'][i])
-                target_pos_coords = (round(float(target_pos_coords[0]), 1), round(float(target_pos_coords[1]), 1))
-                
                 if target_pos_coords in position_map:
                     target_pos = position_map[target_pos_coords]
                 else:
