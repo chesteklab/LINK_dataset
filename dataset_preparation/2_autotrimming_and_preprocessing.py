@@ -5,8 +5,11 @@ import pickle
 import config
 import pdb
 import sys
+from tqdm import tqdm
 sys.path.append(config.pybmipath)
+print(config.pybmipath)
 from pybmi.utils import ZTools # type: ignore
+
 
 def prep_data(resume=True):
     datesruns = load_sheet()
@@ -17,10 +20,9 @@ def prep_data(resume=True):
     else:
         resumeidx = 0
     idxs = np.arange(resumeidx, len(datesruns))
-    # data, data = load_day('2020-03-12')
     extra_bad_days = ['2022-06-09','2023-05-05','2024-01-29'] # first and second, notes file is wrong, third pickling went wrong, can't import.
 
-    for i in idxs:
+    for i in tqdm(idxs):
         date = datesruns['Date'].iloc[i]
         runs = datesruns['Runs'].iloc[i]
         print(f'{date} with runs {runs}')
@@ -34,10 +36,10 @@ def prep_data(resume=True):
             bad_days.append(f'{date}')
         else:
             filename = f'{date}_preprocess.pkl'
-            with open(os.path.join(config.preprocessingpath,filename),'wb') as f:
+            with open(os.path.join(config.preprocessingdir,filename),'wb') as f:
                 pickle.dump((data_CO, data_RD), f)
 
-        with open(os.path.join(config.preprocessingpath,'bad_days.txt'), 'a') as f:
+        with open(os.path.join(config.preprocessingdir,'bad_days.txt'), 'a') as f:
             for day in bad_days:
                 f.write(f"{day}\n")
 
@@ -79,16 +81,16 @@ def load_day(date):
             runs_RD.append(run)
 
     #then do the logic to decide what to keep and preprocess
-    (data_CO, run_CO) = choose_data(data_CO, runs_CO) if data_CO else (pd.DataFrame([]), None)
-    (data_RD, run_RD) = choose_data(data_RD, runs_RD) if data_RD else (pd.DataFrame([]), None)
+    (data_CO, run_CO) = choose_data(data_CO, runs_CO) if data_CO else (None, None)
+    (data_RD, run_RD) = choose_data(data_RD, runs_RD) if data_RD else (None, None)
 
     #once we know we have enough trials, do preprocessing
-    if not data_CO.empty:
+    if data_CO is not None:
         print("PREPROCESSING CO")
-        data_CO = preprocessing(data_CO, run_CO)
-    if not data_RD.empty:
+        data_CO = preprocessing(data_CO, run_CO, "CO")
+    if data_RD is not None:
         print("PREPROCESSING RD")
-        data_RD = preprocessing(data_RD, run_RD)
+        data_RD = preprocessing(data_RD, run_RD, "RD")
     
     return data_CO, data_RD
 
@@ -110,8 +112,9 @@ def load_run(date, run):
     z = z[(z['TargetPosStyle'] == style_mode) 
           & (z['TargetPosStyle'].isin([29.0, 34.0])) 
           & (z['ClosedLoop'] == 0) 
-          & (z['TrialSuccess'] == 1)]
-    # TODO: only 750ms hold time
+          & (z['TrialSuccess'] == 1)
+          & (z['TargetHoldTime'] == 750)]
+          
 
     if style_mode == 34.0:
         target_style = 'CO'
@@ -128,10 +131,14 @@ def choose_data(data, runs):
     argmax_trials = np.argmax(np.asarray([len(z) for z in data]))
     
     # from the largest - see if there are 375 trials
-    if max_trials >= 375:
+    if max_trials > 375:
         # take it
         trim_amount = max_trials - 375
         new_data = data[argmax_trials].iloc[0:-1*trim_amount]
+        run = runs[argmax_trials]
+    # else if
+    elif max_trials == 375:
+        new_data = data[argmax_trials]  
         run = runs[argmax_trials]
     else:
         new_data = None
@@ -139,11 +146,9 @@ def choose_data(data, runs):
 
     return new_data, run
 
-def preprocessing(data, run):
+def preprocessing(data, run, target_style):
     
     processed_run = {}
-    style_mode = data['TargetPosStyle'].mode()[0]
-    target_style = 'CO' if style_mode == 34.0 else 'RD'
 
     # first 5 trials have already been trimmed
     feats = ZTools.getZFeats(data, 
@@ -154,11 +159,14 @@ def preprocessing(data, run):
                                        'TrialNumber',
                                        'TargetPos',
                                        'ExperimentTime',
-                                       'Channel'))
+                                       'Channel',
+                                       'TrialTimeoutms'))
     
     FingerAngles = feats["FingerAnglesTIMRL"][:, (1, 3, 6, 8)]  #selecting only position and velocity
     TrialNumber, TrialIndex, TrialCount = np.unique(feats["TrialNumber"], return_index = True, return_counts = True)
-
+    trial_timeouts = data['TrialTimeoutms'].to_numpy()
+    assert(len(trial_timeouts == len(TrialNumber)))
+    pdb.set_trace()
     sbp = np.abs(feats['NeuralFeature'])
     # sbp = (sbp - np.mean(sbp, axis=0)) / np.std(sbp, axis=0)
 
@@ -168,6 +176,7 @@ def preprocessing(data, run):
     processed_run['trial_index'] = TrialIndex
     processed_run['trial_count'] = TrialCount
     processed_run['run_id'] = run
+    processed_run['trial_timeout'] = trial_timeouts
     processed_run['target_positions'] = feats["TargetPos"][TrialIndex][:, [1, 3]]
     processed_run['time'] = feats['ExperimentTime']
     processed_run['finger_kinematics'] = FingerAngles

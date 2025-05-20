@@ -1,5 +1,10 @@
 __pycache__
+<<<<<<< HEAD
+=======
 *.svg
 *.pdf
 test.py
 *.png
+001201
+**/*.csv
+>>>>>>> 51784b6cb6841909a587cbb7a40d23fb64005748
