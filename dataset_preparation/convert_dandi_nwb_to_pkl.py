@@ -71,10 +71,10 @@ def load_one_nwb(fp: str) -> dict:
         )
 
 if __name__=="__main__":
-    dandiset_path = 'D:\dandisets\\001201'
+    dandiset_path = 'D:\\dandisets\\001201'
     nwb_path = os.path.join(dandiset_path, 'sub-Monkey-N')
 
-    processed_data_path = 'D:\data_test'
+    processed_data_path = './outputs/dataset_pkl/'
 
     # get filenames
     files = os.listdir(nwb_path)
