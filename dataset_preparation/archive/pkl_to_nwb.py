@@ -8,8 +8,8 @@ from pynwb import NWBFile, TimeSeries, NWBHDF5IO
 from pynwb.ecephys import ElectricalSeries
 from pynwb.file import Subject
 from typing import Tuple, Optional
-import config
-from find_impedances import get_impedances
+import dataset_preparation.archive.config as config
+from dataset_preparation.archive.find_impedances import get_impedances
 
 
 def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):

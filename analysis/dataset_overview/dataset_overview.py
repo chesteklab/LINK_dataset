@@ -17,7 +17,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from scipy import stats
 from collections import defaultdict
-
+from tutorial.utils.data_tools import extract_dates_from_filenames, load_day
 # data_path = "Z:\Student Folders\\Nina_Gill\data\only_good_days_timeouts"
 # output_dir = "D:\\University of Michigan Dropbox\Hisham Temmar\Science Communication\Papers\LINK_dataset\experimental setup"
 
@@ -76,28 +76,6 @@ def target_positions(dates, data_path, isOneDay = False, dayIdx = None):
         plt.plot(cos)
         plt.show()
 
-
-def extract_dates_from_filenames(data_path):
-    # Find all matching .pkl files
-    pkl_files = glob.glob(os.path.join(data_path, '*_preprocess.pkl'))
-
-    dates = []
-    for file_path in pkl_files:
-        filename = os.path.basename(file_path)
-        match = re.match(r'(\d{4}-\d{2}-\d{2})_preprocess\.pkl', filename)
-        if match:
-            dates.append(match.group(1))
-
-    dates = np.asarray([datetime.strptime(date, '%Y-%m-%d') for date in dates])
-    return dates #sorted(dates) 
-
-def load_day(date, data_path):
-        file = os.path.join(data_path, f'{date.strftime("%Y-%m-%d")}_preprocess.pkl')
-
-        with open(file, 'rb') as f:
-            data_CO, data_RD = pickle.load(f)
-        
-        return data_CO, data_RD
 
 
 if __name__ == "__main__":

@@ -34,15 +34,15 @@ from sklearn.metrics import mean_squared_error, r2_score, mutual_info_score
 from sklearn.feature_selection import mutual_info_regression
 from sklearn.model_selection import train_test_split
 from scipy import stats
-
+from tutorial.utils.data_tools import *
 from collections import defaultdict
 
 def create_signal_quality_figure(data_path, output_path, calc_avg_sbp = False, calculate_pr = False):
-    dates = signal_utils.extract_dates_from_filenames(data_path)
+    dates = extract_dates_from_filenames(data_path)
     print(f"Found {len(dates)} dates")
     
     fig, ax = plt.subplots(3,1, sharex=True)
-    # data_CO, data_RD = signal_utils.load_day(dates[0])
+    # data_CO, data_RD = load_day(dates[0])
     # for i in range(96):
     #     plt.hist(data_CO['sbp'][:,i])
     # plt.show()
@@ -160,7 +160,7 @@ def calc_mutual_information(dates, characterizationdir):
 
     for date in tqdm(dates, desc="Calculating Mutual Information", file=sys.stdout):
         
-        data_CO, data_RD = signal_utils.load_day(date)
+        data_CO, data_RD = load_day(date)
 
         if data_CO and data_RD:
             sbp = np.concatenate((data_CO['sbp'], data_RD['sbp']), axis=0)

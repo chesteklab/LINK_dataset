@@ -28,10 +28,10 @@ After running this, use the eval script to evaluate the performance of the model
 ########################################################
 
 # data_folder = '/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Hisham_Temmar/big_dataset/2_autotrimming_and_preprocessing/preprocessing_092024_no7822nofalcon'
-data_folder = '/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Nina_Gill/data/only_good_days'
+data_folder = './data_test'
 
 # model_folder = '/home/joey/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/single_day_models'
-model_folder = '/home/joey/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/single_day_models_withnoise'
+model_folder = './analysis/bci_decoding/single_day_models_withnoise'
 
 NUM_TRAIN_TRIALS = 300
 NUM_CHANNELS = 96

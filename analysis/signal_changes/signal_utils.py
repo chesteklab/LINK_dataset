@@ -7,6 +7,7 @@ import re
 from tqdm import tqdm
 from datetime import datetime
 import ast
+from tutorial.utils.data_tools import *
 
 # # server_dir = "/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/"
 # # data_path = os.path.join(server_dir, 'Student Folders','Nina_Gill','data','only_good_days')
@@ -17,27 +18,6 @@ import ast
 # data_path = "C:\\Files\\UM\\ND\\SFN\\only_good_days"
 # output_path = 'C:\\Files\\UM\\ND\\github\\big_nhp_dataset_code\\outputs'
 binsize = 20
-def extract_dates_from_filenames(data_path):
-    # Find all matching .pkl files
-    pkl_files = glob.glob(os.path.join(data_path, '*_preprocess.pkl'))
-
-    dates = []
-    for file_path in pkl_files:
-        filename = os.path.basename(file_path)
-        match = re.match(r'(\d{4}-\d{2}-\d{2})_preprocess\.pkl', filename)
-        if match:
-            dates.append(match.group(1))
-
-    dates = np.asarray([datetime.strptime(date, '%Y-%m-%d') for date in dates])
-    return dates #sorted(dates) 
-
-def load_day(date, data_path):
-        file = os.path.join(data_path, f'{date.strftime("%Y-%m-%d")}_preprocess.pkl')
-
-        with open(file, 'rb') as f:
-            data_CO, data_RD = pickle.load(f)
-        
-        return data_CO, data_RD
 
 def calc_avg_sbps(dates, data_path, output_path):
     sbp_avgs = pd.DataFrame(np.zeros((len(dates), 96), dtype=float), index=dates)
