@@ -1,7 +1,7 @@
 import os
 import shutil
 import pandas as pd
-import config
+import dataset_preparation.archive.config as config
 from tqdm import tqdm
 
 def main():

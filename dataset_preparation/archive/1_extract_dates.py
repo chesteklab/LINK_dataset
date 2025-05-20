@@ -1,7 +1,7 @@
 import csv
 import os
 import re
-import config as config
+import dataset_preparation.archive.config as config
 import datetime
 
 noteLocation = os.path.join(config.notesdir)

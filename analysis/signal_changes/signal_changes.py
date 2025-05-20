@@ -118,4 +118,4 @@ def create_avg_sbp_plot(ax):
     ax.set(xticks=tick_positions, xticklabels=tick_labels)
 
 if __name__ == "__main__":
-    create_signal_quality_figure(True, True)
+    create_signal_quality_figure(calc_avg_sbp=True, calc_pr=True)

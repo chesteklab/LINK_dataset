@@ -2,7 +2,7 @@ import pandas as pd
 import os 
 import numpy as np
 import pickle
-import config
+import dataset_preparation.archive.config as config
 import pdb
 import sys
 from tqdm import tqdm
