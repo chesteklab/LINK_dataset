@@ -10,7 +10,7 @@ pybmipath = "C:\Repos\pybmi"
 datapath = os.path.join(server_dir, "Data", "Monkeys")
 outputdir = os.path.join(server_dir, "Student Folders", "Nina_Gill", "data")
 
-firstpassdir = "add here"
+firstpassdir = "/home/chang/Documents/ND/github/LINK_dataset/data_test"
 notesdir = os.path.join(firstpassdir, "joker_notes_firstpass")
 sheetpath = os.path.join(firstpassdir, "firstpass_datesruns.csv")
 # sheetpath = os.path.join(firstpassdir, 'sfn_datasets.csv')
