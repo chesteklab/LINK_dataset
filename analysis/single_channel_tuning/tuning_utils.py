@@ -26,8 +26,8 @@ mpl.rcParams['figure.titlesize'] = 14
 mpl.rcParams['figure.titleweight'] = 'bold'
 mpl.rcParams['pdf.fonttype'] = 42
 
-data_path = "/home/chang/Documents/ND/github/LINK_dataset/data_test"
-output_path = "/home/chang/Documents/ND/github/LINK_dataset/outputs"
+data_path = "./data_test"
+output_path = "./outputs"
 binsize = 20
 # (for debugging stage) please dont remove these, comment them out would be fine. otherwise ill have to write the directories again which is annoying because windows hates single \
 # data_path = "C:\\Files\\UM\\ND\\SFN\\only_good_days"

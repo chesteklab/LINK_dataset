@@ -22,7 +22,7 @@ To recreate the figures in the paper, first convert the data to dictionaries usi
 * To recreate the target position and data distribution plots in Figure 1, please run the `python analysis/dataset_overview/dataset_overview.py`. Line 21 and 22 can be changed to match user directories.
 * To recreate Figure 2A-C, change the filepaths at line 11 and 12 (if needed) in `analysis/signal_changes/signal_utils.py`. Then run `python analysis/signal_changes/signal_changes.py`. After running for the first time, if you'd like to avoid crunching the numbers again, set the `calc_avg_sbp` and `calc_pr` flags back to `False` in `analysis/signal_changes/signal_changes.py`.
 * To recreate Figure 2D-E, run `python analysis/pop_level_analyses/dimensionality_across_days_analysis.ipynb` in the pop_level_analyses folder. mpath in cell 4 should be changed to user data directory.
-* To recreate Figure 3, change the filepaths at line 29 and 30 in `analysis/tuning_utils.py`, then run `python analysis/single_channel_tuning/single_channel_tuning.py`. After running for the first time, if you'd like to avoid crunching the numbers again, set the `calc_tunings` flag `False` in `analysis/single_channel_tuning/single_channel_tuning.py`.
+* To recreate Figure 3, change the filepaths at line 29 and 30 (if needed) in `analysis/tuning_utils.py`, then run `python analysis/single_channel_tuning/single_channel_tuning.py`. After running for the first time, if you'd like to avoid crunching the numbers again, set the `calc_tunings` flag `False` in `analysis/single_channel_tuning/single_channel_tuning.py`.
 * To recreate Figure 4, refer to `analysis/bci_decoding/readme.md`.
 
 ## Info for NWB files
