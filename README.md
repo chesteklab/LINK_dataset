@@ -6,24 +6,24 @@ The repository is split into two sections, for dataset preparation and analysis.
 
 ## Getting the Data
 1. Clone this repository
-2. Create a conda environment using the requirement.txt file, and also install pytorch
+2. Create a conda environment using the requirement.txt file, python 3.9, and also install pytorch
 3. Install the dandi-cli tool using: `pip install dandi`, if not already installed.
 4. Download the dataset with `dandi download DANDI:001201`
 
 ## Accessing the data
-Data can be accessed aas an nwb file, or converted to dictionaries (with sligtly less information) using the script `convert_dandi_nwb_to_pkl.py` in the `dataset_preparation` folder.
+Data can be accessed aas an nwb file, or converted to dictionaries (with sligtly less information) by running: `python dataset_preparation/convert_dandi_nwb_to_pkl.py`.
 
 ## Visualizing the data
-For a quick way to look at the timeseries data, use the script above to convert the data to dictionaries, then specify the location of the new .pkl files in `dataset_preparation\config.py`, then run the cell in `3_data_review_tool.ipynb`. You may also want to set an output directory in the config file or the tool may break when terminating plotting. Use the `+500` and `-500` buttons to scrub through the data. If two target styles are present on a day, you can use the `Change Target Style` button to view one or the other. You can ignore the rest of the UI, this was for manual data review.
+For a quick way to look at the timeseries data, use the script above to convert the data to dictionaries, then specify the location of the new .pkl files in `dataset_preparation/config.py`, then run the cell in `3_data_review_tool.ipynb`. You may also want to set an output directory in the config file or the tool may break when terminating plotting. Use the `+500` and `-500` buttons to scrub through the data. If two target styles are present on a day, you can use the `Change Target Style` button to view one or the other. You can ignore the rest of the UI, this was for manual data review.
 
 ## Reproducing figures
 To recreate the figures in the paper, first convert the data to dictionaries using the script mentioned above. Once the data is prepared, you can recreate the figures in the paper by running the following scripts in the analysis folder. You will also need to download the font Atkinson Hyperlegible (available [here](https://www.brailleinstitute.org/freefont/)) and rebuild your mpl cache, or change the font in the rcparams of the scripts:
 
-* To recreate the target position and data distribution plots in Figure 1, please run the script `dataset_overview.py` in the dataset_overview folder
-* To recreate Figure 2A-C, run the script `signal_changes.py` in the signal_changes folder, making sure to set filepath in `signal_utils.py` and if running for the first time, set the calc_avg_sbp and calc_pr parameters to true.
-* To recreate Figure 2D-E, run `dimensionality_across_days_analysis.ipynb` in the pop_level_analyses folder.
-* To recreate Figure 3, run the script `single_channel_tuning.py` in the single_channel_tuning folder, making sure to update the filepaths in `tuning_utils.py` and setting the calc_tunings flag to true.
-* To recreate Figure 4, refer to the readme in the bci_decoding folder.
+* To recreate the target position and data distribution plots in Figure 1, please run the `python analysis/dataset_overview/dataset_overview.py`.
+* To recreate Figure 2A-C, change the filepaths in `analysis/signal_changes/signal_utils.py` then run `python analysis/signal_changes/signal_changes.py`. After running for the first time, if you'd like to avoid crunching the numbers again, set the `calc_avg_sbp` and `calc_pr` flags to `False` in `analysis/signal_changes/signal_changes.py`.
+* To recreate Figure 2D-E, run `python analysis/pop_level_analyses/dimensionality_across_days_analysis.ipynb` in the pop_level_analyses folder.
+* To recreate Figure 3, change the filepaths in  `analysis/tuning_utils.py`, then run `python analysis/single_channel_tuning/single_channel_tuning.py`. After running for the first time, if you'd like to avoid crunching the numbers again, set the `calc_tunings` flag `False` in `analysis/single_channel_tuning/single_channel_tuning.py`.
+* To recreate Figure 4, refer to `analysis/bci_decoding/readme.md`.
 
 ## Info for NWB files
 For a NWBHDF5IO object named nwb:
