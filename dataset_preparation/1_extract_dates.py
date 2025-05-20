@@ -8,7 +8,7 @@ noteLocation = os.path.join(config.notesdir)
 
 noteList = os.listdir(noteLocation)
 
-extractedDates = [re.split('NapierNotes|\.txt', note)[1] for note in noteList]
+extractedDates = [re.split('MonkeyNNotes|\.txt', note)[1] for note in noteList]
 extractedDates.sort()
 extractedDates = [[datetime.datetime.strptime(date, '%Y%m%d').date().isoformat()] for date in extractedDates]
 

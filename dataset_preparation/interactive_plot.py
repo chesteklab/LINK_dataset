@@ -107,7 +107,7 @@ class neural_plot(widgets.VBox):
         prev_day.on_click(self.prev_day)
 
         # Time Scrubbers (500 bins)
-        prev_time = widgets.Button(description='← (-500 bins)') # changed it to 500 bins just for the sake of scrubbing through more quickly
+        prev_time = widgets.Button(description='← (-500 bins)') 
         prev_time.on_click(self.shift_back)
         next_time = widgets.Button(description='→ (+500 bins)')
         next_time.on_click(self.shift_forward)

@@ -125,7 +125,7 @@ def create_avg_sbp_plot(ax, output_path):
 
     sbp_avgs['days'] = (sbp_avgs.index - sbp_avgs.index[0]).to_series().dt.days.to_numpy()
 
-    sbp_long = sbp_avgs.reset_index(names="date").melt(id_vars=["date",'days'], var_name='channel', value_name='sbp')
+    sbp_long = sbp_avgs.reset_index().rename(columns={'index': 'date'}).melt(id_vars=["date",'days'], var_name='channel', value_name='sbp')
     sbp_long['sbp'] = sbp_long['sbp']*0.25
     sbp_long['date_ordinal'] = sbp_long['date'].apply(lambda date: date.toordinal())
     
