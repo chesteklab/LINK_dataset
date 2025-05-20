@@ -1,11 +1,10 @@
 # platform: win-64
 matplotlib >= 3.9
 seaborn  >= 0.13
-numpy >= 2.0
+numpy >= 1.26
 pandas >= 2.2
 pynwb >= 3.0
-scipy >= 1.13
+scipy == 1.13
 scikit-learn >= 1.6
 ipython >= 8.18
 tqdm >= 4.67
-torch >=2.7.0
