@@ -9,5 +9,3 @@ scikit-learn >= 1.6
 ipython >= 8.18
 tqdm >= 4.67
 torch >=2.7.0
-zlib=1.2.13=h8cc25b3_1
-zstd=1.5.6=h8880b57_0
