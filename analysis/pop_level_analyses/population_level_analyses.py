@@ -480,11 +480,10 @@ def get_all_trial_classes(df, plot_targs = False, class_span = 45):
     if plot_targs:
         dir_list, position_map, direction_key = direction_map(directions='ext_flex')
 
-        c_list = ['red','blue', 'green', 'purple', 'orange', 'brown', 'pink', 'gray']
-        colors = {}
-        
-        for i, dir in enumerate(sorted(dir_list)):
-            colors[dir] = c_list[i]    
+        colors = {'N': (0.3, 0.0, 0.9), 'NE': (0.15, 0.4,  0.8), # N is Blue
+              'E': (0.0, 0.8, 0.7), 'SE': (0.45, 0.8, 0.35), # W is greenish
+              'S': (0.9, 0.7, 0.0), 'SW': (0.9, 0.35, 0.1),  # S is Yellowish
+              'W': (0.9, 0.0, 0.2), 'NW': (0.65, 0.0,  0.55)}  #E is Red  
             
     diffs = []
     targs = []
@@ -499,14 +498,12 @@ def get_all_trial_classes(df, plot_targs = False, class_span = 45):
             else: 
                 
                 targ = get_targ(target_pos, last, class_span = class_span)
-                if (targ[0]==0) and (targ[1]==0):
-                    a = 1
-                else:
+                if not ((targ[0]==0) and (targ[1]==0)):
                     targs.append(targ)
                     diffs.append(np.array(target_pos) - np.array(last))
 
                 classes.append(targ)
-                last = target_pos  # Update for next iteration
+                last = target_pos 
 
         # Add the classes to the DataFrame
         index = day.name  # Get the actual index label from `df.iterrows()`
@@ -517,7 +514,7 @@ def get_all_trial_classes(df, plot_targs = False, class_span = 45):
         color_list = [colors[position_map[tuple(targ)]] for targ in targs if position_map[tuple(targ)] != 'X']
         coords = np.vstack(diffs)  # Shape becomes (N, 2)
 
-        plt.scatter(coords[:, 0], coords[:, 1], c = color_list)
+        plt.scatter(coords[:, 1], coords[:, 0], c = color_list)
         legend_elements = []
         used_indices = set(position_map[tuple(targ)] for targ in targs if position_map[tuple(targ)] != 'X')
         for idx in sorted(used_indices):
@@ -533,8 +530,8 @@ def get_all_trial_classes(df, plot_targs = False, class_span = 45):
             bbox_to_anchor=(1, 0.5)
         )
 
-        plt.xlabel("MRP Movement")
-        plt.ylabel("Index Movement")
+        plt.ylabel("MRP Movement")
+        plt.xlabel("Index Movement")
         plt.title("Movement (current target position - last target position)")
 
         plt.axis('equal')  # Ensures square aspect ratio
@@ -554,10 +551,7 @@ def get_all_trial_classes(df, plot_targs = False, class_span = 45):
         plt.xlim([-1.1, 1.1])
         plt.ylim([-1.1, 1.1])
         plt.show()
-        
-
-        
-    # print(x_counter)
+      
     return df_out
 
 ## Trim Methods ##
@@ -1263,6 +1257,7 @@ def get_targ(targ_pos, last, class_span=45):
         return np.array(direction_vectors[dir_index])
     else:
         return np.array([0, 0])
+
 ## Main fxns ##
 def plot_centroid_of_pca_data_across_time(df_tuning, n_components = 3, dpca = False, group_by = "year", years_to_skip = [], data_type = 'sbps', remove_RT = False, directions = 'ext_flex', trim_pt = max_jerk, trim_method = trim_neural_data_at_movement_onset_std_and_smooth, PART_TO_PLOT = 'center', normalization_method = 'all', pca_all = True, plot_centr_across_time= True, sigma = .5):
     
