@@ -7,14 +7,15 @@ The repository is split into two sections, for dataset preparation and analysis.
 ## Getting the Data
 1. Clone this repository
 2. Create a conda environment using the requirement.txt file, python 3.9, and also install pytorch
-3. Install the dandi-cli tool using: `pip install dandi`, if not already installed.
-4. Download the dataset with `dandi download DANDI:001201`
+3. Instal the pyNWB API with `pip install -U pynwb`
+4. Install the dandi-cli tool using: `pip install dandi`, if not already installed.
+5. Download the dataset with `dandi download DANDI:001201`
 
 ## Accessing the data
-Data can be accessed aas an nwb file, or converted to dictionaries (with sligtly less information) by running: `python dataset_preparation/convert_dandi_nwb_to_pkl.py`. Directories in line 74 and 77 should be changed to match user environment. N.B. In line 77 processed_data_path needs to be created before running the code.
+Data can be accessed as an nwb file, or converted to dictionaries (with sligtly less information) by running: `python dataset_preparation/convert_dandi_nwb_to_pkl.py`. If needed, please modify the directories in line 74 and 77 to reflect any changes from defauly behavior. Otherwise, the data should live in the root folder of the cloned LINK_dataset repo at `./001201`, and a folder should be created at `./data_test` to hold the preprocessed .pkl files.
 
 ## Visualizing the data
-For a quick way to look at the timeseries data, use the script above to convert the data to dictionaries, then specify the location of the new .pkl files in `dataset_preparation/config.py` (default `./outputs`), then run the cell in `dataset_preparation/data_review_tool.ipynb`. You may also want to set an output directory in the config file or the tool may break when terminating plotting. Use the `+500` and `-500` buttons to scrub through the data. If two target styles are present on a day, you can use the `Change Target Style` button to view one or the other. You can ignore the rest of the UI, this was for manual data review.
+As a quick way to visualize the SBP, TCFR, and timeseries data, open the jupyter notebook `dataset_preparation/data_review_tool.ipynb`. Be sure to replace the file paths in the top cell with the absolute paths of the `./data_test` and `./outputs/datareview` folders. Use the `+500` and `-500` buttons to scrub through the data. If two target styles are present on a day, you can use the `Change Target Style` button to view one or the other. You can ignore the rest of the UI, this was for manual data review.
 
 ## Reproducing figures
 To recreate the figures in the paper, first convert the data to dictionaries using the script mentioned above. Once the data is prepared, you can recreate the figures in the paper by running the following scripts in the analysis folder. You will also need to download the font Atkinson Hyperlegible (available [here](https://www.brailleinstitute.org/freefont/)) and rebuild your mpl cache, or change the font in the rcparams of the scripts:
