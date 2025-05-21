@@ -10,6 +10,7 @@ The repository is split into two sections, for dataset preparation and analysis.
 3. Instal the pyNWB API with `pip install -U pynwb`
 4. Install the dandi-cli tool using: `pip install dandi`, if not already installed.
 5. Download the dataset with `dandi download DANDI:001201`
+6. (TODO: install ipympl)
 
 ## Accessing the data
 Data can be accessed as an nwb file, or converted to dictionaries (with sligtly less information) by running: `python dataset_preparation/convert_dandi_nwb_to_pkl.py`. If needed, please modify the directories in line 74 and 77 to reflect any changes from defauly behavior. Otherwise, the data should live in the root folder of the cloned LINK_dataset repo at `./001201`, and a folder should be created at `./data_test` to hold the preprocessed .pkl files.

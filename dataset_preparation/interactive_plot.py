@@ -111,22 +111,23 @@ class neural_plot(widgets.VBox):
         next_time = widgets.Button(description='→ (+500 bins)')
         next_time.on_click(self.shift_forward)
 
-        # Good/Bad Run Selection Buttons
-        self.good_bad = widgets.RadioButtons(options=[('good', 'good'), ('bad', 'bad')], 
-                                        description='Run Status:', 
-                                        disabled=False)
+        # # Good/Bad Run Selection Buttons
+        # self.good_bad = widgets.RadioButtons(options=[('good', 'good'), ('bad', 'bad')], 
+        #                                 description='Run Status:', 
+        #                                 disabled=False)
         
-        # Note Text Box
-        self.notes = widgets.Textarea(value='', 
-                         placeholder='Enter note for the day (optional)', 
-                         description='Note:', 
-                         disabled=False)
+        # # Note Text Box
+        # self.notes = widgets.Textarea(value='', 
+        #                  placeholder='Enter note for the day (optional)', 
+        #                  description='Note:', 
+        #                  disabled=False)
 
         hbox1 = widgets.HBox([prev_time, next_time, switch_styles])
-        hbox2 = widgets.HBox([self.good_bad, self.notes])
+        # hbox2 = widgets.HBox([self.good_bad, self.notes])
         hbox3 = widgets.HBox([prev_day, next_day, terminate])
         self.text_output = widgets.Output()
-        controls = widgets.VBox([hbox1, hbox2, hbox3, self.text_output])
+        #controls = widgets.VBox([hbox1, hbox2, hbox3, self.text_output])
+        controls = widgets.VBox([hbox1, hbox3, self.text_output])
         out_box = widgets.Box([self.figoutput])
 
         # style the borders/padding
@@ -173,9 +174,10 @@ class neural_plot(widgets.VBox):
         else:
             with self.text_output:
                 print(f'Starting at {self.filenames[self.fileidx]}')
-
+        print(f'Loading {self.filenames[self.fileidx]}...')
         self.load_current_day()
         self.plot_day()
+        print('Plotting Initialized')
         return
 
     def load_current_day(self):
@@ -357,8 +359,10 @@ class neural_plot(widgets.VBox):
                 print(f'Only {self.current_TS} available for {self.filenames[self.fileidx]}.')
     
     def save_day(self):
-        status = self.good_bad.value
-        note = self.notes.value if self.notes.value else ' '
+        #status = self.good_bad.value
+        status = 'good'
+        #note = self.notes.value if self.notes.value else ' '
+        note = ' '
         filename = self.filenames[self.fileidx]
         date = filename[0:10]
 

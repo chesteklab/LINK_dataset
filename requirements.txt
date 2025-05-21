@@ -9,3 +9,4 @@ ipython >= 8.15
 ipykernel >= 6.29
 tqdm >= 4.67
 ipywidgets >= 8.1
+#ipympl >=0.9.7
