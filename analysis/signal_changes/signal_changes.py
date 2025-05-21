@@ -68,6 +68,7 @@ def create_signal_quality_figure(data_path, output_path, calc_avg_sbp = False, c
     # create pr figure
     create_pr_plot(ax[2], output_path)
     active_channels_plot(ax[1],os.path.join(output_path,"participation_ratios.csv"))
+    plt.savefig(os.path.join(output_path, "signal_change"))
     plt.show()
     # per channel sbp distributions over time
     # channels = 4

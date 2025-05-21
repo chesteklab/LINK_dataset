@@ -7,24 +7,13 @@ import seaborn as sns
 from matplotlib.gridspec import GridSpec
 from datetime import datetime
 import os
-#some basic text parameters for figures
-mpl.rcParams['font.family'] = "Atkinson Hyperlegible" # if installed but not showing up, rebuild mpl cache
-mpl.rcParams['font.size'] = 10
-mpl.rcParams['savefig.format'] = 'pdf'
-mpl.rcParams['axes.unicode_minus'] = False
-mpl.rcParams['axes.titlesize'] = 14
-mpl.rcParams['axes.labelsize'] = 12
-mpl.rcParams['axes.titlelocation'] = 'center'
-mpl.rcParams['axes.titleweight'] = 'bold'
-mpl.rcParams['figure.constrained_layout.use'] = True
-mpl.rcParams['figure.titlesize'] = 14
-mpl.rcParams['figure.titleweight'] = 'bold'
-mpl.rcParams['pdf.fonttype'] = 42
+from analysis.config import mpl_config
+
 ########################################################
 ########################################################
 
 # Load the evaluation results
-results_folder = "./analysis/bci_decoding/single_day_model_results"
+#results_folder = "./analysis/bci_decoding/single_day_model_results"
 
 XLIM_ONESIDE = 100
 
@@ -40,8 +29,16 @@ lstm_color = np.asarray([54,106,159])/255
 
 ########################################################
 
-def create_decoding_figure(norm=False):
-    rr_df, lstm_df = load_eval_results(norm)
+def creat_all_decoding_figures(results_folder, output_folder):
+    create_decoding_figure(results_folder, norm = False)
+    plt.savefig(os.path.join(output_folder, "bci_decoding_plots_no_norm"))
+    plt.show()
+    create_decoding_figure(results_folder, norm = True)
+    plt.savefig(os.path.join(output_folder, "bci_decoding_plots_norm"))
+    plt.show()
+
+def create_decoding_figure(results_folder, norm=False):
+    rr_df, lstm_df = load_eval_results(results_folder, norm)
     
     fig = plt.figure(figsize=(10,6), layout='constrained')
     sfs = fig.subfigures(2,1, height_ratios=[1,1.5])
@@ -66,7 +63,7 @@ def create_decoding_figure(norm=False):
     grouped_rr.to_csv(os.path.join(results_folder, 'rr_avg.csv'))
     grouped_lstm.to_csv(os.path.join(results_folder, 'lstm_avg.csv'))
 
-def load_eval_results(norm=True):
+def load_eval_results(results_folder, norm=True):
     if norm:
         rr_df = pd.read_csv(f'{results_folder}/rr_evaluation_updatednorm_20250508_gooddays.csv')
         lstm_df = pd.read_csv(f'{results_folder}/lstm_evaluation_updatednorm_20250507_gooddays.csv')
@@ -255,6 +252,7 @@ def format_date_ticks(ax, date_range_days, unique_dates):
     ax.set_xlim(-padding, total_days + padding)
 
 if __name__=="__main__":
-    create_decoding_figure(False)
-    create_decoding_figure(True)
+    results_folder = "./analysis/bci_decoding/single_day_model_results"
+    create_decoding_figure(results_folder, False)
+    create_decoding_figure(results_folder, True)
     plt.show()

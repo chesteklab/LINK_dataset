@@ -26,7 +26,7 @@ def create_single_channel_tuning_figure(data_path, output_path):
     if calc_tunings:
         tuning_utils.compute_tuning_data(data_path, output_dir)
     
-    tuning_df = tuning_utils.load_tuning_data(output_dir)
+    tuning_df = tuning_utils.load_tuning_data(data_path, output_dir)
     selected_channels = [-1,7,32]
 
     fig = plt.figure(figsize=(8, 10), layout='constrained')  # Adjusted figure size for the additional row
@@ -81,8 +81,10 @@ def create_single_channel_tuning_figure(data_path, output_path):
         if(TICK_OVERRIDE):
             avg_tuning_ax[i].set_xticklabels(['0°','45°', '90°','135°', '180°','-135°','-90°','-45°'])
     subfigs[2].suptitle("E. tuning spreads")
-
+    fig.savefig(os.path.join(output_path, 'single_channel_tuning_figure'))
+    fig2.savefig(os.path.join(output_path, 'single_channel_tuning_figure_avg_tcr'))
     plt.show()
+
 
 if __name__=="__main__":
     create_single_channel_tuning_figure()

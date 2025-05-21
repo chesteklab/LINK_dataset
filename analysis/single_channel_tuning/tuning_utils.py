@@ -15,6 +15,7 @@ import matplotlib as mpl
 #some basic text parameters for figures
 from analysis.config import mpl_config
 
+bin_size = 20
 def compute_channel_tuning(neural, full_behavior, velocity_tuning = False):
     if velocity_tuning:
         behavior = full_behavior[:,[2,3]]
@@ -61,6 +62,7 @@ def compute_channel_tuning(neural, full_behavior, velocity_tuning = False):
     return tuning_df
 
 def compute_tuning_data(data_path, save_dir = None):
+    binsize = bin_size
     # Path to the folder containing pkl files
     data_folder = data_path
 
@@ -123,10 +125,10 @@ def compute_tuning_data(data_path, save_dir = None):
     print(f"Data saved to {save_dir}")
     return df
 
-def load_tuning_data(dir, overwrite=False):
+def load_tuning_data(data_path, dir, overwrite=False):
     if not os.path.exists(dir) or overwrite:
         print(f"Directory {dir} does not exist or overwrite, computing tuning data")
-        df = compute_tuning_data(save_dir=dir)
+        df = compute_tuning_data(data_path, save_dir=dir)
     else:
         df = pd.read_csv(dir)
     df['date'] = pd.to_datetime(df['date'])

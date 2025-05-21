@@ -690,7 +690,7 @@ def get_avg_trajs(df_tuning, group_by, period_to_plot_trajs, years_to_skip = [],
 
 
 ## Visualization
-def plot_trajectories(averaged_pca_results, time_periods, label,  direction_key, directions = 'ext_flex', dim_inds = [0, 1, 2], elev = 20, azim= -45):
+def plot_trajectories(averaged_pca_results, time_periods, label,  direction_key, output_path, directions = 'ext_flex', dim_inds = [0, 1, 2], elev = 20, azim= -45):
     dir_list, position_map, direction_key = direction_map(directions=directions)
 
     if label == 'Year':
@@ -825,9 +825,9 @@ def plot_trajectories(averaged_pca_results, time_periods, label,  direction_key,
     ax_circle.set_ylim(-lim, lim)
     # fig.subplots_adjust(top=.9)
     
-    plt.savefig(f"average_trajectories_{directions}")
+    plt.savefig(os.path.join(output_path, f"average_trajectories_{directions}"))
 
-def centroids_across_time(averaged_pca_results, time_periods, color_dict, label, day_centroids = None, dim_inds = [0, 1, 2], PART_TO_PLOT = 'center', cmap = None, norm = None, radius = 'std'):
+def centroids_across_time(averaged_pca_results, time_periods, color_dict, label, output_path, day_centroids = None, dim_inds = [0, 1, 2], PART_TO_PLOT = 'center', cmap = None, norm = None, radius = 'std'):
            
     legend = False
     # Color scheme by year (2020-2023)
@@ -1004,7 +1004,7 @@ def centroids_across_time(averaged_pca_results, time_periods, color_dict, label,
     ax.view_init(elev=20, azim=80)
     
     # plt.tight_layout()
-    plt.savefig("pca_centroids_across_time")
+    plt.savefig(os.path.join(output_path, "pca_centroids_across_time"))
 
     # plt.show()
 
@@ -1264,7 +1264,7 @@ def get_targ(targ_pos, last, class_span=45):
     else:
         return np.array([0, 0])
 ## Main fxns ##
-def plot_centroid_of_pca_data_across_time(df_tuning, n_components = 3, dpca = False, group_by = "year", years_to_skip = [], data_type = 'sbps', remove_RT = False, directions = 'ext_flex', trim_pt = max_jerk, trim_method = trim_neural_data_at_movement_onset_std_and_smooth, PART_TO_PLOT = 'center', normalization_method = 'all', pca_all = True, plot_centr_across_time= True, sigma = .5):
+def plot_centroid_of_pca_data_across_time(df_tuning, output_path, n_components = 3, dpca = False, group_by = "year", years_to_skip = [], data_type = 'sbps', remove_RT = False, directions = 'ext_flex', trim_pt = max_jerk, trim_method = trim_neural_data_at_movement_onset_std_and_smooth, PART_TO_PLOT = 'center', normalization_method = 'all', pca_all = True, plot_centr_across_time= True, sigma = .5):
     
     # print(directions)
     dir_list, position_map, direction_key = direction_map(directions=directions)
@@ -1299,9 +1299,9 @@ def plot_centroid_of_pca_data_across_time(df_tuning, n_components = 3, dpca = Fa
     neural_data_for_direction, day_centroids = split_and_pca_all_trials(df_time=df_time, time_periods=time_periods, type_of_data=data_type, kinematic_type='vel', position_map = position_map, pca_all = pca_all)
 
     if plot_centr_across_time:
-        centroids_across_time(averaged_pca_results=neural_data_for_direction, time_periods=time_periods, color_dict=color_dict, label = label, PART_TO_PLOT=PART_TO_PLOT, cmap = cmap, norm = norm, radius = 'std', day_centroids = day_centroids)
+        centroids_across_time(averaged_pca_results=neural_data_for_direction, time_periods=time_periods, color_dict=color_dict, label = label,output_path = output_path, PART_TO_PLOT=PART_TO_PLOT, cmap = cmap, norm = norm, radius = 'std', day_centroids = day_centroids)
   
-def plot_avg_trajectories(df_tuning, type_of_data, group_by = "year", display_alignment = False, directions = 'not_all', trim_method = trim_neural_data_at_movement_onset_std_and_smooth, trim_pt = movement_onset, years_to_skip = [], sigma = 0, remove_RT = False):
+def plot_avg_trajectories(df_tuning, type_of_data, output_path, group_by = "year", display_alignment = False, directions = 'not_all', trim_method = trim_neural_data_at_movement_onset_std_and_smooth, trim_pt = movement_onset, years_to_skip = [], sigma = 0, remove_RT = False):
     #  print(directions)
     dir_list, position_map, direction_key = direction_map(directions=directions)
 
@@ -1334,5 +1334,5 @@ def plot_avg_trajectories(df_tuning, type_of_data, group_by = "year", display_al
 
     averaged_pca_results, averaged_kin_results = average_trial_PCA_data(dir_list=dir_list, kinematics=kinematics_data, processed_neural_data_for_direction=processed_neural_data_for_direction)
 
-    plot_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods, direction_key = direction_key, directions = directions, label = label, elev = 15, azim = -45)
+    plot_trajectories(averaged_pca_results=averaged_pca_results, time_periods=time_periods, direction_key = direction_key,output_path = output_path, directions = directions, label = label, elev = 15, azim = -45)
 
