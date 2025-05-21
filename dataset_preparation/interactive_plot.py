@@ -1,10 +1,8 @@
-
 import ipywidgets as widgets
 import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import display, clear_output, update_display
 import pickle
-import config
 import os
 import pandas as pd
 import pdb
@@ -14,11 +12,12 @@ class neural_plot(widgets.VBox):
     """
     Interactive widget for visualizing preprocessed neural data.
     """
-    def __init__(self):
+    def __init__(self, data_path, output_path):
         super().__init__()
-        self.datapath = config.preprocessingdir
+        self.datapath = data_path
+        self.outputpath = output_path
         self.filenames = [f for f in os.listdir(self.datapath) if not f.startswith('.')] #in case there are any hidden files
-        self.filenames.remove('bad_days.txt')
+        #self.filenames.remove('bad_days.txt')
         self.filenames.sort() #for some reason the files weren't in chronological order if left unsorted, maybe a macOS problem?
         self.fileidx = 0
 
@@ -107,7 +106,7 @@ class neural_plot(widgets.VBox):
         prev_day.on_click(self.prev_day)
 
         # Time Scrubbers (500 bins)
-        prev_time = widgets.Button(description='← (-500 bins)') # changed it to 500 bins just for the sake of scrubbing through more quickly
+        prev_time = widgets.Button(description='← (-500 bins)') 
         prev_time.on_click(self.shift_back)
         next_time = widgets.Button(description='→ (+500 bins)')
         next_time.on_click(self.shift_forward)
@@ -167,7 +166,7 @@ class neural_plot(widgets.VBox):
                     with self.text_output:
                         print('Date found, resuming')
         elif resume:
-            with open(config.savestatepath, 'rb') as f:
+            with open(self.outputpath, 'rb') as f:
                 self.fileidx = pickle.load(f)
             with self.text_output:
                 print(f'Resuming from {self.filenames[self.fileidx]}')
@@ -378,12 +377,12 @@ class neural_plot(widgets.VBox):
         self.save_day()
         # TODO FINISH SAVING 
         # save current progress
-        if not os.path.isfile(config.resultspath): # to avoid overwriting
-            self.results_df.to_csv(config.resultspath, mode='w', header=True, index=True)
+        if not os.path.isfile(self.outputpath): # to avoid overwriting
+            self.results_df.to_csv(self.outputpath, mode='w', header=True, index=True)
         else:
-            self.results_df.to_csv(config.resultspath, mode='a', header=False, index=True)
+            self.results_df.to_csv(self.outputpath, mode='a', header=False, index=True)
 
-        with open(config.savestatepath, 'wb') as f:
+        with open(self.outputpath, 'wb') as f:
             pickle.dump(self.fileidx, f)
 
         print('All done! Bye for now')
