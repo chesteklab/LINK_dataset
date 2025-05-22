@@ -12,6 +12,7 @@ The repository is split into two sections, for dataset preparation and analysis.
 5. Install the pyNWB API with `pip install -U pynwb`
 6. Install the dandi-cli tool using: `pip install dandi`, if not already installed.
 7. Download the dataset with `dandi download DANDI:001201`
+
 Alternatively, you can run the prereq.sh bash file from this directory, and install pytorch on the side as well.
 
 ## Accessing the data
