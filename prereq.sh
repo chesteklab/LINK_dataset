@@ -2,7 +2,7 @@
 
 read -p "Enter the name of the conda environment: " env_name
 echo "Creating a new conda environment '$env_name' with Python 3.9."
-conda create -n $env_name --file requirements.txt -y
+conda create -n $env_name python=3.9 --file requirements.txt -y
 
 echo "Activating the conda environment."
 conda activate "$env_name"

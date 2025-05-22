@@ -6,7 +6,7 @@ The repository is split into two sections, for dataset preparation and analysis.
 
 ## Getting the Data
 1. Clone this repository!
-2. In terminal, navigate to this repository and run `conda create -n LINK_dataset --file requirements.txt -y`
+2. In terminal, navigate to this repository and run `conda create -n LINK_dataset python=3.9 --file requirements.txt -y`
 3. Run `conda activate LINK_dataset`
 4. Install the appropriate pytorch for your computer [here](https://pytorch.org/get-started/locally/)
 5. Install the pyNWB API with `pip install -U pynwb`
