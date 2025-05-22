@@ -6,6 +6,7 @@ import pickle
 import os
 import pandas as pd
 import pdb
+from scipy.stats import zscore
 import matplotlib.cm as cm
 
 class neural_plot(widgets.VBox):
@@ -234,6 +235,7 @@ class neural_plot(widgets.VBox):
     def plot_day(self):
         #plot the current data starting at the first set of 5 trials
         self.Data = self.data_CO if self.current_TS == 'CO' else self.data_RD
+        normalized_sbp_per_channel = zscore(self.Data['sbp'], axis=0)
         num_trials = len(self.Data['trial_index'])
         if not self.trial_num_printed: # only prints the number of trials when the day/TS is first loaded
             with self.text_output:
@@ -257,8 +259,9 @@ class neural_plot(widgets.VBox):
 
         # update neural data
         for i, line in enumerate(self.neural_data):
-            line.set_data(exp_time,self.Data['sbp'][time_slice,i])
-        self.average_line.set_data(exp_time,np.mean(self.Data['sbp'],axis=1)[time_slice])
+            #line.set_data(exp_time,self.Data['sbp'][time_slice,i])
+            line.set_data(exp_time,normalized_sbp_per_channel[time_slice,i])
+        self.average_line.set_data(exp_time,np.mean(normalized_sbp_per_channel,axis=1)[time_slice])
         self.ax[0].set(xlabel=None, ylabel='Normalized Binned SBP', title='Neural (Unsmoothed + Average (Red))', xlim=time_lims,ylim=(-5,5))
 
         # update TCFR data
