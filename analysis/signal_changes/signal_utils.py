@@ -8,7 +8,7 @@ from tqdm import tqdm
 from datetime import datetime
 import ast
 
-data_path = "./outputs/dataset_pkl"
+data_path = "./data_test"
 output_path = "./outputs"
 binsize = 20
 

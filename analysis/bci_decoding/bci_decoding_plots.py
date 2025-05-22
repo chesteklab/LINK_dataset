@@ -24,7 +24,7 @@ mpl.rcParams['pdf.fonttype'] = 42
 ########################################################
 
 # Load the evaluation results
-results_folder = "./analysis/bci_decoding/single_day_model_results/"
+results_folder = "./analysis/bci_decoding/single_day_model_results"
 
 XLIM_ONESIDE = 100
 

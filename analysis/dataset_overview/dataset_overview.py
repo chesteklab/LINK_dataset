@@ -18,7 +18,7 @@ from sklearn.model_selection import train_test_split
 from scipy import stats
 from collections import defaultdict
 
-data_path = "./outputs/dataset_pkl"
+data_path = "./data_test"
 output_dir = "./outputs"
 
 def create_dataset_overview_figure():

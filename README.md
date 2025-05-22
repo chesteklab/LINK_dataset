@@ -5,56 +5,52 @@ In this repository, you will find all the code used to create the figures and da
 The repository is split into two sections, for dataset preparation and analysis.
 
 ## Getting the Data
-1. Clone this repository
-2. Create a conda environment using the requirement.txt file, python 3.9, and also install pytorch
-3. Install the dandi-cli tool using: `pip install dandi`, if not already installed.
-4. Download the dataset with `dandi download DANDI:001201`
+1. Clone this repository!
+2. In terminal, navigate to this repository and run `conda create -n LINK_dataset python=3.9 --file requirements.txt -y`
+3. Run `conda activate LINK_dataset`
+4. Install the appropriate pytorch for your computer [here](https://pytorch.org/get-started/locally/)
+5. Install the pyNWB API with `pip install -U pynwb`
+6. Install the dandi-cli tool using: `pip install dandi`, if not already installed.
+7. Download the dataset with `dandi download DANDI:001201`
+Alternatively, you can run the prereq.sh bash file from this directory, and install pytorch on the side as well.
 
 ## Accessing the data
-Data can be accessed aas an nwb file, or converted to dictionaries (with sligtly less information) by running: `python dataset_preparation/convert_dandi_nwb_to_pkl.py`.
+Data can be accessed as an nwb file, or converted to dictionaries (with sligtly less information) by running: `python dataset_preparation/convert_dandi_nwb_to_pkl.py`. If needed, please modify the directories in line 74 and 77 to reflect any changes from defauly behavior. Otherwise, the data should live in the root folder of the cloned LINK_dataset repo at `./001201`, and a folder should be created at `./data_test` to hold the preprocessed .pkl files. For an in-depth description of the NWB file contents, please refer to the Supplementary Materials section of the paper.
 
 ## Visualizing the data
-For a quick way to look at the timeseries data, use the script above to convert the data to dictionaries, then specify the location of the new .pkl files in `dataset_preparation/config.py` (default `./outputs`), then run the cell in `dataset_preparation/data_review_tool.ipynb`. You may also want to set an output directory in the config file or the tool may break when terminating plotting. Use the `+500` and `-500` buttons to scrub through the data. If two target styles are present on a day, you can use the `Change Target Style` button to view one or the other. You can ignore the rest of the UI, this was for manual data review.
+As a quick way to visualize the SBP, TCFR, and timeseries data, open the jupyter notebook `dataset_preparation/data_review_tool.ipynb`. Be sure to replace the file paths in the top cell with the absolute paths of the `./data_test` and `./outputs/datareview` folders. Use the `+500` and `-500` buttons to scrub through the data. If two target styles are present on a day, you can use the `Change Target Style` button to view one or the other. You can ignore the rest of the UI, this was for manual data review.
 
 ## Reproducing figures
 To recreate the figures in the paper, first convert the data to dictionaries using the script mentioned above. Once the data is prepared, you can recreate the figures in the paper by running the following scripts in the analysis folder. You will also need to download the font Atkinson Hyperlegible (available [here](https://www.brailleinstitute.org/freefont/)) and rebuild your mpl cache, or change the font in the rcparams of the scripts:
 
-* To recreate the target position and data distribution plots in Figure 1, please run the `python analysis/dataset_overview/dataset_overview.py`.
-* To recreate Figure 2A-C, change the filepaths in `analysis/signal_changes/signal_utils.py` then run `python analysis/signal_changes/signal_changes.py`. After running for the first time, if you'd like to avoid crunching the numbers again, set the `calc_avg_sbp` and `calc_pr` flags to `False` in `analysis/signal_changes/signal_changes.py`.
-* To recreate Figure 2D-E, run `python analysis/pop_level_analyses/dimensionality_across_days_analysis.ipynb` in the pop_level_analyses folder.
-* To recreate Figure 3, change the filepaths in  `analysis/tuning_utils.py`, then run `python analysis/single_channel_tuning/single_channel_tuning.py`. After running for the first time, if you'd like to avoid crunching the numbers again, set the `calc_tunings` flag `False` in `analysis/single_channel_tuning/single_channel_tuning.py`.
-* To recreate Figure 4, refer to `analysis/bci_decoding/readme.md`.
-
-## Info for NWB files
-For a NWBHDF5IO object named nwb:
-All timeseries data for the nwb files is contained in the analysis module (nwb.analysis)
-Trial information is contained inthe trial table (nwb.trials)
-Additional information about the electrodes, like positional mappings and impedances, are stored in the electrodes
+* To recreate the target position and data distribution plots in Figure 1, please run the `python analysis/dataset_overview/dataset_overview.py`. Line 21 and 22 can be changed to match user directories.
+* To recreate Figure 2A-C, change the filepaths at line 11 and 12 (if needed) in `analysis/signal_changes/signal_utils.py`. Then run `python analysis/signal_changes/signal_changes.py`. After running for the first time, if you'd like to avoid crunching the numbers again, set the `calc_avg_sbp` and `calc_pr` flags back to `False` in `analysis/signal_changes/signal_changes.py`.
+* To recreate Figure 2D-E, run notebook `analysis/pop_level_analyses/dimensionality_across_days_analysis.ipynb` in the pop_level_analyses folder. mpath in cell 4 should be changed to the absolute path of the preprocessed .pkl files.
+* To recreate Figure 3, change the filepaths at line 29 and 30 (if needed) in `analysis/tuning_utils.py`, then run `python analysis/single_channel_tuning/single_channel_tuning.py`. After running for the first time, if you'd like to avoid crunching the numbers again, set the `calc_tunings` flag `False` in `analysis/single_channel_tuning/single_channel_tuning.py`.
+* To recreate Figure 4, refer to `analysis/bci_decoding/readme.md`. For generating plots using pre-calculated data, run `python analysis/bci_decoding/bci_decoding_plots.py`
 
 ## Info & Format for .pkl preprocessed files
 This format does not contain descriptions and as much detail about the subject, device, and electrodes, but contains all the essential data for performing analyses in the paper.
 
 ### What does each file contain?
-* Each contains preprocessed neural and behavioral data from one day, along with metadata and trial data
-* Each contains 375 trials of data for one target style, center-out (CO) or random (RD), or 400 trials for *each* of the two target styles if both target styles are present on the same day, under two seperate dictionaries
-
-### How to open:
+Each contains preprocessed neural and behavioral data from one day, along with metadata and trial data. Each file contains a tuple of length 2, with either two dictionaries and one dictionary and one None. Each available dictionary contains 375 trials of data for one of the two target styles. The first is center-out (CO), the second is random (RD). If a day has both dictionaries present, both target styles are available. You can open the file with:
 `data_CO, data_RD = pickle.load(filepath)`
 
 ### Preprocessed file contents
 Each 'YYYY-MM-DD_plotpreprocess.pkl' file contains a dictionary with the following keys:
 
 **METADATA:**
-'target_style'
+'target_style', 'run_id'
 
 **TRIAL DATA:**
-'trial_number', 'trial_index', 'trial_count', 'target_positions', 'run_id', 'trial_timeout'
+'trial_number', 'trial_index', 'trial_count', 'target_positions', 'trial_timeout'
 
 **TIMESERIES DATA:**
 'sbp', 'finger_kinematics', 'time'
 
 ### metadata
 * **'target_style' (str)**: indicates how targets were presented, either CO (center-out) or RD (random targets)
+* **'run_id' (int)**: indicates the chronological order of that session out of all sessions recorded that day (not super relevant info)
 
 ## trial data
 * **'trial_number' (int64 np.ndarray)**: Mx1 array, M = # of trials included for a particular target style on this day, usually 400. Contains trial id’s of included trials (not necessarily continuous – some trials maybe be removed). If multiple runs are concatinated together from the same day, the first processed run has 1-3 digit trial numbers, the second processed run has trial numbers 1xxx where xxxx indicate the trial id's within that specific run, the third processed run has trial numbers 2xxx, etc.

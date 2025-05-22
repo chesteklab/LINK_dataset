@@ -1,5 +1,7 @@
-<<<<<<< HEAD
 __pycache__
-=======
-__pycache__
->>>>>>> dev
+data_test
+001201
+**/*.csv
+**/*_*.csv
+**/*.png
+**/*.pdf

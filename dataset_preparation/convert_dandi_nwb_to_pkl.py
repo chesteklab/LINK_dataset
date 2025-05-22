@@ -6,6 +6,8 @@ from pynwb import NWBFile, TimeSeries, NWBHDF5IO
 from collections import defaultdict
 import pickle
 from tqdm import tqdm
+from pathlib import Path
+import pdb
 
 def load_one_nwb(fp: str) -> dict:
     with NWBHDF5IO(fp, "r", load_namespaces=True) as io:
@@ -67,15 +69,15 @@ def load_one_nwb(fp: str) -> dict:
             tcfr=tcfr,
             trial_index=trial_index,
             target_style=target_style[0],
-            run_id=np.full_like(trial_number, run_id),
+            run_id=run_id,
         )
 
 if __name__=="__main__":
-    dandiset_path = 'D:\\dandisets\\001201'
+    dandiset_path = './001201'
     nwb_path = os.path.join(dandiset_path, 'sub-Monkey-N')
 
-    processed_data_path = './outputs/dataset_pkl/'
-
+    processed_data_path = './data_test'
+    Path(processed_data_path).mkdir(parents=True, exist_ok=True)
     # get filenames
     files = os.listdir(nwb_path)
     files = [f for f in files if os.path.isfile(os.path.join(nwb_path, f))]
