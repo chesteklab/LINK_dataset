@@ -7,7 +7,7 @@ import re
 from tqdm import tqdm
 from datetime import datetime
 import ast
-from tutorial.utils.data_tools import *
+from utils.data_tools import *
 
 # # server_dir = "/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/"
 # # data_path = os.path.join(server_dir, 'Student Folders','Nina_Gill','data','only_good_days')

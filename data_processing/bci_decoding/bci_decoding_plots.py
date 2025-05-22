@@ -7,7 +7,7 @@ import seaborn as sns
 from matplotlib.gridspec import GridSpec
 from datetime import datetime
 import os
-from analysis.config import mpl_config
+from utils import mpl_config
 
 ########################################################
 ########################################################

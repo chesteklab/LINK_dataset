@@ -28,13 +28,13 @@ import matplotlib as mpl
 # # mpl.rcParams['figure.titlesize'] = 14
 # mpl.rcParams['figure.titleweight'] = 'bold'
 # mpl.rcParams['pdf.fonttype'] = 42
-from analysis.config import mpl_config
+from utils import mpl_config
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score, mutual_info_score
 from sklearn.feature_selection import mutual_info_regression
 from sklearn.model_selection import train_test_split
 from scipy import stats
-from tutorial.utils.data_tools import *
+from utils.data_tools import *
 from collections import defaultdict
 
 def create_signal_quality_figure(data_path, output_path, calc_avg_sbp = False, calculate_pr = False):

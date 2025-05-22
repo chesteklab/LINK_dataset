@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import sys
 import matplotlib as mpl
 #some basic text parameters for figures
-from analysis.config import mpl_config
+from utils import mpl_config
 
 bin_size = 20
 def compute_channel_tuning(neural, full_behavior, velocity_tuning = False):

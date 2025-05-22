@@ -9,7 +9,7 @@ import pickle
 from datetime import datetime
 from tqdm import tqdm
 from .population_level_analyses import *
-from analysis.config import mpl_config
+from utils import mpl_config
 
 def create_dimensionality_across_days_figures(data_path, output_path):
     mpath = data_path

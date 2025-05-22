@@ -17,7 +17,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from scipy import stats
 from collections import defaultdict
-from tutorial.utils.data_tools import extract_dates_from_filenames, load_day
+from utils.data_tools import extract_dates_from_filenames, load_day
 # data_path = "Z:\Student Folders\\Nina_Gill\data\only_good_days_timeouts"
 # output_dir = "D:\\University of Michigan Dropbox\Hisham Temmar\Science Communication\Papers\LINK_dataset\experimental setup"
 
