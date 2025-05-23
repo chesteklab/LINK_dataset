@@ -1,9 +1,9 @@
 #TODO: BCI DECODING IMPORT
-from data_processing.pop_level_analyses import create_dimensionality_across_days_figures
-from data_processing.dataset_overview import create_dataset_overview_figure
-from data_processing.signal_changes import create_signal_quality_figure
-from data_processing.single_channel_tuning import create_single_channel_tuning_figure
-from data_processing.bci_decoding import creat_all_decoding_figures
+from data_plotting import create_dimensionality_across_days_figures
+from data_plotting import create_dataset_overview_figure
+from data_plotting import create_signal_quality_figure
+from data_plotting import create_single_channel_tuning_figure
+from data_plotting import creat_all_decoding_figures
 import argparse
 import sys
 

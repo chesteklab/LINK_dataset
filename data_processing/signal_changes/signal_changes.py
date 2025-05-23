@@ -37,53 +37,53 @@ from scipy import stats
 from utils.data_tools import *
 from collections import defaultdict
 
-def create_signal_quality_figure(data_path, output_path, calc_avg_sbp = False, calculate_pr = False):
-    dates = extract_dates_from_filenames(data_path)
-    print(f"Found {len(dates)} dates")
+# def create_signal_quality_figure(data_path, output_path, calc_avg_sbp = False, calculate_pr = False):
+#     dates = extract_dates_from_filenames(data_path)
+#     print(f"Found {len(dates)} dates")
     
-    fig, ax = plt.subplots(3,1, sharex=True)
-    # data_CO, data_RD = load_day(dates[0])
-    # for i in range(96):
-    #     plt.hist(data_CO['sbp'][:,i])
-    # plt.show()
+#     fig, ax = plt.subplots(3,1, sharex=True)
+#     # data_CO, data_RD = load_day(dates[0])
+#     # for i in range(96):
+#     #     plt.hist(data_CO['sbp'][:,i])
+#     # plt.show()
 
-    #show example channel heatmap over time
-    # calc_sbp_heatmaps = False
-    # if calc_sbp_heatmaps:
-    #     signal_utils.calc_sbp_heatmaps(dates, data_path, output_path)
+#     #show example channel heatmap over time
+#     # calc_sbp_heatmaps = False
+#     # if calc_sbp_heatmaps:
+#     #     signal_utils.calc_sbp_heatmaps(dates, data_path, output_path)
 
-    # create_channel_heatmaps(dates, channel = 0, output_path)
+#     # create_channel_heatmaps(dates, channel = 0, output_path)
 
-    #average sbp figure
-    # calc_avg_sbp = False
-    if calc_avg_sbp:
-        signal_utils.calc_avg_sbps(dates, data_path, output_path)
-    create_avg_sbp_plot(ax[0], output_path)
+#     #average sbp figure
+#     # calc_avg_sbp = False
+#     if calc_avg_sbp:
+#         signal_utils.calc_avg_sbps(dates, data_path, output_path)
+#     create_avg_sbp_plot(ax[0], output_path)
     
-    # calculate participation ratio on each day
-    # calculate_pr = False
-    if calculate_pr:
-        signal_utils.calc_pr_all_days(dates, data_path, output_path)
+#     # calculate participation ratio on each day
+#     # calculate_pr = False
+#     if calculate_pr:
+#         signal_utils.calc_pr_all_days(dates, data_path, output_path)
 
-    # create pr figure
-    create_pr_plot(ax[2], output_path)
-    active_channels_plot(ax[1],os.path.join(output_path,"participation_ratios.csv"))
-    plt.savefig(os.path.join(output_path, "signal_change"))
-    plt.show()
-    # per channel sbp distributions over time
-    # channels = 4
-    # channels = [1,3,5] # select multiple channels
-    # channels = (1,5) # select range of channels
-    # sbp_distributions(dates,channels,preprocessingdir,characterizationdir)
-    # channel_chosen = 4
-    # fig, ax = plt.subplots(1, 1, figsize = (19.5, 6), sharex=True)
-    # signal_distribution_per_ch(dates, ax,channel_chosen, preprocessingdir, characterizationdir,100,display_mean=False,display_median=False, crunch=False)
-    # plt.savefig(os.path.join(characterizationdir, f"sbp_distributions_{4}_same.png"))
-    #maybe do this for all channels? find a way to combine
+#     # create pr figure
+#     create_pr_plot(ax[2], output_path)
+#     active_channels_plot(ax[1],os.path.join(output_path,"participation_ratios.csv"))
+#     plt.savefig(os.path.join(output_path, "signal_change"))
+#     plt.show()
+#     # per channel sbp distributions over time
+#     # channels = 4
+#     # channels = [1,3,5] # select multiple channels
+#     # channels = (1,5) # select range of channels
+#     # sbp_distributions(dates,channels,preprocessingdir,characterizationdir)
+#     # channel_chosen = 4
+#     # fig, ax = plt.subplots(1, 1, figsize = (19.5, 6), sharex=True)
+#     # signal_distribution_per_ch(dates, ax,channel_chosen, preprocessingdir, characterizationdir,100,display_mean=False,display_median=False, crunch=False)
+#     # plt.savefig(os.path.join(characterizationdir, f"sbp_distributions_{4}_same.png"))
+#     #maybe do this for all channels? find a way to combine
     
-    # add mutual information calculations per day
+#     # add mutual information calculations per day
 
-    # calc_mutual_information(dates, characterizationdir="./output_dir")
+#     # calc_mutual_information(dates, characterizationdir="./output_dir")
 
 def active_channels_plot(ax, path_to_pr_calcs):
 
