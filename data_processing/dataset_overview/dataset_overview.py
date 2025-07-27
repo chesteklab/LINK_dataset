@@ -1,23 +1,19 @@
 import os
 import pandas as pd
 import numpy as np
-import glob
 from datetime import datetime
 #import config
 import matplotlib.pyplot as plt
-import seaborn as sns
 import pickle
 import pdb
 import os
-import re
-import sys
 import glob
-from sklearn import linear_model
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split
-from scipy import stats
-from collections import defaultdict
-from utils.data_tools import extract_dates_from_filenames, load_day
+
+from tqdm import tqdm
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../utils')))
+from data_tools import extract_dates_from_filenames, load_day
+import mpl_config
 # data_path = "Z:\Student Folders\\Nina_Gill\data\only_good_days_timeouts"
 # output_dir = "D:\\University of Michigan Dropbox\Hisham Temmar\Science Communication\Papers\LINK_dataset\experimental setup"
 
@@ -76,7 +72,89 @@ def target_positions(dates, data_path, isOneDay = False, dayIdx = None):
         plt.plot(cos)
         plt.show()
 
+def create_behavior_metrics_figure():
+    # load the dataset pkl files
+    dataset_pkl_dir = "D:\\link_dataset_pkl"
 
+    mean_bitrates = []
+    std_bitrates = []
+    dates = []
+    for filename in tqdm(os.listdir(dataset_pkl_dir)):
+        if filename.endswith(".pkl"):
+            file_path = os.path.join(dataset_pkl_dir, filename)
+            with open(file_path, "rb") as file:
+                data_co, data_rd = pickle.load(file)
+            
+            # get date from filename
+            date_str = filename.split('_')[0]
+
+            #convert date string to datetime object
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+
+        else:
+            continue
+
+        # check if data_co and data_rd are not None
+        bitrates = []
+        if data_co is not None:
+            bitrates.append(calculate_bitrate(data_co))
+        if data_rd is not None:
+            bitrates.append(calculate_bitrate(data_rd))
+
+        bitrates = np.concatenate(bitrates)
+        mean_bitrates.append(np.mean(bitrates))
+        std_bitrates.append(np.std(bitrates)/np.sqrt(len(bitrates)))
+        dates.append(date_obj)
+
+    # convert dates to relative day from first date
+    first_date = min(dates)
+    dates = [(date - first_date).days for date in dates]
+    # plot the mean and std over time according to the dates
+    fig, ax = plt.subplots(1,1, figsize=(10, 5), layout='constrained')
+    ax.plot(dates, mean_bitrates, label='Mean Bitrate', color='black')
+    ax.fill_between(dates, np.array(mean_bitrates) - np.array(std_bitrates), np.array(mean_bitrates) + np.array(std_bitrates), color='black', alpha=0.2)
+    ax.set(xlabel='Days', ylabel='Bitrate (bps)', title='Mean Bitrate over Time', xlim=(0, max(dates)))
+    plt.show()
+
+def calculate_bitrate(data):
+    """
+    calculate per trial bitrate in bits per second using fitts law
+    """
+    # get behavior from data
+    behavior = data['finger_kinematics']
+
+    #get trial start indices
+    trial_start_indices = data['trial_index']
+
+    #get trial lengths
+    trial_lengths = data['trial_count']
+
+    # get target positions
+    target_positions = data['target_positions']
+
+    # organize data into trials using trial start indices and trial lengthsand calculate bitrate using target positions
+    bitrates = []
+    for i in range(len(trial_start_indices) - 1):
+        trial_data = behavior[trial_start_indices[i]:trial_start_indices[i] + trial_lengths[i]]
+        target_position = target_positions[i]
+        
+        # assuming target scaling is 100
+        widths = np.array([.0375 * 2, .0375 * 2])  # Example widths for x and y dimensions
+
+
+        if len(trial_data) > 0:
+            # calculate distance berween trial starting position and target position
+            trial_start_position = trial_data[0, :2]  # Assuming first two columns are x, y positions
+            dists = np.abs(target_position - trial_start_position[:2])
+            dists -= widths
+            
+            trial_id = np.log2(1 + dists / (2 * widths))
+            trial_length = (trial_lengths[i] * 20 - 750)/1000 # assuming 20ms per sample and 750 hold time
+            trial_throughput = np.sum(trial_id) / trial_length
+            # Calculate bitrate for each trial
+            bitrates.append(trial_throughput)
+    return np.array(bitrates)
 
 if __name__ == "__main__":
-    create_dataset_overview_figure()
+    # create_dataset_overview_figure()
+    create_behavior_metrics_figure()
