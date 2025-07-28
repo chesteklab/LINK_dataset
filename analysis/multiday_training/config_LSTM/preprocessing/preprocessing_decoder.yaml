@@ -1,0 +1,32 @@
+preprocessing_decoder: 
+  order: [dict1, split1, add_history1, update_normalize_sequence, tensor1, tuple_out]
+  content:
+    dict1:
+      type: Dict2DataDictBlock
+      params:
+        neural_type: sbp
+    split1:
+      type: DataSplitBlock
+      params:
+        split_ratio: 0.9
+        split_seed: -1
+    add_history1:
+      type: AddHistoryBlock
+      params:
+        location: ['neural_train', 'neural_test']
+        seq_length: 20
+    update_normalize_sequence:
+      type: UpdateNormalizationBlock
+      params:
+        location: ['neural_train', 'neural_test']
+        method: sequence_scaler
+        normalizer_params:
+          is_save: False
+    tensor1:
+      type: EnforceTensorBlock
+      params:
+        device: cuda
+        dtype: float32
+    tuple_out:
+      type: Dict2TupleBlock
+      params: {}
