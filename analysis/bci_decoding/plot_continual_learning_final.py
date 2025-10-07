@@ -10,13 +10,13 @@ import seaborn as sns
 results_folder = '/home/joey/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/continual_learning_results'
 
 # Specify the unified results file from the sweep
-results_file = 'results_continual_learning_sweep_RDandCO_neuralnormupdated_20seeddays.csv'
+results_file = 'results_continual_learning_sweep_RDandCO_neuralnormupdated_20seeddays_200days.csv'
 
 # Metric to plot (column name in CSV)
 metric = 'R2'  # Change to 'Correlation', 'MSE', etc. if desired
 metric_ylabel = 'Prediction Accuracy (R²)'
 
-xlim = (-1, 101)
+xlim = (-1, 201)
 ylim = (-0.1, 0.8)
 
 

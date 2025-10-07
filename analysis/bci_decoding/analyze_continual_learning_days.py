@@ -8,13 +8,13 @@ import numpy as np
 results_folder = '/home/joey/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/continual_learning_results'
 
 # Specify the unified results file from the sweep
-results_file = 'results_continual_learning_sweep_RDandCO_neuralnormupdated_20seeddays.csv'
+results_file = 'results_continual_learning_sweep_RDandCO_neuralnormupdated_20seeddays_200days.csv'
 
 # Metric to analyze
 metric = 'R2'
 
 # Specific days to analyze
-target_days = [0, 5, 10, 50, 100]
+target_days = [0, 5, 10, 50, 100, 200]
 
 # Legend names for different sample sizes (from plot script)
 legend_names = {

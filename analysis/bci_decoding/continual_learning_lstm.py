@@ -67,9 +67,9 @@ TARGET_TYPE = 'BOTH'  # 'CO', 'RD', or 'BOTH' - specify target type (BOTH priori
 # Continual learning parameter sweeps
 NUM_FINETUNE_SAMPLES_LIST = [30*32, 60*32, 120*32, 300*32]  # Different numbers of samples to sweep over
 
-MAX_DAYS_TO_TEST = 50       # Maximum number of days to test (set to None for all available days)
+MAX_DAYS_TO_TEST = 200       # Maximum number of days to test (set to None for all available days)
 
-MAX_DAY_DIFFERENCE = 100    # If not None, will stop if day diff is greater than this
+MAX_DAY_DIFFERENCE = 200    # If not None, will stop if day diff is greater than this
 
 # Option to force a specific number of finetune iterations for a given number of finetune samples
 # (using this after we've already run the sweep)
