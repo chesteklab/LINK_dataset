@@ -54,7 +54,7 @@ Each 'YYYY-MM-DD_plotpreprocess.pkl' file contains a dictionary with the followi
 * **'run_id' (int)**: indicates the chronological order of that session out of all sessions recorded that day (not super relevant info)
 
 ## trial data
-* **'trial_number' (int64 np.ndarray)**: Mx1 array, M = # of trials included for a particular target style on this day, usually 400. Contains trial id’s of included trials (not necessarily continuous – some trials maybe be removed). If multiple runs are concatinated together from the same day, the first processed run has 1-3 digit trial numbers, the second processed run has trial numbers 1xxx where xxxx indicate the trial id's within that specific run, the third processed run has trial numbers 2xxx, etc.
+* **'trial_number' (int64 np.ndarray)**: Mx1 array, M = # of trials included for a particular target style on this day (should be 375). Contains trial id’s of included trials (not necessarily continuous – some trials maybe be removed).
 * **'trial_index' (int64 np.ndarray)**: Mx1 array. Contains start indices of each trial in timeseries data
 * **'trial_count' (int64 np.ndarray)**: Mx1 array. Contains length of each trial in the timeseries data
 * **'target_positions' (float32 np.ndarray)**: Mx2 array. Each row contains the target position for the index finger and MRP (middle-ring-pinky) fingers: [index, MRP]
