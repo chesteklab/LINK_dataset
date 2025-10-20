@@ -121,7 +121,7 @@ def convert_pkl_to_nwb(data_dir, electrode_table_csv_path, end_dir=None):
             # Create an NWB file with timezone-aware datetime objects
             nwbfile = NWBFile(
                 session_description=f"Neural and behavioral data for target style {trials_df['target_style'][0]}",
-                identifier=f"{date}_{trials_df['target_style']}_nwb",
+                identifier=f"{date}_{trials_df['target_style'][0]}_nwb",
                 session_start_time=datetime.strptime(date, "%Y-%m-%d").replace(
                     tzinfo=timezone.utc
                 ),
