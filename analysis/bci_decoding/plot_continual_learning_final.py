@@ -10,7 +10,7 @@ import seaborn as sns
 results_folder = '/home/joey/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/continual_learning_results'
 
 # Specify the unified results file from the sweep
-results_file = 'results_continual_learning_sweep_RDandCO_neuralnormupdated_20seeddays_200days.csv'
+results_file = 'results_continual_learning_sweep_RDandCO_neuralnormupdated_20seeddays_200days_20msbins.csv'
 
 # Metric to plot (column name in CSV)
 metric = 'R2'  # Change to 'Correlation', 'MSE', etc. if desired
@@ -21,18 +21,18 @@ ylim = (-0.1, 0.8)
 
 
 legend_names = {
-    960: '30 s',
-    1920: '1 min', 
-    3840: '2 min',
-    9600: '5 min',
+    30*50: '30 s',
+    60*50: '1 min', 
+    120*50: '2 min',
+    300*50: '5 min',
 }
 
 # Create color mapping based on fine-tune samples
 sample_color_map = {
-    960: '#1f77b4',
-    1920: '#ff7f0e',
-    3840: '#2ca02c',
-    9600: '#d62728',
+    30*50: '#1f77b4',
+    60*50: '#ff7f0e',
+    120*50: '#2ca02c',
+    300*50: '#d62728',
 }
 
 
@@ -131,7 +131,7 @@ def plot_continual_learning_sweep():
     plt.tight_layout()
     
     # Save the plot
-    output_filename = f'continual_learning_final_{metric.lower()}.png'
+    output_filename = f'continual_learning_final_{metric.lower()}_20msbins.png'
     output_path = os.path.join(results_folder, output_filename)
     plt.savefig(output_path, bbox_inches='tight', dpi=300)
     plt.show()

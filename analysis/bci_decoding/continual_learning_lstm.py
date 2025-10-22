@@ -35,7 +35,8 @@ Results are saved as CSV with performance metrics for each day.
 # Configuration Parameters
 ########################################################
 
-data_folder = '/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Nina_Gill/data/only_good_days'
+# data_folder = '/run/user/1000/gvfs/smb-share:server=cnpl-drmanhattan.engin.umich.edu,share=share/Student Folders/Nina_Gill/data/only_good_days'
+data_folder = '/home/joey/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/newdata/pkl_data'
 
 results_folder = '/home/joey/University of Michigan Dropbox/Joseph Costello/Chestek Lab/Code/NeuralNet/Temmar2025BigDataAnalysis/LINK_dataset/analysis/bci_decoding/continual_learning_results'
 
@@ -65,7 +66,8 @@ STARTING_DAYS = [
 TARGET_TYPE = 'BOTH'  # 'CO', 'RD', or 'BOTH' - specify target type (BOTH prioritizes CO over RD)
 
 # Continual learning parameter sweeps
-NUM_FINETUNE_SAMPLES_LIST = [30*32, 60*32, 120*32, 300*32]  # Different numbers of samples to sweep over
+# NUM_FINETUNE_SAMPLES_LIST = [30*32, 60*32, 120*32, 300*32]  # Different numbers of samples to sweep over (OLD - asumming 32ms bins)
+NUM_FINETUNE_SAMPLES_LIST = [30*50, 60*50, 120*50, 300*50]  # Different numbers of samples to sweep over (New - assuming 20ms bins)
 
 MAX_DAYS_TO_TEST = 200       # Maximum number of days to test (set to None for all available days)
 
@@ -75,10 +77,10 @@ MAX_DAY_DIFFERENCE = 200    # If not None, will stop if day diff is greater than
 # (using this after we've already run the sweep)
 FORCE_FINETUNE_ITERATIONS = True
 FORCE_FINETUNE_ITERATIONS_DICT = {
-    30*32: 50,
-    60*32: 250,
-    120*32: 250,
-    300*32: 500,
+    30*50: 50,
+    60*50: 250,
+    120*50: 250,
+    300*50: 500,
 }
 
 FINETUNE_ITERATIONS_LIST = [10, 20, 50, 250, 500]         # Different numbers of finetune iterations to sweep over
