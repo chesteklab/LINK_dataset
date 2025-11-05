@@ -1,0 +1,12 @@
+type: LSTM  
+params:
+  input_size: 96
+  num_outputs: 4
+  hidden_size: 300
+  num_layers: 1  
+  rnn_type: lstm
+  device: cuda  
+  hidden_noise_std: 0.0
+  dropout_input: False 
+  drop_prob: 0.0
+  sequence_length: 20
