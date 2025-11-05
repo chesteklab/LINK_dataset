@@ -1,6 +1,6 @@
 import matplotlib as mpl
 #some basic text parameters for figures
-#mpl.rcParams['font.family'] = "Atkinson Hyperlegible" # if installed but not showing up, rebuild mpl cache
+mpl.rcParams['font.family'] = "Atkinson Hyperlegible" # if installed but not showing up, rebuild mpl cache
 mpl.rcParams['font.size'] = 10
 mpl.rcParams['savefig.format'] = 'pdf'
 mpl.rcParams['axes.unicode_minus'] = False
