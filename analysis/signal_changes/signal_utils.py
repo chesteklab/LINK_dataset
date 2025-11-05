@@ -9,8 +9,8 @@ from datetime import datetime
 import ast
 import matplotlib.pyplot as plt
 
-data_path = "../../../AdaptiveAlignment/data/hisham_good_days/datasets/raw_data"
-output_path = "../../outputs"
+data_path = "./data_test"
+output_path = "./outputs"
 binsize = 20
 
 def extract_dates_from_filenames():
