@@ -7,12 +7,14 @@ import re
 from tqdm import tqdm
 from datetime import datetime
 import ast
+import matplotlib.pyplot as plt
 
 data_path = "./data_test"
 output_path = "./outputs"
 binsize = 20
 
 def extract_dates_from_filenames():
+    print(os.listdir(data_path))
     # Find all matching .pkl files
     pkl_files = glob.glob(os.path.join(data_path, '*_preprocess.pkl'))
 
@@ -54,11 +56,42 @@ def calc_avg_sbps(dates):
         sbp_avgs.loc[date] = np.mean(sbp, axis=0)
         sbp_stds.loc[date] = np.std(sbp, axis=0)
 
-    #pdb.set_trace()
     sbp_avgs.to_csv(os.path.join(output_path, "sbp_avgs.csv"))
     sbp_stds.to_csv(os.path.join(output_path, "sbp_stds.csv"))
 
-def calc_pr_all_days(dates):
+# def calc_avg_sbps_by_region(dates):
+#     dates = pd.to_datetime(dates)
+    
+#     sbp_avgs = {}
+#     sbp_stds = {}
+#     regions = ['lateral', 'medial1', 'medial2']
+#     for region in regions:
+        
+#         sbp_avgs[region] = pd.DataFrame(np.zeros((len(dates), 32), dtype=float), index=dates)
+#         # sbp_avgs[region].index = pd.to_datetime(sbp_avgs.index)
+
+#         sbp_stds[region] = pd.DataFrame(np.zeros((len(dates), 32), dtype=float), index=dates)
+#         # sbp_stds[region].index = pd.to_datetime(sbp_stds.index)
+    
+#     for date in tqdm(dates):
+#         data_CO, data_RD = load_day(date)
+        
+#         if data_CO and data_RD:
+#             sbp = np.concatenate((data_CO['sbp'], data_RD['sbp']),axis=0)
+#         elif data_RD:
+#             sbp = data_RD['sbp']
+#         else:
+#             sbp = data_CO['sbp']
+
+#         print(sbp.shape)
+#         for i, r in zip([0, 32, 64], regions):
+#             sbp_avgs[r].loc[date] = np.mean(sbp[:, i:i+32], axis=0)
+#             sbp_stds[r].loc[date] = np.std(sbp[:, i:i+32], axis=0)
+
+#     sbp_avgs.to_csv(os.path.join(output_path, "sbp_avgs_by_region.csv"))
+#     sbp_stds.to_csv(os.path.join(output_path, "sbp_stds_by_region.csv"))
+
+def calc_pr_all_days(dates, active_hist = True):
     pr_dict = {'date': [],
                'chan_mask': [],
                'participation_ratio':[],
@@ -66,6 +99,8 @@ def calc_pr_all_days(dates):
                'target_style': []
                }
     
+    active_sbps = []
+    inactive_sbps = []
     for date in tqdm(dates):
         data_CO, data_RD = load_day(date)
         # use CO if its there
@@ -77,6 +112,10 @@ def calc_pr_all_days(dates):
 
         # find all channels >1hz mean fr (CHECK)
         chanMask = np.where(np.mean(tcfr, axis=0) > 1)[0]
+        active_sbps.append(sbp[:, chanMask].mean())
+        inactive_sbps.append(sbp[:, ~chanMask].mean())
+
+        # print(f"Date: {date}, avg_sbp active: {sbp[:, chanMask].mean()}, {sbp[:, ~chanMask].mean()}, num_over ")
         if chanMask.shape[0] == 0:
             continue
         
@@ -88,6 +127,17 @@ def calc_pr_all_days(dates):
         pr_dict['participation_ratio'].append(daily_pr)
         pr_dict['participation_ratio_active'].append(daily_pr_active)
         pr_dict['target_style'].append(target_style)
+        
+    if active_hist:
+        plt.figure()
+        active = np.concatenate([a.ravel() for a in active_sbps])
+        inactive = np.concatenate([a.ravel() for a in inactive_sbps])
+        plt.hist(active, bins=50, alpha=0.5, label='active')
+        plt.hist(inactive, bins=50, alpha=0.5, label='inactive')
+        plt.legend()
+        plt.xlabel('Average SBP')
+        plt.ylabel('Frequency')
+        plt.title('Histogram of average SBP for inactive and active channels')
 
     pr_df = pd.DataFrame.from_dict(pr_dict)
     pr_df.to_csv(os.path.join(output_path,"participation_ratios.csv"))
