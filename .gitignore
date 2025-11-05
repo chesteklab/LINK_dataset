@@ -5,3 +5,4 @@ data_test
 **/*_*.csv
 **/*.png
 **/*.pdf
+**/*.pkl
