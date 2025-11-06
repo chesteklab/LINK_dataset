@@ -130,7 +130,7 @@ def plot_tuning_heatmap(ax, dataframe, metric = 'magnitude', cmap = 'coolwarm', 
         else:
             xticks = list(range(len(available_dates)))
         ax.set_xticks(xticks)
-        ax.set_xticklabels([f'{i+1}: {pd.to_datetime(available_dates[i]).strftime("%Y-%m-%d")}' for i in xticks], rotation = 0)
+        ax.set_xticklabels([f'{i+1} ({pd.to_datetime(available_dates[i]).strftime("%Y-%m-%d")})' for i in xticks], rotation = 0)
 
     ax.set_yticks([0 , 32, 64, 95])
     ax.set_yticklabels([0 , 31, 63, 95])
