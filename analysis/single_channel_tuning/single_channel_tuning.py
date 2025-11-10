@@ -6,7 +6,7 @@ import tuning_utils
 import tuning_plotter
 
 TICK_OVERRIDE = True
-def create_single_channel_tuning_figure(calc_tunings = False):
+def create_single_channel_tuning_figure(calc_tunings = False, include_empty_dates = False):
     output_dir = os.path.join(tuning_utils.output_path,'channel_stability_tuning.csv')
     if calc_tunings:
         tuning_utils.compute_tuning_data(output_dir)
@@ -42,9 +42,9 @@ def create_single_channel_tuning_figure(calc_tunings = False):
     # subfigs[1].suptitle("C. tuning heatmaps")
     fig2, supp_tcr_ax = plt.subplots(1,1,figsize=(8,2.5), layout='constrained')
     cbar_kw = {'ticks':[-180, -90, 0, 90, 180]}
-    tuning_plotter.plot_tuning_heatmap(tuning_angle_heatmap_ax, tuning_df, metric='angle', cmap='hsv')
-    tuning_plotter.plot_tuning_heatmap(tuning_strength_heatmap_ax, tuning_df, metric='magnitude', cmap='plasma')
-    tuning_plotter.plot_tuning_heatmap(supp_tcr_ax, tuning_df, metric='avg_tcr', cmap='plasma')
+    tuning_plotter.plot_tuning_heatmap(tuning_angle_heatmap_ax, tuning_df, metric='angle', cmap='hsv', include_empty_dates = include_empty_dates)
+    tuning_plotter.plot_tuning_heatmap(tuning_strength_heatmap_ax, tuning_df, metric='magnitude', cmap='plasma', include_empty_dates = include_empty_dates)
+    tuning_plotter.plot_tuning_heatmap(supp_tcr_ax, tuning_df, metric='avg_tcr', cmap='plasma', include_empty_dates = include_empty_dates)
     tuning_angle_heatmap_ax.set(xlabel=None)
     tuning_strength_heatmap_ax.set(xlabel=None)
     #plot tuning spreads
@@ -70,4 +70,4 @@ def create_single_channel_tuning_figure(calc_tunings = False):
     plt.show()
 
 if __name__=="__main__":
-    create_single_channel_tuning_figure(calc_tunings=True)
+    create_single_channel_tuning_figure(calc_tunings=False)

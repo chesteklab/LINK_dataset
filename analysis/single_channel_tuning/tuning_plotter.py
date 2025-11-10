@@ -76,11 +76,14 @@ def plot_polar_tuning(ax, dataframe, channel_number, params = {'ylim':None, 'cma
     #ax.set_yticks((.05, .1))
     return scatter
 
-def plot_tuning_heatmap(ax, dataframe, metric = 'magnitude', cmap = 'coolwarm'):
-        
-    all_dates = pd.date_range(dataframe['date'].min(), dataframe['date'].max())
-    matrix = (dataframe.pivot(index='channel', columns='date', values=metric).reindex(columns=all_dates))
+def plot_tuning_heatmap(ax, dataframe, metric = 'magnitude', cmap = 'coolwarm', include_empty_dates = True):
 
+    if include_empty_dates:
+        all_dates = pd.date_range(dataframe['date'].min(), dataframe['date'].max())
+        matrix = (dataframe.pivot(index='channel', columns='date', values=metric).reindex(columns=all_dates))
+    else:
+        available_dates = dataframe['date'].unique()
+        matrix = (dataframe.pivot(index='channel', columns='date', values=metric))
     if metric == 'magnitude':
         lower_limit = 0
         upper_limit = np.nanquantile(matrix.values, 0.99)
@@ -116,9 +119,18 @@ def plot_tuning_heatmap(ax, dataframe, metric = 'magnitude', cmap = 'coolwarm'):
     sns.heatmap(matrix, ax=ax, cmap=cmapn, vmin=lower_limit, vmax=upper_limit, cbar_kws=cbar_kws)
     ax.set_aspect('auto', adjustable='box')
     ax.set(title=title, xlabel='Date', ylabel='Channel')
-    xticks = [i for i, date in enumerate(all_dates) if date.month in [3, 9] and date.day == 1]
-    ax.set_xticks(xticks)
-    ax.set_xticklabels(pd.to_datetime(all_dates[xticks]).strftime('%Y-%m-%d'), rotation = 0)
+    if include_empty_dates:
+        xticks = [i for i, date in enumerate(all_dates) if date.month in [3, 9] and date.day == 1]
+        ax.set_xticks(xticks)
+        ax.set_xticklabels(pd.to_datetime(all_dates[xticks]).strftime('%Y-%m-%d'), rotation = 0)
+    else:
+        if len(available_dates) > 5:
+            step = len(available_dates) // 4
+            xticks = list(range(0, len(available_dates), step))[:5]
+        else:
+            xticks = list(range(len(available_dates)))
+        ax.set_xticks(xticks)
+        ax.set_xticklabels([f'{i+1} ({pd.to_datetime(available_dates[i]).strftime("%Y-%m-%d")})' for i in xticks], rotation = 0)
 
     ax.set_yticks([0 , 32, 64, 95])
     ax.set_yticklabels([0 , 31, 63, 95])
