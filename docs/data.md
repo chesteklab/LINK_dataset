@@ -1,3 +1,7 @@
+---
+title: Data
+---
+
 # Data Access & Structure
 
 The LINK dataset contains long-term intracortical recordings from a nonhuman primate performing dexterous finger movements across four years.
@@ -16,6 +20,9 @@ It enables the study of neural stability, drift, and long-term BCI decoding.
     2. *Random target*: randomized order and position each trial.
 - **Kinematics:** Finger joint angles measured continuously and synchronized with neural recordings.
 **Behavioral data were averaged into 20 ms bins**, and **velocity was calculated post hoc**.
+
+![Experimental setup](experimental_setup.png)
+
 ---
 
 ## Data Curation 

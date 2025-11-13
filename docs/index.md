@@ -1,3 +1,7 @@
+---
+title: Home
+---
+
 # LINK: Long-Term Intracortical Neural activity and Kinematics
 
 **Long-term Intracortical Neural activity and Kinematics (LINK)** is a chronic, large-scale, high-resolution intracortical dataset collected from a nonhuman primate performing dexterous finger movements over more than four years.
