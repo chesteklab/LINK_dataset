@@ -43,8 +43,6 @@ def load_all_datasets(data_folder = '../../Hisham_Temmar/big_dataset/2_autotrimm
     # Create a progress bar
     pbar = tqdm(total=total_datasets, desc="Processing datasets")
 
-    # Path to the folder containing pkl files (FIND THIS IN HISHAMS STUDENT FOLDER -> BIG DATASET -> AUTOTRIMMING AND PREPROCESSING)
-
     # Get list of pkl files
     pkl_files = sorted(glob.glob(os.path.join(data_folder, '*.pkl')))
 

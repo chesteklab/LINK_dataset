@@ -1,32 +1,17 @@
 ### IMPORTS ###
 import os
 import numpy as np
-import pandas as pd
 import matplotlib.pyplot as plt
-from collections import defaultdict
-from matplotlib.gridspec import GridSpec, GridSpecFromSubplotSpec
-import matplotlib.cm as cm
-import matplotlib.colors as colors
-import matplotlib as mpl
-import glob
-import sys
-import pdb
-#from dataset_characterization import dataset_characterization
-import matplotlib.gridspec as gridspec
-#import config
-
-from data_processing.single_channel_tuning import tuning_utils
-from data_processing.single_channel_tuning import tuning_plotter
-import seaborn as sns
+import tuning_utils
+import tuning_plotter
 
 TICK_OVERRIDE = True
-def create_single_channel_tuning_figure(data_path, output_path):
-    output_dir = os.path.join(output_path,'channel_stability_tuning.csv')
-    calc_tunings = False
+def create_single_channel_tuning_figure(calc_tunings = False, include_empty_dates = False):
+    output_dir = os.path.join(tuning_utils.output_path,'channel_stability_tuning.csv')
     if calc_tunings:
-        tuning_utils.compute_tuning_data(data_path, output_dir)
+        tuning_utils.compute_tuning_data(output_dir)
     
-    tuning_df = tuning_utils.load_tuning_data(data_path, output_dir)
+    tuning_df = tuning_utils.load_tuning_data(output_dir)
     selected_channels = [-1,7,32]
 
     fig = plt.figure(figsize=(8, 10), layout='constrained')  # Adjusted figure size for the additional row
@@ -57,9 +42,9 @@ def create_single_channel_tuning_figure(data_path, output_path):
     # subfigs[1].suptitle("C. tuning heatmaps")
     fig2, supp_tcr_ax = plt.subplots(1,1,figsize=(8,2.5), layout='constrained')
     cbar_kw = {'ticks':[-180, -90, 0, 90, 180]}
-    tuning_plotter.plot_tuning_heatmap(tuning_angle_heatmap_ax, tuning_df, metric='angle', cmap='hsv')
-    tuning_plotter.plot_tuning_heatmap(tuning_strength_heatmap_ax, tuning_df, metric='magnitude', cmap='plasma')
-    tuning_plotter.plot_tuning_heatmap(supp_tcr_ax, tuning_df, metric='avg_tcr', cmap='plasma')
+    tuning_plotter.plot_tuning_heatmap(tuning_angle_heatmap_ax, tuning_df, metric='angle', cmap='hsv', include_empty_dates = include_empty_dates)
+    tuning_plotter.plot_tuning_heatmap(tuning_strength_heatmap_ax, tuning_df, metric='magnitude', cmap='plasma', include_empty_dates = include_empty_dates)
+    tuning_plotter.plot_tuning_heatmap(supp_tcr_ax, tuning_df, metric='avg_tcr', cmap='plasma', include_empty_dates = include_empty_dates)
     tuning_angle_heatmap_ax.set(xlabel=None)
     tuning_strength_heatmap_ax.set(xlabel=None)
     #plot tuning spreads
@@ -81,10 +66,8 @@ def create_single_channel_tuning_figure(data_path, output_path):
         if(TICK_OVERRIDE):
             avg_tuning_ax[i].set_xticklabels(['0°','45°', '90°','135°', '180°','-135°','-90°','-45°'])
     subfigs[2].suptitle("E. tuning spreads")
-    fig.savefig(os.path.join(output_path, 'single_channel_tuning_figure'))
-    fig2.savefig(os.path.join(output_path, 'single_channel_tuning_figure_avg_tcr'))
+
     plt.show()
 
-
 if __name__=="__main__":
-    create_single_channel_tuning_figure()
+    create_single_channel_tuning_figure(calc_tunings=False)

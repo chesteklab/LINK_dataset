@@ -23,17 +23,17 @@ def parse():
     parser.add_argument(
         "--data_dir",
         type=str,
-        default="C:\\Files\\UM\\ND\\github\\big_nhp_dataset_code\\data\\pickles"
+        default="link_dataset_pkl"
     )
     parser.add_argument(
         "--output_dir",
         type=str,
-        default="C:\\Files\\UM\\ND\\github\\big_nhp_dataset_code\\outputs"
+        default="outputs"
     )
     parser.add_argument(
         "--bci_dir",
         type=str,
-        default="C:\\Files\\UM\\ND\\github\\big_nhp_dataset_code\\data_processing\\bci_decoding\\single_day_model_results"
+        default="data_processing/bci_decoding/single_day_model_results"
     )
 
     args = parser.parse_args()
@@ -49,20 +49,17 @@ def parse():
             sys.exit(1)
         if results_folder is None: 
             print("No --plot argument and --bci_dir passed. Plotting all figures except BCI figures.")
-            creat_all_decoding_figures(results_folder, output_path)
-            create_dimensionality_across_days_figures(data_path)
+            create_dimensionality_across_days_figures(data_path, output_path)
             create_dataset_overview_figure(data_path, output_path)
             create_signal_quality_figure(data_path, output_path, calc_avg_sbp=True, calculate_pr=True)
             create_single_channel_tuning_figure(data_path, output_path)
-            raise NotImplementedError("bci_decoding plotting not implemented")
         else:
             print("No --plot argument passed. Plotting all figures.")
             creat_all_decoding_figures(results_folder, output_path)
-            create_dimensionality_across_days_figures(data_path)
+            create_dimensionality_across_days_figures(data_path, output_path)
             create_dataset_overview_figure(data_path, output_path)
             create_signal_quality_figure(data_path, output_path, calc_avg_sbp=True, calculate_pr=True)
             create_single_channel_tuning_figure(data_path, output_path)
-            raise NotImplementedError("bci_decoding plotting not implemented")
     if args.plot == "bci_decoding":
         if results_folder is None:
             print("bci_dir is required")
@@ -78,7 +75,7 @@ def parse():
         if output_path is None:
             print("output_dir is required")
             sys.exit(1)
-        create_dimensionality_across_days_figures(data_path)
+        create_dimensionality_across_days_figures(data_path, output_path)
     elif args.plot == "dataset_overview":
         if data_path is None:
             print("data_dir is required")

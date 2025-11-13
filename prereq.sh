@@ -1,4 +1,5 @@
 #!/bin/bash
+eval "$(conda shell.bash hook)"
 
 read -p "Enter the name of the conda environment: " env_name
 echo "Creating a new conda environment '$env_name' with Python 3.9."

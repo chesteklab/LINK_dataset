@@ -1,0 +1,16 @@
+preprocessing_trainer:
+  order: [dict1, split1, tuple_out]
+  content:
+    dict1:
+      type: Dict2DataDictBlock
+      params:
+        neural_type: sbp
+    split1:
+      type: DataSplitBlock
+      params:
+        split_ratio: 0.9
+        split_seed: -1
+    tuple_out:
+      type: Dict2TupleBlock
+      params: {}
+    

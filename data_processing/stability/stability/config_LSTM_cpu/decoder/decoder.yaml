@@ -1,0 +1,4 @@
+defaults:
+  - /model: model
+
+fpath: "analysis/multiday_training/models/lstm/lstm_date_{date}_day_{day}.pkl" # directory to saved model
