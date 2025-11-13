@@ -2,6 +2,8 @@
 title: Data Information
 ---
 
+[Home](index.html) | [Data Information](data.html)
+
 # Data Access & Structure
 
 The LINK dataset contains long-term intracortical recordings from a nonhuman primate performing dexterous finger movements across four years.
