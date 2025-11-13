@@ -35,6 +35,6 @@ For details on dataset curation, refer to the *Supplementary Materials* of the N
 
 ## Data Format and Organization
  
-All files are hosted on the [DANDI Archive] (https://dandiarchive.org/dandiset/001201) and follow the **Neurodata Without Borders (NWB)** format. 
+All files are hosted on the [DANDI Archive](https://dandiarchive.org/dandiset/001201) and follow the **Neurodata Without Borders (NWB)** format. 
 
 Demo notebooks are available to illustrate data loading and structure – see the github readme for details.

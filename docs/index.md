@@ -24,9 +24,9 @@ LINK serves as a useful dataset for exploring **non-stationarity in brain-machin
 ---
 
 ## Access
-- **Dataset:** [DANDI dataset 001201] (https://snel-repo.github.io/falcon/)
-- **Code and documentation:** [Github: chesteklab/LINK_dataset] (https://github.com/chesteklab/LINK_dataset)
-- **Paper:** [*Long-term Intracortical Neural activity and Kinematics (LINK): An intracortical neural dataset for chronic brain-machine interfaces, neuroscience, and machine learning* - OpenReview] (https://openreview.net/)
+- **Dataset:** [DANDI dataset 001201](https://snel-repo.github.io/falcon/)
+- **Code and documentation:** [Github: chesteklab/LINK_dataset](https://github.com/chesteklab/LINK_dataset)
+- **Paper:** [*Long-term Intracortical Neural activity and Kinematics (LINK): An intracortical neural dataset for chronic brain-machine interfaces, neuroscience, and machine learning* - OpenReview](https://openreview.net/forum?id=TAdeh1dLzu)
 
 ## Citation
 
