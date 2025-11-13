@@ -1,5 +1,5 @@
 ---
-title: Data
+title: Data Information
 ---
 
 # Data Access & Structure
@@ -21,7 +21,7 @@ It enables the study of neural stability, drift, and long-term BCI decoding.
 - **Kinematics:** Finger joint angles measured continuously and synchronized with neural recordings.
 **Behavioral data were averaged into 20 ms bins**, and **velocity was calculated post hoc**.
 
-![Experimental setup](experimental_setup.png)
+![Experimental setup](experimental_setup_task.png)
 
 ---
 

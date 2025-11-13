@@ -1,6 +1,6 @@
 title: LINK Dataset
 description: Long-term intracortical neural activity and kinematics (Chestek Lab)
-theme: jekyll-theme-cayman
+theme: jekyll-theme-minimal
 markdown: kramdown
 
 # Top navigation
