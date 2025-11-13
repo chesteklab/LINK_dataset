@@ -2,8 +2,6 @@
 
 In this repository, you will find all the code used to create the figures and dataset presented in `Long-term Intracortical Neural activity and Kinematics (LINK): An intracortical neural dataset for chronic brain-machine interfaces, neuroscience, and machine learning`, Temmar et al. (NeurIPS D&B 2025)
 
-The repository is split into two sections, for dataset preparation and analysis.
-
 ## Getting the Data
 1. Clone this repository!
 2. In terminal, navigate to this repository and run `conda create -n LINK_dataset python=3.9 --file requirements.txt -y`
