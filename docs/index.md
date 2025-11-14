@@ -3,13 +3,14 @@ layout: default
 
 ---
 
+[**Dataset**](https://dandiarchive.org/dandiset/001201/0.251023.2336) | [**Code and documentation**](https://github.com/chesteklab/LINK_dataset) | [**Paper - Currently OpenReview**](https://openreview.net/forum?id=TAdeh1dLzu)
+
 # LINK: Long-Term Intracortical Neural Activity and Kinematics
 
 **Long-term Intracortical Neural activity and Kinematics (LINK)** is a chronic, large-scale, high-resolution intracortical dataset collected from a nonhuman primate performing dexterous finger movements over more than four years.
 LINK serves as a useful dataset for exploring **non-stationarity in brain-machine interfaces, computational neuroscience, and in machine learning generally.**
 
 ---
-
 ## Experimental Setup
 <img src="experimental_setup.png" alt="Experimental Setup"; width: 300px;">
 
@@ -24,7 +25,6 @@ LINK serves as a useful dataset for exploring **non-stationarity in brain-machin
 - **Kinematics:** Finger joint angles measured continuously and synchronized with neural recordings, binned into 20ms timepoints. Position was recorded during experiments, and velocities were calculated *post hoc*
 
 ---
-
 ## Data Format and Organization
 
 Data is organized by 'sessions' - 375 (mostly) contiguous trials per session. Each task variation is one of the two specified above. In total, there are 312 sessions, recorded on 303 days, spanning 1,242 days (~3.5 years).
@@ -34,12 +34,6 @@ All files are hosted on the [DANDI Archive](https://dandiarchive.org/dandiset/00
 Demo notebooks are available to illustrate data loading and structure – see the github readme for details.
 
 ---
-
-## Access
-- [**Dataset**](https://dandiarchive.org/dandiset/001201/0.251023.2336)
-- [**Code and documentation**](https://github.com/chesteklab/LINK_dataset)
--  [**Paper - Currently OpenReview**](https://openreview.net/forum?id=TAdeh1dLzu)
-
 ## Citation
 
 If you use this dataset, please cite both the LINK paper and the DANDI repository.
