@@ -17,6 +17,7 @@ Data is organized by 'sessions', with 375 (mostly) contiguous trials per session
 All files are hosted on the [DANDI Archive](https://dandiarchive.org/dandiset/001201) and follow the **Neurodata Without Borders (NWB)** format. 
 
 Demo notebooks are available to illustrate data loading and structure – see the github readme for details.
+
 ---
 ## Experimental Setup
 
