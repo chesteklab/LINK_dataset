@@ -3,7 +3,7 @@ layout: default
 
 ---
 
-[**Dataset**](https://dandiarchive.org/dandiset/001201/0.251023.2336) | [**Code and documentation**](https://github.com/chesteklab/LINK_dataset) | [**Paper - Currently OpenReview**](https://openreview.net/forum?id=TAdeh1dLzu)
+[**Dataset**](https://dandiarchive.org/dandiset/001201/0.251023.2336) | [**Code**](https://github.com/chesteklab/LINK_dataset) | [**Paper**](https://openreview.net/forum?id=TAdeh1dLzu)
 
 # LINK: Long-Term Intracortical Neural Activity and Kinematics
 
@@ -12,7 +12,7 @@ LINK serves as a useful dataset for exploring **non-stationarity in brain-machin
 
 ---
 ## Experimental Setup
-<img src="experimental_setup.png" alt="Experimental Setup"; width: 300px;">
+<img src="experimental_setup.png" alt="Experimental Setup" style="width: 300px;">
 
 - **Subject:** Male rhesus macaque (*Macaca mulatta*), recorded from 7-11 years of age.
 - **Behavioral task:** Two-degree-of-freedom, trial-based individuated finger flexion task ("center-out" and "random" target styles). Two task variations:
