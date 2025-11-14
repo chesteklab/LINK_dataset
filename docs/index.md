@@ -11,7 +11,7 @@ LINK serves as a useful dataset for exploring **non-stationarity in brain-machin
 ---
 
 ## Experimental Setup
-<img src="experimental_setup.png" alt="Experimental Setup" style="float: left; width: 300px; margin-right: 20px;">
+<img src="experimental_setup.png" alt="Experimental Setup"; width: 300px;">
 
 - **Subject:** Male rhesus macaque (*Macaca mulatta*), recorded from 7-11 years of age.
 - **Behavioral task:** Two-degree-of-freedom, trial-based individuated finger flexion task ("center-out" and "random" target styles). Two task variations:
