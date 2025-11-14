@@ -1,10 +1,9 @@
 ---
 title: LINK Dataset
 
-[Home](index.html) | [Data Information](data.html)
 ---
 
-
+[Home](index.html) | [Data Information](data.html)
 
 # LINK: Long-Term Intracortical Neural Activity and Kinematics
 
