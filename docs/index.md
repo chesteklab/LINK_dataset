@@ -13,7 +13,7 @@ LINK serves as a useful dataset for exploring **non-stationarity in brain-machin
 ---
 
 ## Overview
-<img src="experimental_setup.png" alt="Experimental Setup" style="float: left; width: 300px;">
+<img src="experimental_setup.png" alt="Experimental Setup" style="float: left; width: 300px; margin-right: 20px;">
 
 - **Subject:** Male rhesus macaque (*Macaca mulatta*), recorded from 7-11 years of age.
 - **Duration:** 1,242 days of recording; 303 valid days after curation.
