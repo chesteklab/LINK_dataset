@@ -10,6 +10,7 @@ The LINK dataset contains long-term intracortical recordings from a nonhuman pri
 It enables the study of neural stability, drift, and long-term BCI decoding.
 
 ## Experimental Setup
+![Experimental setup](experimental_setup_task.png)
 
 - **Subject:** Male rhesus macaque (*Macaca mulatta*), recorded between ages 7-11.
 - **Implants:** Two 64-channel Utah microelectrode arrays (Blackrock Neurotech) placed in the hand area of the right precentral gyrus.
@@ -22,8 +23,6 @@ It enables the study of neural stability, drift, and long-term BCI decoding.
     2. *Random target*: randomized order and position each trial.
 - **Kinematics:** Finger joint angles measured continuously and synchronized with neural recordings.
 **Behavioral data were averaged into 20 ms bins**, and **velocity was calculated post hoc**.
-
-![Experimental setup](experimental_setup_task.png)
 
 ---
 
