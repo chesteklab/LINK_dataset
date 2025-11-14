@@ -17,15 +17,15 @@ LINK serves as a useful dataset for exploring **non-stationarity in brain-machin
 
 **Behavioral task:** Two degree-of-freedom, trial-based individuated finger flexion task ("center-out" and "random" target styles). Two task variations:
 
-    1. *Center-out*: fixed sequence of target positions.
-    2. *Random target*: randomized order and position each trial.
+1. *Center-out*: fixed sequence of target positions.
+2. *Random target*: randomized order and position each trial.
     
 **Implants:** Two 64-channel Utah microelectrode arrays (Blackrock Neurotech) placed in the hand area of the right precentral gyrus.
 
 **Neural Features:** 96-channel threshold crossings (TCR) and spiking-band power (SBP), binned into 20ms timepoints.
 
-   - **Threshold Crossings (TCR):** Spike were counted using a -4.5x RMS threshold on each channel at 30 kHz sampling, then summed into 20 ms bins.
-   - **Spiking-Band Power (SBP):** Raw neural data was bandpass-filtered from 300-1,000 Hz and downsampled to 2 kHz. The resulting signal power was then averaged into 20 ms bins.
+- **Threshold Crossings (TCR):** Spike were counted using a -4.5x RMS threshold on each channel at 30 kHz sampling, then summed into 20 ms bins.
+- **Spiking-Band Power (SBP):** Raw neural data was bandpass-filtered from 300-1,000 Hz and downsampled to 2 kHz. The resulting signal power was then averaged into 20 ms bins.
 
 **Kinematics:** Finger joint angles measured continuously and synchronized with neural recordings, binned into 20ms timepoints. Position was recorded during experiments, and velocities were calculated *post hoc*
 
