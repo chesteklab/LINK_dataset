@@ -10,6 +10,8 @@ layout: default
 **Long-term Intracortical Neural activity and Kinematics (LINK)** is a chronic intracortical dataset collected from a single nonhuman primate performing a dexterous finger movement task over ~3.5 years.
 LINK serves as a useful dataset for exploring **non-stationarity in brain-machine interfaces, computational neuroscience, and in machine learning generally.**
 
+___
+
 ## Data Format and Organization
 
 Data is organized by 'sessions', with 375 (mostly) contiguous trials per session. Each task variation is one of the two specified above. In total, there are 312 sessions, recorded on 303 days, spanning 1,242 days (~3.5 years).
@@ -17,6 +19,8 @@ Data is organized by 'sessions', with 375 (mostly) contiguous trials per session
 All files are hosted on the [DANDI Archive](https://dandiarchive.org/dandiset/001201) and follow the **Neurodata Without Borders (NWB)** format. 
 
 Demo notebooks are available to illustrate data loading and structure – see the github readme for details.
+
+___
 
 ## Experimental Setup
 
@@ -35,6 +39,8 @@ Demo notebooks are available to illustrate data loading and structure – see th
 - **Spiking-Band Power (SBP):** Raw neural data was bandpass-filtered from 300-1,000 Hz and downsampled to 2 kHz. The resulting signal power was then averaged into 20-ms bins.
 
 **Kinematics:** Finger joint angles measured continuously and synchronized with neural recordings, binned into 20ms timepoints. Position was recorded during experiments, and velocities were calculated *post hoc*
+
+___
 
 ## Citation
 
