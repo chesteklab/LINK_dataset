@@ -14,7 +14,7 @@ ___
 
 ## Data Format and Organization
 
-Data is organized by 'sessions', with 375 (mostly) contiguous trials per session. Each task variation is one the two specified below. In total, there are 312 sessions, recorded on 303 days, spanning 1,242 days (~3.5 years).
+Data is organized by 'sessions', with 375 (mostly) contiguous trials per session. Each session will be one of the two task variations described below. In total, there are 312 sessions, recorded on 303 days, spanning 1,242 days (~3.5 years).
 
 All files are hosted on the [DANDI Archive](https://dandiarchive.org/dandiset/001201) and follow the **Neurodata Without Borders (NWB)** format. 
 
