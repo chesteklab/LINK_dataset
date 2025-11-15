@@ -38,7 +38,7 @@ ___
 - **Threshold Crossings (TCR):** Spike were counted using a -4.5*RMS threshold on each channel at 30 kHz sampling, then summed into 20-ms bins.
 - **Spiking-Band Power (SBP):** Raw neural data was bandpass-filtered from 300-1,000 Hz and downsampled to 2 kHz. The resulting signal power was then averaged into 20-ms bins.
 
-**Kinematics:** Finger joint angles measured continuously and synchronized with neural recordings, binned into 20ms timepoints. Position was recorded during experiments, and velocities were calculated *post hoc*
+**Kinematics:** Finger joint angles measured continuously and synchronized with neural recordings, binned into 20ms timepoints. Position was recorded during experiments, and velocities were calculated *post hoc*.
 
 ___
 
