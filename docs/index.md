@@ -24,6 +24,8 @@ ___
 
 ## Experimental Setup
 
+![Experimental Setup](experimental_setup.png)
+
 **Subject**: Male rhesus macaque (*Macaca mulatta*), recorded from 7-11 years of age. Recordings were captured from day 349 post-implant to 1591 days post-implant.
 
 **Behavioral task:** Two degree-of-freedom, trial-based individuated finger flexion task ("center-out" and "random" target styles). Each session is one of two task variations, described in more detail in the paper:
